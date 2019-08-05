@@ -1,45 +1,22 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using CommandLine;
-using Party.Shared;
+using Microsoft.Extensions.Configuration;
+using Party.CLI.Commands;
 
 namespace Party.CLI
 {
-    class Program
+    public class Program
     {
-        [Verb("scenes", HelpText = "Show all scenes")]
-        class ScenesOptions
+        public static int Main(string[] args)
         {
-            [Option('p', "path", Required = false, HelpText = "The Saves directory; defaults to the Saves folder under the current directory.")]
-            public string Saves { get; set; }
-        }
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false);
 
-        static int Main(string[] args)
-        {
-            return CommandLine.Parser.Default.ParseArguments<ScenesOptions>(args)
+            return CommandLine.Parser.Default.ParseArguments<ListScenesCommand.Options>(args)
               .MapResult(
-                (ScenesOptions opts) => RunScenes(opts),
+                (ListScenesCommand.Options opts) => ListScenesCommand.Execute(opts),
                 errs => 1);
-        }
-
-        private static int RunScenes(ScenesOptions opts)
-        {
-            var savesDirectory = Path.GetFullPath(opts.Saves ?? Path.Combine(Environment.CurrentDirectory, "Saves"));
-            var saves = SavesScanner.Scan(savesDirectory);
-
-            Console.WriteLine("Scenes:");
-            foreach (var scene in saves.Scenes)
-            {
-                Console.WriteLine($"- {scene.Filename}");
-            }
-
-            Console.WriteLine("Scripts:");
-            foreach (var script in saves.Scripts)
-            {
-                Console.WriteLine($"- {script.Filename} ({script.GetHash()})");
-            }
-
-            return 0;
         }
     }
 }

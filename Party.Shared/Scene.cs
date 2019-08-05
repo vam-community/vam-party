@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -9,8 +8,8 @@ namespace Party.Shared
 {
     public class Scene : Resource
     {
-        public Scene(string file)
-        : base(file)
+        public Scene(VamLocation path)
+        : base(path)
         {
         }
 
@@ -28,7 +27,7 @@ namespace Party.Shared
                         var plugins = (JObject)storable["plugins"];
                         foreach (var plugin in plugins.Properties())
                         {
-                            yield return new Script(Path.GetFullPath(Path.Combine(ContainingDirectory, (string)plugin.Value)));
+                            yield return new Script(VamLocation.RelativeTo(Location, (string)plugin.Value));
                         }
                     }
                 }
@@ -37,7 +36,7 @@ namespace Party.Shared
 
         private async Task<JObject> ParseAsync()
         {
-            using (var file = File.OpenText(FullPath))
+            using (var file = File.OpenText(Location.FullPath))
             using (var reader = new JsonTextReader(file))
             {
                 return (JObject)await JToken.ReadFromAsync(reader);

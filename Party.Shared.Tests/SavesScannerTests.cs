@@ -16,17 +16,17 @@ namespace Party.Shared.Tests
         [Test]
         public void CanListScenes()
         {
-            var scenes = _saves.Scenes.Select(scenes => scenes.Filename);
+            var scenes = _saves.Scenes.Select(scene => scene.Location.RelativePath);
 
-            Assert.That(scenes, Is.EquivalentTo(new[] { "My Scene 1.json" }));
+            Assert.That(scenes, Is.EquivalentTo(new[] { @"scene\My Scene 1.json" }));
         }
 
         [Test]
         public void CanListScripts()
         {
-            var scripts = _saves.Scripts.Select(scenes => scenes.Filename);
+            var scripts = _saves.Scripts.Select(script => script.Location.RelativePath);
 
-            Assert.That(scripts, Is.EquivalentTo(new[] { "My Script 1.cs" }));
+            Assert.That(scripts, Is.EquivalentTo(new[] { @"Scripts\My Script 1.cs" }));
         }
     }
 }

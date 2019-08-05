@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -13,8 +12,7 @@ namespace Party.Shared.Tests
         [SetUp]
         public void BeforeEach()
         {
-            string sceneFile = Path.Combine(TestContext.GetTestsSavesDirectory(), "scene", "My Scene 1.json");
-            _scene = new Scene(sceneFile);
+            _scene = new Scene(TestContext.GetSavesFile("scene", "My Scene 1.json"));
         }
 
         [Test]
@@ -24,7 +22,7 @@ namespace Party.Shared.Tests
             await foreach (var script in _scene.GetScriptsAsync())
                 scripts.Add(script);
 
-            Assert.That(scripts.Select(scripts => scripts.Filename), Is.EquivalentTo(new[] { "My Script 1.cs" }));
+            Assert.That(scripts.Select(scripts => scripts.Location.RelativePath), Is.EquivalentTo(new[] { @"Scripts\My Script 1.cs" }));
         }
     }
 }
