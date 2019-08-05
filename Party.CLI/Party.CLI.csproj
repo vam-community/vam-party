@@ -4,6 +4,10 @@
     <ProjectReference Include="..\Party.Shared\Party.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="CommandLineParser" Version="2.6.0" />
+  </ItemGroup>
+
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <AssemblyName>Name your assembly here</AssemblyName>
