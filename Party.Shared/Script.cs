@@ -1,8 +1,8 @@
 namespace Party.Shared
 {
-    public class Scene : Resource
+    public class Script : Resource
     {
-        public Scene(string file)
+        public Script(string file)
         : base(file)
         {
         }
