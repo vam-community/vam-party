@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using CommandLine;
 using Party.Shared;
 
@@ -14,19 +16,19 @@ namespace Party.CLI.Commands
             public bool Scripts { get; set; }
         }
 
-        public static int Execute(Options opts)
+        public static async Task<int> ExecuteAsync(Options opts)
         {
             var savesDirectory = Path.GetFullPath(opts.Saves ?? Path.Combine(Environment.CurrentDirectory, "Saves"));
-            var saves = SavesScanner.Scan(savesDirectory);
+            var scenes = SavesScanner.Scan(savesDirectory).OfType<Scene>();
 
             Console.WriteLine("Scenes:");
-            foreach (var scene in saves.Scenes)
+            foreach (var scene in scenes)
             {
                 Console.WriteLine($"- {scene.Location.RelativePath}");
 
                 if (opts.Scripts)
                 {
-                    foreach (var script in saves.Scripts)
+                    await foreach (var script in scene.GetScriptsAsync())
                     {
                         Console.WriteLine($"  - {script.Location.RelativePath} ({script.GetHash()})");
                     }

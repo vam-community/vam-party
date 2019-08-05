@@ -5,8 +5,9 @@ namespace Party.Shared
 {
     public class SavesScanner
     {
-        public static Saves Scan(string savesDirectory)
+        public static IEnumerable<Resource> Scan(string savesDirectory)
         {
+            savesDirectory = Path.GetFullPath(savesDirectory);
             var scenes = new List<Scene>();
             var scripts = new List<Script>();
 
@@ -15,15 +16,13 @@ namespace Party.Shared
                 switch (Path.GetExtension(file))
                 {
                     case ".json":
-                        scenes.Add(new Scene(VamLocation.Absolute(savesDirectory, file)));
+                        yield return new Scene(VamLocation.Absolute(savesDirectory, file));
                         break;
                     case ".cs":
-                        scripts.Add(new Script(VamLocation.Absolute(savesDirectory, file)));
+                        yield return new Script(VamLocation.Absolute(savesDirectory, file));
                         break;
                 }
             }
-
-            return new Saves(scenes.ToArray(), scripts.ToArray());
         }
     }
 }

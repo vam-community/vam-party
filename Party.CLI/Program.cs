@@ -15,7 +15,7 @@ namespace Party.CLI
 
             return CommandLine.Parser.Default.ParseArguments<ListScenesCommand.Options>(args)
               .MapResult(
-                (ListScenesCommand.Options opts) => ListScenesCommand.Execute(opts),
+                (ListScenesCommand.Options opts) => ListScenesCommand.ExecuteAsync(opts).GetAwaiter().GetResult(),
                 errs => 1);
         }
     }

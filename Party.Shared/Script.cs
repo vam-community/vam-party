@@ -13,11 +13,22 @@ namespace Party.Shared
 
         public string GetHash()
         {
-            using (var stream = File.OpenRead(Location.FullPath))
-            using (var sha256Hash = SHA256.Create())
+            try
             {
-                byte[] checksum = sha256Hash.ComputeHash(stream);
-                return BitConverter.ToString(checksum).Replace("-", String.Empty);
+                using (var stream = File.OpenRead(Location.FullPath))
+                using (var sha256Hash = SHA256.Create())
+                {
+                    byte[] checksum = sha256Hash.ComputeHash(stream);
+                    return BitConverter.ToString(checksum).Replace("-", String.Empty);
+                }
+            }
+            catch (DirectoryNotFoundException)
+            {
+                return null;
+            }
+            catch (FileNotFoundException)
+            {
+                return null;
             }
         }
     }

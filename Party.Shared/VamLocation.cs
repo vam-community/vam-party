@@ -16,7 +16,7 @@ namespace Party.Shared
             if (!path.StartsWith(savesDirectory))
                 throw new InvalidOperationException("Path must live in the Saves directory");
 
-            return new VamLocation(savesDirectory, path.Substring(savesDirectory.Length + 1));
+            return new VamLocation(savesDirectory, path.Substring(savesDirectory.Length).TrimStart(Path.DirectorySeparatorChar));
         }
 
         public string SavesDirectory { get; }
