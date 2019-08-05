@@ -9,13 +9,9 @@ namespace Party.Shared
 {
     public class Scene : Resource
     {
-        private async Task<JObject> ParseAsync()
+        public Scene(string file)
+        : base(file)
         {
-            using (var file = File.OpenText(FullPath))
-            using (var reader = new JsonTextReader(file))
-            {
-                return (JObject)await JToken.ReadFromAsync(reader);
-            }
         }
 
         public async IAsyncEnumerable<Script> GetScriptsAsync()
@@ -39,9 +35,13 @@ namespace Party.Shared
             }
         }
 
-        public Scene(string file)
-        : base(file)
+        private async Task<JObject> ParseAsync()
         {
+            using (var file = File.OpenText(FullPath))
+            using (var reader = new JsonTextReader(file))
+            {
+                return (JObject)await JToken.ReadFromAsync(reader);
+            }
         }
     }
 }
