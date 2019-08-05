@@ -4,13 +4,15 @@ namespace Party.Shared
 {
     public abstract class Resource
     {
-        private string _sceneFile;
+        public string FullPath { get; }
 
-        public string Filename => Path.GetFileName(_sceneFile);
+        public string Filename => Path.GetFileName(FullPath);
 
-        public Resource(string sceneFile)
+        public string ContainingDirectory => Path.GetDirectoryName(FullPath);
+
+        public Resource(string path)
         {
-            _sceneFile = sceneFile;
+            FullPath = path;
         }
     }
 }
