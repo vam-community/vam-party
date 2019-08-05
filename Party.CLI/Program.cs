@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using CommandLine;
 using Microsoft.Extensions.Configuration;
 using Party.CLI.Commands;
@@ -9,13 +10,14 @@ namespace Party.CLI
     {
         public static int Main(string[] args)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false);
+            var config = new ConfigurationBuilder()
+                .SetBasePath(Path.Combine(AppContext.BaseDirectory))
+                .AddJsonFile("party.settings.json", optional: false, reloadOnChange: false)
+                .Build();
 
             return CommandLine.Parser.Default.ParseArguments<ListScenesCommand.Options>(args)
               .MapResult(
-                (ListScenesCommand.Options opts) => ListScenesCommand.ExecuteAsync(opts).GetAwaiter().GetResult(),
+                (ListScenesCommand.Options opts) => ListScenesCommand.ExecuteAsync(opts, config).GetAwaiter().GetResult(),
                 errs => 1);
         }
     }

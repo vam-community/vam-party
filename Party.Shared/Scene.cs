@@ -8,8 +8,8 @@ namespace Party.Shared
 {
     public class Scene : Resource
     {
-        public Scene(VamLocation path)
-        : base(path)
+        public Scene(VamLocation path, IScriptHashCache cache)
+        : base(path, cache)
         {
         }
 
@@ -17,17 +17,20 @@ namespace Party.Shared
         {
             var json = await ParseAsync();
             var atoms = (JArray)json["atoms"];
+            if (atoms == null) yield break;
             foreach (var atom in atoms)
             {
                 var storables = (JArray)atom["storables"];
+                if (storables == null) continue;
                 foreach (var storable in storables)
                 {
                     if ((string)storable["id"] == "PluginManager")
                     {
                         var plugins = (JObject)storable["plugins"];
+                        if (plugins == null) continue;
                         foreach (var plugin in plugins.Properties())
                         {
-                            yield return new Script(VamLocation.RelativeTo(Location, (string)plugin.Value));
+                            yield return new Script(VamLocation.RelativeTo(Location, (string)plugin.Value), Cache);
                         }
                     }
                 }

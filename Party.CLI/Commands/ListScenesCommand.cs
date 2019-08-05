@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CommandLine;
+using Microsoft.Extensions.Configuration;
 using Party.Shared;
 
 namespace Party.CLI.Commands
@@ -16,10 +17,11 @@ namespace Party.CLI.Commands
             public bool Scripts { get; set; }
         }
 
-        public static async Task<int> ExecuteAsync(Options opts)
+        public static async Task<int> ExecuteAsync(Options opts, IConfiguration config)
         {
             var savesDirectory = Path.GetFullPath(opts.Saves ?? Path.Combine(Environment.CurrentDirectory, "Saves"));
-            var scenes = SavesScanner.Scan(savesDirectory).OfType<Scene>();
+            var ignore = config.GetSection("Scanning:Ignore").GetChildren().Select(x => x.Value).ToArray();
+            var scenes = SavesScanner.Scan(savesDirectory, ignore).OfType<Scene>();
 
             Console.WriteLine("Scenes:");
             foreach (var scene in scenes)

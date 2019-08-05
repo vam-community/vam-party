@@ -1,0 +1,5 @@
+{
+  "Scanning": {
+    "Ignore": ["scene\\MeshedVR", "Person", "Downloads"]
+  }
+}

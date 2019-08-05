@@ -13,7 +13,7 @@ namespace Party.Shared.Tests
         [SetUp]
         public void BeforeEach()
         {
-            _script = new Script(TestContext.GetSavesFile("Scripts", "My Script 1.cs"));
+            _script = new Script(TestContext.GetSavesFile("Scripts", "My Script 1.cs"), new NoScriptHashCache());
         }
 
         [Test]

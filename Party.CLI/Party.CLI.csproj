@@ -17,4 +17,8 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="party.settings.json" CopyToOutputDirectory="Always" />
+  </ItemGroup>
+
 </Project>

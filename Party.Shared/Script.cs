@@ -6,12 +6,17 @@ namespace Party.Shared
 {
     public class Script : Resource
     {
-        public Script(VamLocation path)
-        : base(path)
+        public Script(VamLocation path, IScriptHashCache cache)
+        : base(path, cache)
         {
         }
 
         public string GetHash()
+        {
+            return Cache.GetOrCreate(Location.FullPath, _ => GetHashInternal());
+        }
+
+        private string GetHashInternal()
         {
             try
             {
