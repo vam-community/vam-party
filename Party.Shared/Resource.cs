@@ -7,9 +7,9 @@ namespace Party.Shared
     public abstract class Resource
     {
         public VamLocation Location { get; }
-        protected readonly IScriptHashCache Cache;
+        protected readonly IHashCache Cache;
 
-        public Resource(VamLocation path, IScriptHashCache cache)
+        public Resource(VamLocation path, IHashCache cache)
         {
             Location = path;
             Cache = cache;
@@ -39,6 +39,11 @@ namespace Party.Shared
             {
                 return null;
             }
+        }
+
+        public string GetIdentifier()
+        {
+            return $"{Location.Filename}!${GetHash()}";
         }
     }
 }

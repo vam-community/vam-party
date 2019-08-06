@@ -6,17 +6,17 @@ namespace Party.Shared
 {
     public class SavesScanner
     {
-        public static IEnumerable<Resource> Scan(string savesDirectory, string[] ignore)
+        public static IEnumerable<Resource> Scan(string savesDirectory, string[] ignoredPaths)
         {
             savesDirectory = Path.GetFullPath(savesDirectory);
-            var cache = new ScriptHashCache();
-            var scenes = new List<Scene>();
-            var scripts = new List<Script>();
+            var cache = new HashCache();
 
             foreach (var file in Directory.EnumerateFiles(savesDirectory, "*.*", SearchOption.AllDirectories))
             {
                 var path = VamLocation.Absolute(savesDirectory, file);
-                if (ignore.Any(i => path.RelativePath.StartsWith(i))) continue;
+
+                if (ignoredPaths.Any(ignoredPath => path.RelativePath.StartsWith(ignoredPath))) continue;
+
                 switch (Path.GetExtension(file))
                 {
                     case ".json":

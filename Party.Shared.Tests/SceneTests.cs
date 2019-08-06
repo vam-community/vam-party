@@ -12,7 +12,7 @@ namespace Party.Shared.Tests
         [SetUp]
         public void BeforeEach()
         {
-            _scene = new Scene(TestContext.GetSavesFile("scene", "My Scene 1.json"), new NoScriptHashCache());
+            _scene = new Scene(TestContext.GetSavesFile("scene", "My Scene 1.json"), new NoHashCache());
         }
 
         [Test]

@@ -20,24 +20,35 @@ namespace Party.CLI.Commands
             public bool Scenes { get; set; }
         }
 
-        public static Task<int> ExecuteAsync(Options opts, IConfiguration config)
+        public static async Task<int> ExecuteAsync(Options opts, IConfiguration config)
         {
             var savesDirectory = Path.GetFullPath(opts.Saves ?? Path.Combine(Environment.CurrentDirectory, "Saves"));
             var ignore = config.GetSection("Scanning:Ignore").GetChildren().Select(x => x.Value).ToArray();
-            var scripts = SavesScanner.Scan(savesDirectory, ignore).OfType<Script>().GroupBy(s => s.GetHash());
+            var map = await SavesResolver.Resolve(SavesScanner.Scan(savesDirectory, ignore));
 
             Console.WriteLine("Scripts:");
-            foreach (var script in scripts)
+            foreach (var scriptMap in map.ScriptMaps.OrderBy(sm => sm.Key))
             {
-                Console.WriteLine($"- {script.First().Location.Filename} ({script.Count()})");
+                Console.WriteLine($"- {scriptMap.Value.Scripts.FirstOrDefault().Location.Filename} ({Pluralize(scriptMap.Value.Scripts.Count(), "copy", "copies")} used by {Pluralize(scriptMap.Value.Scenes.Count(), "scene", "scenes")})");
 
                 if (opts.Scenes)
                 {
-                    throw new NotImplementedException();
+                    foreach (var scene in scriptMap.Value.Scenes)
+                    {
+                        Console.WriteLine($"  - {scene.Location.RelativePath}");
+                    }
                 }
             }
 
-            return Task.FromResult(0);
+            return 0;
+        }
+
+        private static string Pluralize(int count, string singular, string plural)
+        {
+            if (count == 1)
+                return $"{count} {singular}";
+            else
+                return $"{count} {plural}";
         }
     }
 }

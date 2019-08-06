@@ -8,7 +8,7 @@ namespace Party.Shared
 {
     public class Scene : Resource
     {
-        public Scene(VamLocation path, IScriptHashCache cache)
+        public Scene(VamLocation path, IHashCache cache)
         : base(path, cache)
         {
         }
