@@ -25,6 +25,9 @@ namespace Party.Shared
                     case ".cs":
                         yield return new Script(path, cache);
                         break;
+                    case ".cslist":
+                        yield return new ScriptList(path, cache);
+                        break;
                 }
             }
         }

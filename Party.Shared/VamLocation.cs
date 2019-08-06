@@ -22,6 +22,7 @@ namespace Party.Shared
         public string SavesDirectory { get; }
         public string RelativePath { get; }
         public string FullPath => Path.Combine(SavesDirectory, RelativePath);
+        public string Filename => Path.GetFileName(RelativePath);
         public string ContainingDirectory => Path.Combine(SavesDirectory, Path.GetDirectoryName(RelativePath));
 
         public VamLocation(string savesDirectory, string relativePath)
