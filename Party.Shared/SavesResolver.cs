@@ -12,30 +12,44 @@ namespace Party.Shared
             var all = resources.ToList();
             var map = new SavesMap();
 
-            foreach (var resource in all)
+            foreach (var script in all.OfType<Script>())
             {
-                switch (resource)
+                var scriptMap = map.ScriptMaps.GetOrAdd(script.GetIdentifier(), _ => new ScriptMap(script.Location.Filename));
+                scriptMap.Scripts.Add(script);
+            }
+
+            foreach (var scene in all.OfType<Scene>())
+            {
+                await foreach (var scriptRef in scene.GetScriptsAsync())
                 {
-                    case Script script:
-                        var scriptMap = map.ScriptMaps.GetOrAdd(script.GetIdentifier(), _ => new ScriptMap());
-                        scriptMap.Scripts.Add(script);
-                        break;
+                    if (map.ScriptMaps.TryGetValue(scriptRef.GetIdentifier(), out var scriptMap))
+                    {
+                        scriptMap.Scenes.Add(scene);
+                    }
                 }
             }
 
-            foreach (var resource in all)
+            foreach (var scriptList in all.OfType<ScriptList>())
             {
-                switch (resource)
+                var scriptListMap = map.ScriptMaps.GetOrAdd(scriptList.GetIdentifier(), _ => new ScriptMap(scriptList.Location.Filename));
+
+                await foreach (var scriptRef in scriptList.GetScriptsAsync())
                 {
-                    case Scene scene:
-                        await foreach (var scriptRef in scene.GetScriptsAsync())
+                    if (map.ScriptMaps.TryRemove(scriptRef.GetIdentifier(), out var scriptMap))
+                    {
+                        foreach (var scene in scriptMap.Scenes)
                         {
-                            if (map.ScriptMaps.TryGetValue(scriptRef.GetIdentifier(), out var scriptMap))
-                            {
-                                scriptMap.Scenes.Add(scene);
-                            }
+                            // TODO: Shared instance by path using a mega dictionary
+                            if (!scriptListMap.Scenes.Any(s => s.Location.RelativePath == scene.Location.RelativePath))
+                                scriptListMap.Scenes.Add(scene);
                         }
-                        break;
+                        foreach (var script in scriptMap.Scripts)
+                        {
+                            // TODO: Shared instance by path using a mega dictionary
+                            if (!scriptListMap.Scripts.Any(s => s.Location.RelativePath == script.Location.RelativePath))
+                                scriptListMap.Scripts.Add(script);
+                        }
+                    }
                 }
             }
 
@@ -50,8 +64,17 @@ namespace Party.Shared
 
     public class ScriptMap
     {
+        public string Name { get; }
+
+        public ConcurrentBag<ScriptList> ScriptLists { get; } = new ConcurrentBag<ScriptList>();
         public ConcurrentBag<Script> Scripts { get; } = new ConcurrentBag<Script>();
         public ConcurrentBag<Scene> Scenes { get; } = new ConcurrentBag<Scene>();
+
+        public ScriptMap(string name)
+        {
+            // TODO: To avoid ADD_ME.cslist, we should choose between: Registry name, folder name, first script name, etc.
+            Name = name;
+        }
     }
 
 }

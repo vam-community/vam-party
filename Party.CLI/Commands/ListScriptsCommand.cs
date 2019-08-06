@@ -29,7 +29,7 @@ namespace Party.CLI.Commands
             Console.WriteLine("Scripts:");
             foreach (var scriptMap in map.ScriptMaps.OrderBy(sm => sm.Key))
             {
-                Console.WriteLine($"- {scriptMap.Value.Scripts.FirstOrDefault().Location.Filename} ({Pluralize(scriptMap.Value.Scripts.Count(), "copy", "copies")} used by {Pluralize(scriptMap.Value.Scenes.Count(), "scene", "scenes")})");
+                Console.WriteLine($"- {scriptMap.Value.Name} ({Pluralize(scriptMap.Value.Scripts.Count(), "copy", "copies")} used by {Pluralize(scriptMap.Value.Scenes.Count(), "scene", "scenes")})");
 
                 if (opts.Scenes)
                 {
