@@ -23,7 +23,7 @@ namespace Party.Shared.Tests.Resources
             await foreach (var script in _scene.GetScriptsAsync())
                 scripts.Add(script);
 
-            Assert.That(scripts.Select(scripts => scripts.Location.RelativePath), Is.EquivalentTo(new[] { @"Scripts\My Script 1.cs" }));
+            Assert.That(scripts.Select(scripts => scripts.Location.RelativePath), Is.EquivalentTo(new[] { @"Scripts\My Script 1.cs".OnWindows() }));
         }
     }
 }
