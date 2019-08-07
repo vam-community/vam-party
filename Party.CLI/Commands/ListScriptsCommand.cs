@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CommandLine;
 using Microsoft.Extensions.Configuration;
-using Party.Shared;
+using Party.Shared.Discovery;
 
 namespace Party.CLI.Commands
 {

@@ -1,4 +1,4 @@
-namespace Party.Shared
+namespace Party.Shared.Resources
 {
     public class Script : Resource
     {

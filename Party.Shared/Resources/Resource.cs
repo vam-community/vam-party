@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 
-namespace Party.Shared
+namespace Party.Shared.Resources
 {
     public abstract class Resource
     {

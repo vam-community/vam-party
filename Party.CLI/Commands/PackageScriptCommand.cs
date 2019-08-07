@@ -7,6 +7,8 @@ using CommandLine;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Party.Shared;
+using Party.Shared.Discovery;
+using Party.Shared.Resources;
 
 namespace Party.CLI.Commands
 {

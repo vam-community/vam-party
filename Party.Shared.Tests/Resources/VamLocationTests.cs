@@ -1,6 +1,7 @@
 using NUnit.Framework;
+using Party.Shared.Resources;
 
-namespace Party.Shared.Tests
+namespace Party.Shared.Tests.Resources
 {
     public class VamLocationTests
     {

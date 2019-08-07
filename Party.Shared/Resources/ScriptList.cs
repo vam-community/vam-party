@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Party.Shared
+namespace Party.Shared.Resources
 {
     public class ScriptList : Resource
     {

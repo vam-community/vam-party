@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using Party.Shared.Resources;
 
 namespace Party.Shared.Tests
 {

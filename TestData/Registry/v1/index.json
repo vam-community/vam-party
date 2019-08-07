@@ -7,8 +7,9 @@
       },
       "homepage": "https://github.com/acidbubbles/vam-improved-pov",
       "repository": "https://github.com/acidbubbles/vam-improved-pov",
-      "versions": {
-        "2.0.4": {
+      "versions": [
+        {
+          "version": "2.0.4",
           "files": [
             {
               "filename": "ImprovedPoV.cs",
@@ -20,7 +21,7 @@
             }
           ]
         }
-      }
+      ]
     }
   }
 }

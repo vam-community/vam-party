@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Party.Shared.Resources;
 
-namespace Party.Shared
+namespace Party.Shared.Discovery
 {
     public class SavesScanner
     {

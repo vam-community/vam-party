@@ -1,5 +1,8 @@
 {
   "Scanning": {
     "Ignore": ["scene\\MeshedVR", "Person", "Downloads"]
+  },
+  "Registry": {
+    "Urls": ["https://github.com/vam-community/vam-registry.git"]
   }
 }

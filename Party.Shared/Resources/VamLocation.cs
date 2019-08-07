@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Party.Shared
+namespace Party.Shared.Resources
 {
     public class VamLocation
     {
