@@ -1,1 +1,23 @@
-{}
+{
+  "scripts": {
+    "improved-pov": {
+      "author": {
+        "name": "acidbubbles",
+        "profile": "https://github.com/acidbubbles"
+      },
+      "homepage": "https://github.com/acidbubbles/vam-improved-pov",
+      "repository": "https://github.com/acidbubbles/vam-improved-pov",
+      "versions": {
+        "2.0.4": {
+          "files": [
+            {
+              "type": "cs",
+              "url": "https://github.com/acidbubbles/vam-improved-pov/releases/download/v2.0.4/ImprovedPoV.cs",
+              "hash": { "type": "sha256", "value": "TDB" }
+            }
+          ]
+        }
+      }
+    }
+  }
+}
