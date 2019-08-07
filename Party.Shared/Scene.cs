@@ -8,6 +8,8 @@ namespace Party.Shared
 {
     public class Scene : Resource
     {
+        public override string Type { get => "scene"; }
+
         public Scene(VamLocation path, IHashCache cache)
         : base(path, cache)
         {

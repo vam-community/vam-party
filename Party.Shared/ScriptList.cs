@@ -6,6 +6,8 @@ namespace Party.Shared
 {
     public class ScriptList : Resource
     {
+        public override string Type { get => "cslist"; }
+
         public ScriptList(VamLocation path, IHashCache cache)
         : base(path, cache)
         {

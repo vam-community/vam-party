@@ -11,9 +11,12 @@
         "2.0.4": {
           "files": [
             {
-              "type": "cs",
+              "filename": "ImprovedPoV.cs",
               "url": "https://github.com/acidbubbles/vam-improved-pov/releases/download/v2.0.4/ImprovedPoV.cs",
-              "hash": { "type": "sha256", "value": "TDB" }
+              "hash": {
+                "type": "sha256",
+                "value": "F128134F45CDD2F029DD94D0758178A842B9DF82AFD0884B7A98892E3DD29DB6"
+              }
             }
           ]
         }

@@ -9,6 +9,8 @@ namespace Party.Shared
         public VamLocation Location { get; }
         protected readonly IHashCache Cache;
 
+        public abstract string Type { get; }
+
         public Resource(VamLocation path, IHashCache cache)
         {
             Location = path;
