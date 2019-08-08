@@ -18,11 +18,15 @@ namespace Party.CLI.Commands
 
         public static async Task<int> ExecuteAsync(Options opts, IConfiguration config)
         {
+            // TODO: Extension on IConfiguration
+            var trustedDomains = config.GetSection("Registry:TrustedDomains").GetChildren().Select(x => x.Value);
             var client = new RegistryLoader(config.GetSection("Registry:Urls").GetChildren().Select(x => x.Value).ToArray());
             var registry = await client.Acquire();
             foreach (var script in registry.Scripts)
             {
-                Console.WriteLine($"- {script.Name} by {script.Author.Name} (v{script.GetLatestVersion().Version})");
+                var trusted = script.Versions.SelectMany(v => v.Files).All(f => trustedDomains.Any(t => f.Url.StartsWith(t)));
+                var trustedMsg = trusted ? "" : " [NOT TRUSTED]";
+                Console.WriteLine($"- {script.Name} by {script.Author.Name} (v{script.GetLatestVersion().Version}){trustedMsg}");
             }
             /*
             var savesDirectory = Path.GetFullPath(opts.Saves ?? Path.Combine(Environment.CurrentDirectory, "Saves"));

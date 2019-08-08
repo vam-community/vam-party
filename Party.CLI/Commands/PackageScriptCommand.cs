@@ -21,7 +21,7 @@ namespace Party.CLI.Commands
             public string Script { get; set; }
         }
 
-        public static Task<int> ExecuteAsync(Options opts, IConfiguration config)
+        public static async Task<int> ExecuteAsync(Options opts, IConfiguration config)
         {
             var savesDirectory = Path.GetFullPath(opts.Saves ?? Path.Combine(Environment.CurrentDirectory, "Saves"));
             var path = Path.GetFullPath(opts.Script);
@@ -53,7 +53,7 @@ namespace Party.CLI.Commands
                     hash = new
                     {
                         type = "sha256",
-                        value = resource.GetHashAsync()
+                        value = await resource.GetHashAsync()
                     }
                 });
             }
@@ -64,7 +64,7 @@ namespace Party.CLI.Commands
             };
             Console.WriteLine(JsonConvert.SerializeObject(scriptNode, Formatting.Indented));
 
-            return Task.FromResult(0);
+            return 0;
         }
 
         private static string Pluralize(int count, string singular, string plural)
