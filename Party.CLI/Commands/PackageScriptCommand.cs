@@ -17,7 +17,7 @@ namespace Party.CLI.Commands
         [Verb("package", HelpText = "Provides a ready to use JSON for your scripts")]
         public class Options : CommonOptions
         {
-            [Option("script", Required = true, HelpText = "The path to the script, or script folder")]
+            [Value(0, MetaName = "script", Required = true, HelpText = "The path to the script, or script folder")]
             public string Script { get; set; }
         }
 
