@@ -33,7 +33,7 @@ namespace Party.CLI.Commands
                 {
                     await foreach (var script in scene.GetScriptsAsync())
                     {
-                        Console.WriteLine($"  - {script.Location.RelativePath} ({script.GetHash()})");
+                        Console.WriteLine($"  - {script.Location.RelativePath} ({script.GetHashAsync()})");
                     }
                 }
             }

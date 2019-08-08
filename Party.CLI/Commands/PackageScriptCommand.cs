@@ -53,7 +53,7 @@ namespace Party.CLI.Commands
                     hash = new
                     {
                         type = "sha256",
-                        value = resource.GetHash()
+                        value = resource.GetHashAsync()
                     }
                 });
             }
