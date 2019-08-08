@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Party.Shared.Registry
 {
@@ -11,9 +13,16 @@ namespace Party.Shared.Registry
     public class RegistryScript
     {
         public RegistryScriptAuthor Author { get; set; }
+        public string Name { get; set; }
         public string Homepage { get; set; }
         public string Repository { get; set; }
         public List<RegistryScriptVersion> Versions { get; set; }
+
+        public RegistryScriptVersion GetLatestVersion()
+        {
+            // TODO: String sorting will not cut it
+            return Versions.OrderByDescending(x => x.Version).FirstOrDefault();
+        }
     }
 
     public class RegistryScriptAuthor

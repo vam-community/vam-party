@@ -17,17 +17,32 @@ namespace Party.Shared.Registry
         }
         public async Task<Registry> Acquire()
         {
-            if (_urls.Length != 1) throw new NotSupportedException("Only one registry url is currently supported");
-            using (var response = await _http.GetAsync(_urls[0]))
+            // if (_urls.Length != 1) throw new NotSupportedException("Only one registry url is currently supported");
+            string url = _urls[0];
+            if (Uri.IsWellFormedUriString(url, UriKind.Absolute))
             {
-                response.EnsureSuccessStatusCode();
-                using (var streamReader = new StreamReader(await response.Content.ReadAsStreamAsync()))
-                using (var jsonTestReader = new JsonTextReader(streamReader))
+                using (var response = await _http.GetAsync(url))
                 {
-                    var jsonSerializer = new JsonSerializer();
-                    var registry = jsonSerializer.Deserialize<Registry>(jsonTestReader);
-                    return registry;
+                    response.EnsureSuccessStatusCode();
+                    using (var streamReader = new StreamReader(await response.Content.ReadAsStreamAsync()))
+                        return Deserialize(streamReader);
                 }
+            }
+            else
+            {
+                using (var fileStream = File.OpenRead(Path.Combine(RuntimeUtilities.GetApplicationRoot(), url)))
+                using (var streamReader = new StreamReader(fileStream))
+                    return Deserialize(streamReader);
+            }
+        }
+
+        private static Registry Deserialize(StreamReader streamReader)
+        {
+            using (var jsonTestReader = new JsonTextReader(streamReader))
+            {
+                var jsonSerializer = new JsonSerializer();
+                var registry = jsonSerializer.Deserialize<Registry>(jsonTestReader);
+                return registry;
             }
         }
     }

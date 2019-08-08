@@ -1,6 +1,7 @@
 {
-  "scripts": {
-    "improved-pov": {
+  "scripts": [
+    {
+      "name": "improved-pov",
       "author": {
         "name": "acidbubbles",
         "profile": "https://github.com/acidbubbles"
@@ -23,5 +24,5 @@
         }
       ]
     }
-  }
+  ]
 }
