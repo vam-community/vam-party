@@ -5,3 +5,11 @@ script:
   - choco install dotnetcore-sdk --pre -y
   - dotnet restore ./Party.CLI
   - dotnet publish ./Party.CLI -c Release -r win-x64
+deploy:
+  provider: releases
+  skip_cleanup: true
+  api_key: $GITHUB_TOKEN
+  file:
+    - ./Party.CLI/bin/Release/netcoreapp3.0/win-x64/native/party.exe
+  on:
+    tags: true
