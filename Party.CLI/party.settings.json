@@ -1,9 +1,15 @@
 {
+  "VirtAMate": {
+    "SavesDirectory": "../../../../TestData/Saves"
+  },
   "Scanning": {
     "Ignore": ["scene\\MeshedVR", "Person", "Downloads"]
   },
   "Registry": {
-    "TrustedDomains": ["https://github.com/", "https://raw.githubusercontent.com/"],
+    "TrustedDomains": [
+      "https://github.com/",
+      "https://raw.githubusercontent.com/"
+    ],
     "Urls": [
       "../../../../TestData/Registry/v1/index.json",
       "https://raw.githubusercontent.com/vam-community/vam-registry/master/v1/index.json"

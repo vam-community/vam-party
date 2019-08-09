@@ -1,6 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Party.Shared.Discovery;
 using Party.Shared.Registry;
+using Party.Shared.Resources;
 
 namespace Party.Shared.Commands
 {
@@ -10,6 +14,7 @@ namespace Party.Shared.Commands
         {
             public bool Trusted { get; set; }
             public RegistryScript Script { get; set; }
+            public Scene[] Scenes { get; internal set; }
         }
 
         public SearchCommand(PartyConfiguration config)
@@ -17,39 +22,31 @@ namespace Party.Shared.Commands
         {
         }
 
-        public async IAsyncEnumerable<SearchResult> ExecuteAsync()
+        public async IAsyncEnumerable<SearchResult> ExecuteAsync(string filter, bool local)
         {
-            // TODO: Extension on IConfiguration
-            var client = new RegistryLoader(_config.Registry.Urls);
-            var registry = await client.Acquire();
-            foreach (var script in registry.Scripts)
+            var client = new RegistryLoader(Config.Registry.Urls);
+            Registry.Registry registry = null;
+            SavesMap map = null;
+            await Task.WhenAll(
+                ((Func<Task>)(async () => { registry = await client.Acquire(); }))(),
+                ((Func<Task>)(async () => { map = local ? await ScanLocalScripts() : null; }))()
+            );
+            foreach (var package in registry.Scripts)
             {
-                var trusted = script.Versions.SelectMany(v => v.Files).All(f => _config.Registry.TrustedDomains.Any(t => f.Url.StartsWith(t)));
+                var trusted = package.Versions.SelectMany(v => v.Files).All(f => Config.Registry.TrustedDomains.Any(t => f.Url.StartsWith(t)));
+                Scene[] scenes = null;
+                if (local)
+                {
+                    var scripts = package.Versions?.SelectMany(v => v.Files ?? new List<RegistryFile>()).Select(f => f.GetIdentifier());
+                    scenes = scripts?.Select(s => map.ScriptMaps.GetValueOrDefault(s)).Where(r => r != null && r.Scenes != null).SelectMany(r => r.Scenes).Distinct().ToArray();
+                }
                 yield return new SearchResult
                 {
-                    Script = script,
-                    Trusted = trusted
+                    Script = package,
+                    Trusted = trusted,
+                    Scenes = scenes
                 };
             }
-            /*
-            var savesDirectory = Path.GetFullPath(opts.Saves ?? Path.Combine(Environment.CurrentDirectory, "Saves"));
-            var ignore = config.GetSection("Scanning:Ignore").GetChildren().Select(x => x.Value).ToArray();
-            var map = await SavesResolver.Resolve(SavesScanner.Scan(savesDirectory, ignore));
-
-            Console.WriteLine("Scripts:");
-            foreach (var scriptMap in map.ScriptMaps.OrderBy(sm => sm.Key))
-            {
-                Console.WriteLine($"- {scriptMap.Value.Name} ({Pluralize(scriptMap.Value.Scripts.Count(), "copy", "copies")} used by {Pluralize(scriptMap.Value.Scenes.Count(), "scene", "scenes")})");
-
-                if (opts.Scenes)
-                {
-                    foreach (var scene in scriptMap.Value.Scenes)
-                    {
-                        Console.WriteLine($"  - {scene.Location.RelativePath}");
-                    }
-                }
-            }
-            */
         }
     }
 }

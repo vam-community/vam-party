@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Party.Shared.Registry
@@ -41,6 +42,12 @@ namespace Party.Shared.Registry
         public string Filename { get; set; }
         public string Url { get; set; }
         public RegistryFileHash Hash { get; set; }
+
+        public string GetIdentifier()
+        {
+            // This should be a common util with Resource
+            return $"{Filename}:{Hash.Value ?? "-"}";
+        }
     }
 
     public class RegistryFileHash

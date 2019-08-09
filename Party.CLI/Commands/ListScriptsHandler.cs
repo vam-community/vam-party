@@ -3,15 +3,15 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CommandLine;
-using Microsoft.Extensions.Configuration;
+using Party.Shared.Commands;
 using Party.Shared.Discovery;
 
 namespace Party.CLI.Commands
 {
-    public class ListScriptsCommand
+    public class ListScriptsCommand : HandlerBase
     {
         [Verb("scripts", HelpText = "Show all scripts")]
-        public class Options : CommonOptions
+        public class Options : HandlerBase.CommonOptions
         {
             [Option("online", Default = false, HelpText = "Include online scripts from your registries")]
             public bool Online { get; set; }
@@ -20,10 +20,15 @@ namespace Party.CLI.Commands
             public bool Scenes { get; set; }
         }
 
-        public static async Task<int> ExecuteAsync(Options opts, IConfiguration config)
+        public ListScriptsCommand(PartyConfiguration config) : base(config)
         {
-            var savesDirectory = Path.GetFullPath(opts.Saves ?? Path.Combine(Environment.CurrentDirectory, "Saves"));
-            var ignore = config.GetSection("Scanning:Ignore").GetChildren().Select(x => x.Value).ToArray();
+        }
+
+        public async Task<int> ExecuteAsync(Options opts)
+        {
+            var config = GetConfig(opts, Config);
+            var savesDirectory = config.VirtAMate.SavesDirectory;
+            var ignore = config.Scanning.Ignore;
             var map = await SavesResolver.Resolve(SavesScanner.Scan(savesDirectory, ignore));
 
             Console.WriteLine("Scripts:");

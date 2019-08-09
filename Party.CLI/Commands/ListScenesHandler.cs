@@ -3,25 +3,30 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CommandLine;
-using Microsoft.Extensions.Configuration;
+using Party.Shared.Commands;
 using Party.Shared.Discovery;
 using Party.Shared.Resources;
 
 namespace Party.CLI.Commands
 {
-    public class ListScenesCommand
+    public class ListScenesCommand : HandlerBase
     {
         [Verb("scenes", HelpText = "Show all scenes")]
-        public class Options : CommonOptions
+        public class Options : HandlerBase.CommonOptions
         {
             [Option("scripts", Default = false, HelpText = "Whether to show scripts used in each scene")]
             public bool Scripts { get; set; }
         }
 
-        public static async Task<int> ExecuteAsync(Options opts, IConfiguration config)
+        public ListScenesCommand(PartyConfiguration config) : base(config)
         {
-            var savesDirectory = Path.GetFullPath(opts.Saves ?? Path.Combine(Environment.CurrentDirectory, "Saves"));
-            var ignore = config.GetSection("Scanning:Ignore").GetChildren().Select(x => x.Value).ToArray();
+        }
+
+        public async Task<int> ExecuteAsync(Options opts)
+        {
+            var config = GetConfig(opts, Config);
+            var savesDirectory = config.VirtAMate.SavesDirectory;
+            var ignore = config.Scanning.Ignore;
             var scenes = SavesScanner.Scan(savesDirectory, ignore).OfType<Scene>();
 
             Console.WriteLine("Scenes:");

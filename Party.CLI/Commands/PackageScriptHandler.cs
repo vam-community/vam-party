@@ -4,27 +4,32 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CommandLine;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Party.Shared;
+using Party.Shared.Commands;
 using Party.Shared.Discovery;
 using Party.Shared.Resources;
 
 namespace Party.CLI.Commands
 {
-    public class PackageScriptsCommand
+    public class PackageHandler : HandlerBase
     {
         [Verb("package", HelpText = "Provides a ready to use JSON for your scripts")]
-        public class Options : CommonOptions
+        public class Options : HandlerBase.CommonOptions
         {
             [Value(0, MetaName = "script", Required = true, HelpText = "The path to the script, or script folder")]
             public string Script { get; set; }
         }
 
-        public static async Task<int> ExecuteAsync(Options opts, IConfiguration config)
+        public PackageHandler(PartyConfiguration config) : base(config)
         {
-            var savesDirectory = Path.GetFullPath(opts.Saves ?? Path.Combine(Environment.CurrentDirectory, "Saves"));
-            var path = Path.GetFullPath(opts.Script);
+        }
+
+        public async Task<int> ExecuteAsync(Options opts)
+        {
+            var config = GetConfig(opts, Config);
+            var savesDirectory = config.VirtAMate.SavesDirectory;
+            var path = Path.GetFullPath(opts.Script, Environment.CurrentDirectory);
 
             var attrs = File.GetAttributes(path);
             Resource[] resources;
