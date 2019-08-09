@@ -3,10 +3,10 @@ language: csharp
 mono: none
 script:
   - choco install dotnetcore-sdk --pre -y
-  - dotnet tool install coveralls.net --tool-path tools
+  - choco install opencover.portable codecov -y
   - dotnet restore
-  - powershell "dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover"
-  - powershell "./tools/csmacnz.coveralls --opencover -i Party.Shared.Tests\coverage.opencover.xml --useRelativePaths --repoToken $COVERALLS_REPO_TOKEN --commitId $COMMIT --commitBranch $BRANCH --commitAuthor '$REPO_COMMIT_AUTHOR' --commitEmail '$REPO_COMMIT_AUTHOR_EMAIL' --commitMessage '$REPO_COMMIT_MESSAGE' --jobId $TRAVIS_JOB_ID"
+  - OpenCover.Console.exe -register:user -target:"C:/Program Files/dotnet/dotnet.exe" -targetargs:"test --logger:trx;LogFileName=results.trx /p:DebugType=full ./Party.Shared.Tests/Party.Shared.Tests.csproj" -filter:"+[Party*]* -[Party.Shared.Tests*]*" -output:"coverage.xml"
+  - powershell "codecov -f coverage.xml -t $env:CODECOV_TOKEN"
   - dotnet publish Party.CLI -c Release -r win-x64
 deploy:
   provider: releases

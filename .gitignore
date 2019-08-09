@@ -1,5 +1,4 @@
 obj/
 bin/
 tools/
-coverage.json
-coverage.opencover.xml
+coverage.xml
