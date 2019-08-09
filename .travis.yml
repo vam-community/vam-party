@@ -3,6 +3,8 @@ language: csharp
 mono: none
 script:
   - choco install dotnetcore-sdk --pre -y
+  - dotnet restore ./Party.Shared.Tests
+  - dotnet test ./Party.Shared.Tests
   - dotnet restore ./Party.CLI
   - dotnet publish ./Party.CLI -c Release -r win-x64
 deploy:
