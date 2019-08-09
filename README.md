@@ -10,9 +10,15 @@ This repository and the maintainers are not affiliated in any way with Virt-A-Ma
 
 ## Installation
 
-TBD
+Download `party.exe` from the [latest release](https://github.com/vam-community/vam-party/releases) and put it directly in the Virt-A-Mate directory (next to `VaM.exe`). You'll then need to use a command-line tool (such as powershell or cmd), double-clicking on it won't help you much!
 
 ## Commands
+
+Commands can be invoked using `party command-name (arguments...)`. See below for examples.
+
+### `help`
+
+You can show commands using `party help`, or help on a specific command using `party help command-name`.
 
 ### `search`
 
@@ -46,7 +52,7 @@ Prepares the output JSON for publishing on the registry.
 
 ## Configuration
 
-TBD
+You can create a `party.settings.json` next to the `party.exe` file to customize it's settings. You can check this [example](https://github.com/vam-community/vam-party/blob/master/Party.CLI/party.settings.json) to see what settings are supported.
 
 ## Contributing
 
@@ -58,7 +64,7 @@ To compile an executable ready for deployment, use:
 
 And get `party.exe` from `.\bin\Release\netcoreapp3.0\win-x64\publish\`. Yes, it's a single executable with everything in it!
 
-If you make a pull request, make sure to follow the coding style, the `.editconfig` settings, and run tests!
+If you make a pull request, make sure to follow the coding style, the `.editorconfig` settings, and run tests!
 
     > dotnet test ./Party.Shared.Tests
 
