@@ -6,7 +6,7 @@ script:
   - dotnet tool install coveralls.net --tool-path tools
   - dotnet restore
   - powershell "dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover"
-  - powershell "./tools/csmacnz.coveralls --opencover -i Party.Shared.Tests\coverage.opencover.xml --useRelativePaths --repoToken $COVERALLS_REPO_TOKEN --commitId $COMMIT --commitBranch $BRANCH --commitAuthor “$REPO_COMMIT_AUTHOR” --commitEmail “$REPO_COMMIT_AUTHOR_EMAIL” --commitMessage “$REPO_COMMIT_MESSAGE” --jobId $TRAVIS_JOB_ID"
+  - powershell "./tools/csmacnz.coveralls --opencover -i Party.Shared.Tests\coverage.opencover.xml --useRelativePaths --repoToken $COVERALLS_REPO_TOKEN --commitId $COMMIT --commitBranch $BRANCH --commitAuthor '$REPO_COMMIT_AUTHOR' --commitEmail '$REPO_COMMIT_AUTHOR_EMAIL' --commitMessage '$REPO_COMMIT_MESSAGE' --jobId $TRAVIS_JOB_ID"
   - dotnet publish Party.CLI -c Release -r win-x64
 deploy:
   provider: releases

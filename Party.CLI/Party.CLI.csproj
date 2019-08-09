@@ -4,6 +4,11 @@
     <OutputType>Exe</OutputType>
     <AssemblyName>party</AssemblyName>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+		<IlcInvariantGlobalization>true</IlcInvariantGlobalization>
+		<RootAllApplicationAssemblies>false</RootAllApplicationAssemblies>
+		<IlcGenerateStackTraceData>false</IlcGenerateStackTraceData>
+		<IlcDisableReflection>true</IlcDisableReflection>
+		<IlcOptimizationPreference>Size</IlcOptimizationPreference>
   </PropertyGroup>
 
   <ItemGroup>
