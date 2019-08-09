@@ -3,10 +3,10 @@ language: csharp
 mono: none
 script:
   - choco install dotnetcore-sdk --pre -y
-  - dotnet tool install -g coveralls.net
+  - dotnet tool install coveralls.net --tool-path tools
   - dotnet restore
-  - dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
-  - csmacnz.coveralls --opencover -i ./Party.Shared.Tests/coverage.opencover.xml --useRelativePaths
+  - powershell "dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover"
+  - powershell "./tools/csmacnz.coveralls --opencover -i Party.Shared.Tests\coverage.opencover.xml --useRelativePaths"
   - dotnet publish Party.CLI -c Release -r win-x64
 deploy:
   provider: releases
