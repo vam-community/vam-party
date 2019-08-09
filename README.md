@@ -1,6 +1,6 @@
 # Party: A Virt-A-Mate Package Manager
 
-[![Build Status](https://travis-ci.org/vam-community/vam-party.svg?branch=master)](https://travis-ci.org/vam-community/vam-party)
+[![Build Status](https://travis-ci.org/vam-community/vam-party.svg?branch=master)](https://travis-ci.org/vam-community/vam-party) [![Coverage Status](https://coveralls.io/repos/github/vam-community/vam-party/badge.svg)](https://coveralls.io/github/vam-community/vam-party)
 
 Under development - please do not use, yet.
 
