@@ -1,5 +1,7 @@
 # Party: A Virt-A-Mate Package Manager
 
+[![Build Status](https://travis-ci.org/vam-community/vam-party.svg?branch=master)](https://travis-ci.org/vam-community/vam-party)
+
 Under development - please do not use, yet.
 
 Download and keep Virt-A-Mate scripts up to date.
