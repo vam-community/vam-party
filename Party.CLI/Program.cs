@@ -13,7 +13,7 @@ namespace Party.CLI
         {
             var rootConfig = new ConfigurationBuilder()
                 .SetBasePath(Path.Combine(AppContext.BaseDirectory))
-                .AddJsonFile("party.settings.json", optional: false, reloadOnChange: false)
+                .AddJsonFile("party.settings.json", optional: true, reloadOnChange: false)
                 .Build();
             var config = DefaultConfiguration.Get();
             rootConfig.Bind(config);

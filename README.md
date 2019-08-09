@@ -48,7 +48,17 @@ TBD
 
 ## Contributing
 
-TBD
+This project uses .NET Core 3 preview 7.
+
+To compile an executable ready for deployment, use:
+
+    > dotnet publish -c Release -r win-x64
+
+And get `party.exe` from `.\bin\Release\netcoreapp3.0\win-x64\publish\`. Yes, it's a single executable with everything in it!
+
+If you make a pull request, make sure to follow the coding style, the `.editconfig` settings, and run tests!
+
+    > dotnet test ./Party.Shared.Tests
 
 ## License
 
