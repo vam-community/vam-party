@@ -1,0 +1,8 @@
+path_classifiers:
+  test:
+    - "Party.Shared.Tests/**/*.cs"
+extraction:
+  csharp:
+    index:
+      dotnet:
+        version: 3.0.100-preview7-012821
