@@ -15,7 +15,7 @@ namespace Party.Shared.Resources
 
         public async IAsyncEnumerable<Script> GetScriptsAsync()
         {
-            var lines = await File.ReadAllLinesAsync(Location.FullPath);
+            var lines = await File.ReadAllLinesAsync(Location.FullPath).ConfigureAwait(false);
             foreach (var line in lines.Where(line => !string.IsNullOrWhiteSpace(line)))
             {
                 yield return new Script(VamLocation.RelativeTo(Location, line), Cache);

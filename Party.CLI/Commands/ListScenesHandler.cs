@@ -18,7 +18,7 @@ namespace Party.CLI.Commands
             public bool Scripts { get; set; }
         }
 
-        public ListScenesCommand(PartyConfiguration config) : base(config)
+        public ListScenesCommand(PartyConfiguration config, TextWriter output) : base(config, output)
         {
         }
 
@@ -29,18 +29,20 @@ namespace Party.CLI.Commands
             var ignore = config.Scanning.Ignore;
             var scenes = SavesScanner.Scan(savesDirectory, ignore).OfType<Scene>();
 
-            Console.WriteLine("Scenes:");
+            Output.WriteLine("Scenes:");
             foreach (var scene in scenes)
             {
-                Console.WriteLine($"- {scene.Location.RelativePath}");
-
-                if (opts.Scripts)
+                Output.WriteLine($"- {scene.Location.RelativePath}");
+                if (!opts.Scripts)
                 {
-                    await foreach (var script in scene.GetScriptsAsync())
-                    {
-                        Console.WriteLine($"  - {script.Location.RelativePath} ({script.GetHashAsync()})");
-                    }
+                    continue;
                 }
+
+                await foreach (var script in scene.GetScriptsAsync().ConfigureAwait(false))
+                {
+                    Output.WriteLine($"  - {script.Location.RelativePath} ({script.GetHashAsync().Result})");
+                }
+
             }
 
             return 0;

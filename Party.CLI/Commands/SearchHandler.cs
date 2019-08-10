@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using CommandLine;
 using Party.Shared.Commands;
@@ -17,7 +18,7 @@ namespace Party.CLI.Commands
             public bool Local { get; set; }
         }
 
-        public SearchHandler(PartyConfiguration config) : base(config)
+        public SearchHandler(PartyConfiguration config, TextWriter output) : base(config, output)
         {
         }
 
@@ -25,13 +26,14 @@ namespace Party.CLI.Commands
         {
             var command = new SearchCommand(GetConfig(opts, Config));
 
-            await foreach (var result in command.ExecuteAsync(opts.Filter, opts.Local))
+            await foreach (var result in command.ExecuteAsync(opts.Filter, opts.Local).ConfigureAwait(false))
             {
                 var trustedMsg = result.Trusted ? "" : " [NOT TRUSTED]";
+                var showScenes = opts.Local && result.Scenes != null;
                 var usedMsg = opts.Local
-                    ? ((result.Scenes?.Length ?? 0) > 0 ? $" (referenced in {result.Scenes.Length} scenes)" : " (not referenced)")
+                    ? showScenes ? $" (referenced in {result.Scenes.Length} scenes)" : " (not referenced)"
                     : "";
-                Console.WriteLine($"- {result.Script.Name} by {result.Script.Author.Name} (v{result.Script.GetLatestVersion().Version}){trustedMsg}{usedMsg}");
+                Output.WriteLine($"- {result.Script.Name} by {result.Script.Author.Name} (v{result.Script.GetLatestVersion().Version}){trustedMsg}{usedMsg}");
             }
 
             return 0;

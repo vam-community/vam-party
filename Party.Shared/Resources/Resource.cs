@@ -13,7 +13,7 @@ namespace Party.Shared.Resources
 
         public abstract string Type { get; }
 
-        public Resource(VamLocation path, IHashCache cache)
+        protected Resource(VamLocation path, IHashCache cache)
         {
             Location = path;
             Cache = cache;
@@ -21,14 +21,14 @@ namespace Party.Shared.Resources
 
         public Task<string> GetHashAsync()
         {
-            return Cache.GetOrCreate(Location.FullPath, async _ => await GetHashInternalAsync());
+            return Cache.GetOrCreate(Location.FullPath, async _ => await GetHashInternalAsync().ConfigureAwait(false));
         }
 
         private async Task<string> GetHashInternalAsync()
         {
             try
             {
-                var content = string.Join('\n', await File.ReadAllLinesAsync(Location.FullPath));
+                var content = string.Join('\n', await File.ReadAllLinesAsync(Location.FullPath).ConfigureAwait(false));
                 var bytes = Encoding.UTF8.GetBytes(content);
                 using (var sha256Hash = SHA256.Create())
                 {

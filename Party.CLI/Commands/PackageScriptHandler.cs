@@ -21,7 +21,7 @@ namespace Party.CLI.Commands
             public string Script { get; set; }
         }
 
-        public PackageHandler(PartyConfiguration config) : base(config)
+        public PackageHandler(PartyConfiguration config, TextWriter output) : base(config, output)
         {
         }
 
@@ -58,7 +58,7 @@ namespace Party.CLI.Commands
                     hash = new
                     {
                         type = "sha256",
-                        value = await resource.GetHashAsync()
+                        value = await resource.GetHashAsync().ConfigureAwait(false)
                     }
                 });
             }
@@ -67,17 +67,9 @@ namespace Party.CLI.Commands
             {
                 files = fileNodes
             };
-            Console.WriteLine(JsonConvert.SerializeObject(scriptNode, Formatting.Indented));
+            Output.WriteLine(JsonConvert.SerializeObject(scriptNode, Formatting.Indented));
 
             return 0;
-        }
-
-        private static string Pluralize(int count, string singular, string plural)
-        {
-            if (count == 1)
-                return $"{count} {singular}";
-            else
-                return $"{count} {plural}";
         }
     }
 }

@@ -28,9 +28,9 @@ namespace Party.Shared.Commands
             Registry.Registry registry = null;
             SavesMap map = null;
             await Task.WhenAll(
-                ((Func<Task>)(async () => { registry = await client.Acquire(); }))(),
-                ((Func<Task>)(async () => { map = local ? await ScanLocalScripts() : null; }))()
-            );
+                ((Func<Task>)(async () => { registry = await client.Acquire().ConfigureAwait(false); }))(),
+                ((Func<Task>)(async () => { map = local ? await ScanLocalScripts().ConfigureAwait(false) : null; }))()
+            ).ConfigureAwait(false);
             foreach (var package in registry.Scripts)
             {
                 var trusted = package.Versions.SelectMany(v => v.Files).All(f => Config.Registry.TrustedDomains.Any(t => f.Url.StartsWith(t)));

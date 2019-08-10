@@ -5,11 +5,10 @@ using Party.Shared.Resources;
 
 namespace Party.Shared.Discovery
 {
-    public class SavesScanner
+    public static class SavesScanner
     {
         public static IEnumerable<Resource> Scan(string savesDirectory, string[] ignoredPaths)
         {
-            savesDirectory = Path.GetFullPath(savesDirectory);
             var cache = new HashCache();
 
             foreach (var file in Directory.EnumerateFiles(savesDirectory, "*.*", SearchOption.AllDirectories))
@@ -28,6 +27,9 @@ namespace Party.Shared.Discovery
                         break;
                     case ".cslist":
                         yield return new ScriptList(path, cache);
+                        break;
+                    default:
+                        // Ignore anything else
                         break;
                 }
             }

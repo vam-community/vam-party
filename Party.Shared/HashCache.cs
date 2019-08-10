@@ -16,7 +16,7 @@ namespace Party.Shared
         {
             if (_cache.TryGetValue(fullPath, out var hash))
                 return hash;
-            hash = await create(fullPath);
+            hash = await create(fullPath).ConfigureAwait(false);
             _cache.TryAdd(fullPath, hash);
             return hash;
         }

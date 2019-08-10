@@ -7,11 +7,13 @@ namespace Party.CLI.Commands
 {
     public abstract class HandlerBase
     {
-        protected PartyConfiguration Config;
+        protected PartyConfiguration Config { get; }
+        protected TextWriter Output { get; }
 
-        protected HandlerBase(PartyConfiguration config)
+        protected HandlerBase(PartyConfiguration config, TextWriter output)
         {
             Config = config;
+            Output = output;
         }
 
         public abstract class CommonOptions
@@ -25,6 +27,18 @@ namespace Party.CLI.Commands
             if (!string.IsNullOrEmpty(opts.SavesFolder))
                 config.VirtAMate.SavesDirectory = Path.GetFullPath(opts.SavesFolder, Environment.CurrentDirectory);
             return config;
+        }
+
+        protected static string Pluralize(int count, string singular, string plural)
+        {
+            if (count == 1)
+            {
+                return $"{count} {singular}";
+            }
+            else
+            {
+                return $"{count} {plural}";
+            }
         }
     }
 }

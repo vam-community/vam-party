@@ -20,7 +20,7 @@ namespace Party.CLI.Commands
             public bool Scenes { get; set; }
         }
 
-        public ListScriptsCommand(PartyConfiguration config) : base(config)
+        public ListScriptsCommand(PartyConfiguration config, TextWriter output) : base(config, output)
         {
         }
 
@@ -29,31 +29,23 @@ namespace Party.CLI.Commands
             var config = GetConfig(opts, Config);
             var savesDirectory = config.VirtAMate.SavesDirectory;
             var ignore = config.Scanning.Ignore;
-            var map = await SavesResolver.Resolve(SavesScanner.Scan(savesDirectory, ignore));
+            var map = await SavesResolver.Resolve(SavesScanner.Scan(savesDirectory, ignore)).ConfigureAwait(false);
 
-            Console.WriteLine("Scripts:");
+            Output.WriteLine("Scripts:");
             foreach (var scriptMap in map.ScriptMaps.OrderBy(sm => sm.Key))
             {
-                Console.WriteLine($"- {scriptMap.Value.Name} ({Pluralize(scriptMap.Value.Scripts.Count(), "copy", "copies")} used by {Pluralize(scriptMap.Value.Scenes.Count(), "scene", "scenes")})");
+                Output.WriteLine($"- {scriptMap.Value.Name} ({Pluralize(scriptMap.Value.Scripts.Count(), "copy", "copies")} used by {Pluralize(scriptMap.Value.Scenes.Count(), "scene", "scenes")})");
 
                 if (opts.Scenes)
                 {
                     foreach (var scene in scriptMap.Value.Scenes)
                     {
-                        Console.WriteLine($"  - {scene.Location.RelativePath}");
+                        Output.WriteLine($"  - {scene.Location.RelativePath}");
                     }
                 }
             }
 
             return 0;
-        }
-
-        private static string Pluralize(int count, string singular, string plural)
-        {
-            if (count == 1)
-                return $"{count} {singular}";
-            else
-                return $"{count} {plural}";
         }
     }
 }

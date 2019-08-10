@@ -10,26 +10,25 @@ namespace Party.Shared.Resources
     {
         public override string Type { get => "scene"; }
 
-        public Scene(VamLocation path, IHashCache cache)
-        : base(path, cache)
+        public Scene(VamLocation path, IHashCache cache) : base(path, cache)
         {
         }
 
         public async IAsyncEnumerable<Script> GetScriptsAsync()
         {
-            var json = await ParseAsync();
+            var json = await ParseAsync().ConfigureAwait(false);
             var atoms = (JArray)json["atoms"];
-            if (atoms == null) yield break;
+            if (atoms == null) { yield break; }
             foreach (var atom in atoms)
             {
                 var storables = (JArray)atom["storables"];
-                if (storables == null) continue;
+                if (storables == null) { continue; }
                 foreach (var storable in storables)
                 {
                     if ((string)storable["id"] == "PluginManager")
                     {
                         var plugins = (JObject)storable["plugins"];
-                        if (plugins == null) continue;
+                        if (plugins == null) { continue; }
                         foreach (var plugin in plugins.Properties())
                         {
                             yield return new Script(VamLocation.RelativeTo(Location, (string)plugin.Value), Cache);
@@ -44,7 +43,7 @@ namespace Party.Shared.Resources
             using (var file = File.OpenText(Location.FullPath))
             using (var reader = new JsonTextReader(file))
             {
-                return (JObject)await JToken.ReadFromAsync(reader);
+                return (JObject)await JToken.ReadFromAsync(reader).ConfigureAwait(false);
             }
         }
     }

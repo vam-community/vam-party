@@ -7,9 +7,13 @@ namespace Party.Shared.Tests
         public static string OnWindows(this string path)
         {
             if (Path.DirectorySeparatorChar == '/')
+            {
                 return path.Replace('/', '\\');
+            }
             else
+            {
                 return path;
+            }
         }
     }
 }

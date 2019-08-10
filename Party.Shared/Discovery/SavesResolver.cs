@@ -6,7 +6,7 @@ using Party.Shared.Resources;
 
 namespace Party.Shared.Discovery
 {
-    public class SavesResolver
+    public static class SavesResolver
     {
         public static async Task<SavesMap> Resolve(IEnumerable<Resource> resources)
         {
@@ -21,7 +21,7 @@ namespace Party.Shared.Discovery
 
             foreach (var scene in all.OfType<Scene>())
             {
-                await foreach (var scriptRef in scene.GetScriptsAsync())
+                await foreach (var scriptRef in scene.GetScriptsAsync().ConfigureAwait(false))
                 {
                     if (map.ScriptMaps.TryGetValue(scriptRef.GetIdentifier(), out var scriptMap))
                     {
@@ -34,7 +34,7 @@ namespace Party.Shared.Discovery
             {
                 var scriptListMap = map.ScriptMaps.GetOrAdd(scriptList.GetIdentifier(), _ => new ScriptMap(scriptList.Location.Filename));
 
-                await foreach (var scriptRef in scriptList.GetScriptsAsync())
+                await foreach (var scriptRef in scriptList.GetScriptsAsync().ConfigureAwait(false))
                 {
                     if (map.ScriptMaps.TryRemove(scriptRef.GetIdentifier(), out var scriptMap))
                     {

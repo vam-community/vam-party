@@ -20,7 +20,7 @@ namespace Party.Shared.Tests.Resources
         public async Task CanListScripts()
         {
             var scripts = new List<Script>();
-            await foreach (var script in _scene.GetScriptsAsync())
+            await foreach (var script in _scene.GetScriptsAsync().ConfigureAwait(false))
                 scripts.Add(script);
 
             Assert.That(scripts.Select(scripts => scripts.Location.RelativePath), Is.EquivalentTo(new[] { @"Scripts\My Script 1.cs".OnWindows() }));

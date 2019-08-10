@@ -21,10 +21,10 @@ namespace Party.CLI
 
             return CommandLine.Parser.Default.ParseArguments<ListScenesCommand.Options, ListScriptsCommand.Options, PackageHandler.Options, Commands.SearchHandler.Options>(args)
                 .MapResult(
-                    (ListScenesCommand.Options opts) => new ListScenesCommand(config).ExecuteAsync(opts).Result,
-                    (ListScriptsCommand.Options opts) => new ListScriptsCommand(config).ExecuteAsync(opts).Result,
-                    (PackageHandler.Options opts) => new PackageHandler(config).ExecuteAsync(opts).Result,
-                    (Commands.SearchHandler.Options opts) => new SearchHandler(config).ExecuteAsync(opts).Result,
+                    (ListScenesCommand.Options opts) => new ListScenesCommand(config, Console.Out).ExecuteAsync(opts).Result,
+                    (ListScriptsCommand.Options opts) => new ListScriptsCommand(config, Console.Out).ExecuteAsync(opts).Result,
+                    (PackageHandler.Options opts) => new PackageHandler(config, Console.Out).ExecuteAsync(opts).Result,
+                    (Commands.SearchHandler.Options opts) => new SearchHandler(config, Console.Out).ExecuteAsync(opts).Result,
                     errs => 1);
         }
     }

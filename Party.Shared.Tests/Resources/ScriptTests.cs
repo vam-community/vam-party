@@ -19,7 +19,7 @@ namespace Party.Shared.Tests.Resources
         [Test]
         public async Task CanGetHash()
         {
-            string hash = await _script.GetHashAsync();
+            string hash = await _script.GetHashAsync().ConfigureAwait(false);
 
             Assert.That(hash, Is.EqualTo("7C656425A97C2581C29357D5F181EF916A484D57C31E6B57F24C969AC5FF4CA7"));
         }

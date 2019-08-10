@@ -2,7 +2,7 @@ using Party.Shared.Commands;
 
 namespace Party.CLI
 {
-    public class DefaultConfiguration
+    public static class DefaultConfiguration
     {
         public static PartyConfiguration Get()
         {
