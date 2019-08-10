@@ -12,8 +12,8 @@ namespace Party.Shared.Commands
     {
         public class SearchResult
         {
-            public bool Trusted { get; set; }
-            public RegistryScript Script { get; set; }
+            public bool Trusted { get; internal set; }
+            public RegistryScript Script { get; internal set; }
             public Scene[] Scenes { get; internal set; }
         }
 
