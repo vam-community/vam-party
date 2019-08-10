@@ -4,11 +4,12 @@
     <OutputType>Exe</OutputType>
     <AssemblyName>party</AssemblyName>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-		<IlcInvariantGlobalization>true</IlcInvariantGlobalization>
-		<RootAllApplicationAssemblies>false</RootAllApplicationAssemblies>
-		<IlcGenerateStackTraceData>false</IlcGenerateStackTraceData>
-		<IlcDisableReflection>true</IlcDisableReflection>
-		<IlcOptimizationPreference>Size</IlcOptimizationPreference>
+    <IlcInvariantGlobalization>true</IlcInvariantGlobalization>
+    <RootAllApplicationAssemblies>false</RootAllApplicationAssemblies>
+    <IlcGenerateStackTraceData>false</IlcGenerateStackTraceData>
+    <IlcDisableReflection>true</IlcDisableReflection>
+    <IlcOptimizationPreference>Size</IlcOptimizationPreference>
+    <IlcGenerateCompleteTypeMetadata>false</IlcGenerateCompleteTypeMetadata>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,6 +24,11 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <IlcReference Include="$(NuGetPackageFolders)\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\netstandard.dll" />
+    <IlcReference Include="$(NuGetPackageFolders)\microsoft.netcore.app\2.2.0\ref\netcoreapp2.2\System.Threading.Tasks.Extensions.dll" />
   </ItemGroup>
 
   <ItemGroup>
