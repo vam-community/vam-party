@@ -1,15 +1,17 @@
 ﻿using System;
+using System.CommandLine;
+using System.CommandLine.Invocation;
 using System.IO;
-using CommandLine;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Party.CLI.Commands;
-using Party.Shared;
 
 namespace Party.CLI
 {
     public class Program
     {
-        public static int Main(string[] args)
+        public static async Task<int> Main(string[] args)
         {
             var rootConfig = new ConfigurationBuilder()
                 .SetBasePath(Path.Combine(AppContext.BaseDirectory))
@@ -17,15 +19,21 @@ namespace Party.CLI
                 .Build();
             var config = DefaultConfiguration.Get();
             rootConfig.Bind(config);
-            config.VirtAMate.SavesDirectory = Path.GetFullPath(config.VirtAMate.SavesDirectory, RuntimeUtilities.GetApplicationRoot());
+            config.VirtAMate.SavesDirectory = Path.GetFullPath(config.VirtAMate.SavesDirectory, AppContext.BaseDirectory);
 
-            return CommandLine.Parser.Default.ParseArguments<ListScenesCommand.Options, ListScriptsCommand.Options, PackageHandler.Options, Commands.SearchHandler.Options>(args)
-                .MapResult(
-                    (ListScenesCommand.Options opts) => new ListScenesCommand(config, Console.Out).ExecuteAsync(opts).Result,
-                    (ListScriptsCommand.Options opts) => new ListScriptsCommand(config, Console.Out).ExecuteAsync(opts).Result,
-                    (PackageHandler.Options opts) => new PackageHandler(config, Console.Out).ExecuteAsync(opts).Result,
-                    (Commands.SearchHandler.Options opts) => new SearchHandler(config, Console.Out).ExecuteAsync(opts).Result,
-                    errs => 1);
+            var output = new ConsoleRenderer(Console.Out);
+            var rootCommand = new RootCommand("Party: A Virt-A-Mate Package Manager") {
+                SearchCommand.CreateCommand(output, config),
+                StatusCommand.CreateCommand(output, config),
+                PublishCommand.CreateCommand(output, config)
+            };
+
+            // For CoreRT:
+            rootCommand.Name = Path.GetFileName(Environment.GetCommandLineArgs().FirstOrDefault()) ?? "party.exe";
+
+            await rootCommand.InvokeAsync(args);
+
+            return 0;
         }
     }
 }

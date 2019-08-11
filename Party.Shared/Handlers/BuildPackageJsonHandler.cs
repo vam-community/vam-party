@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,14 +9,14 @@ using Party.Shared.Resources;
 
 namespace Party.Shared.Commands
 {
-    public class PackageCommand : CommandBase
+    public class BuildPackageJsonHandler : HandlerBase
     {
         public class PackageResult
         {
             public string Formatted { get; internal set; }
         }
 
-        public PackageCommand(PartyConfiguration config)
+        public BuildPackageJsonHandler(PartyConfiguration config)
         : base(config)
         {
         }

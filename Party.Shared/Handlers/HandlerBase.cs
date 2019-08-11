@@ -1,13 +1,13 @@
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Party.Shared.Discovery;
 
 namespace Party.Shared.Commands
 {
-    public abstract class CommandBase
+    public abstract class HandlerBase
     {
         protected PartyConfiguration Config;
 
-        public CommandBase(PartyConfiguration config)
+        public HandlerBase(PartyConfiguration config)
         {
             Config = config;
         }

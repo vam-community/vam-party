@@ -67,7 +67,7 @@ namespace Party.Shared.Registry
             }
             else
             {
-                using (var fileStream = File.OpenRead(Path.Combine(RuntimeUtilities.GetApplicationRoot(), url)))
+                using (var fileStream = File.OpenRead(Path.Combine(AppContext.BaseDirectory, url)))
                 using (var streamReader = new StreamReader(fileStream))
                 {
                     return Deserialize(streamReader);

@@ -2,8 +2,10 @@
   "scripts": [
     {
       "name": "improved-pov",
+      "description": "Finally, possession feels right! Moves the camera to the correct position and prevents hair and face rendering.",
+      "tags": ["possession", "person"],
       "author": {
-        "name": "acidbubbles",
+        "name": "Acidbubbles",
         "profile": "https://github.com/acidbubbles"
       },
       "homepage": "https://github.com/acidbubbles/vam-improved-pov",
