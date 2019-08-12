@@ -5,17 +5,26 @@ using Party.Shared.Resources;
 
 namespace Party.Shared.Discovery
 {
-    public static class SavesScanner
+    public class SavesScanner
     {
-        public static IEnumerable<Resource> Scan(string savesDirectory, string[] ignoredPaths)
+        private readonly string _savesDirectory;
+        private readonly string[] _ignoredPaths;
+
+        public SavesScanner(string savesDirectory, string[] ignoredPaths)
+        {
+            _savesDirectory = savesDirectory;
+            _ignoredPaths = ignoredPaths;
+        }
+
+        public IEnumerable<Resource> Scan()
         {
             var cache = new HashCache();
 
-            foreach (var file in Directory.EnumerateFiles(savesDirectory, "*.*", SearchOption.AllDirectories))
+            foreach (var file in Directory.EnumerateFiles(_savesDirectory, "*.*", SearchOption.AllDirectories))
             {
-                var path = VamLocation.Absolute(savesDirectory, file);
+                var path = VamLocation.Absolute(_savesDirectory, file);
 
-                if (ignoredPaths.Any(ignoredPath => path.RelativePath.StartsWith(ignoredPath))) continue;
+                if (_ignoredPaths.Any(ignoredPath => path.RelativePath.StartsWith(ignoredPath))) continue;
 
                 switch (Path.GetExtension(file))
                 {

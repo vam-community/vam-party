@@ -6,24 +6,22 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Party.Shared.Discovery;
 using Party.Shared.Resources;
+using Party.Shared.Results;
 
-namespace Party.Shared.Commands
+namespace Party.Shared.Handlers
 {
-    public class BuildPackageJsonHandler : HandlerBase
+    public class PublishHandler
     {
-        public class PackageResult
+        private readonly PartyConfiguration _config;
+
+        public PublishHandler(PartyConfiguration config)
         {
-            public string Formatted { get; internal set; }
+            _config = config;
         }
 
-        public BuildPackageJsonHandler(PartyConfiguration config)
-        : base(config)
+        public async Task<PublishResult> ExecuteAsync(string path)
         {
-        }
-
-        public async Task<PackageResult> ExecuteAsync(string path)
-        {
-            var savesDirectory = Config.VirtAMate.SavesDirectory;
+            var savesDirectory = _config.VirtAMate.SavesDirectory;
 
             var attrs = File.GetAttributes(path);
             Resource[] resources;
@@ -31,7 +29,7 @@ namespace Party.Shared.Commands
             var cache = new NoHashCache();
             if (attrs.HasFlag(FileAttributes.Directory))
             {
-                resources = SavesScanner.Scan(path, new string[0]).Where(s => types.Contains(s.Type)).ToArray();
+                resources = new SavesScanner(path, new string[0]).Scan().Where(s => types.Contains(s.Type)).ToArray();
             }
             else if (attrs.HasFlag(FileAttributes.Normal))
             {
@@ -65,6 +63,8 @@ namespace Party.Shared.Commands
                     Profile = "https://"
                 },
                 Name = files.Select(f => Path.GetFileNameWithoutExtension(f.Filename)).FirstOrDefault(),
+                Description = "",
+                Tags = new List<string>(new[] { "" }),
                 Homepage = "https://...",
                 Repository = "https://...",
                 Versions = new List<Registry.RegistryScriptVersion> {
@@ -75,7 +75,7 @@ namespace Party.Shared.Commands
                 }
             };
 
-            return new PackageResult
+            return new PublishResult
             {
                 Formatted = JsonConvert.SerializeObject(scriptJson, Formatting.Indented)
             };

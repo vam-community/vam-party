@@ -2,19 +2,21 @@
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.IO;
-using Party.Shared.Commands;
+using Party.Shared;
 
 namespace Party.CLI.Commands
 {
     public abstract class CommandBase
     {
-        protected IRenderer Output;
-        protected PartyConfiguration Config;
+        protected readonly IRenderer Output;
+        protected readonly PartyConfiguration Config;
+        protected readonly PartyController Controller;
 
-        protected CommandBase(IRenderer output, PartyConfiguration config, string saves)
+        protected CommandBase(IRenderer output, PartyConfiguration config, string saves, PartyController controller)
         {
             Output = output;
             Config = GetConfig(config, saves);
+            Controller = controller;
         }
 
         private static PartyConfiguration GetConfig(PartyConfiguration config, string saves)
@@ -26,7 +28,7 @@ namespace Party.CLI.Commands
 
         protected static void AddCommonOptions(Command command)
         {
-            command.AddOption(new Option("--saves", "Specify the Saves folder to use") { Argument = ArgumentExtensions.ExistingOnly(new Argument<DirectoryInfo>()) });
+            command.AddOption(new Option("--saves", "Specify the Saves folder to use") { Argument = new Argument<DirectoryInfo>().ExistingOnly() });
         }
 
         protected static string Pluralize(int count, string singular, string plural)

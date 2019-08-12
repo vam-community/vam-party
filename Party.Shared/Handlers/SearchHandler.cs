@@ -1,36 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Party.Shared.Discovery;
 using Party.Shared.Registry;
 using Party.Shared.Resources;
+using Party.Shared.Results;
 
-namespace Party.Shared.Commands
+namespace Party.Shared.Handlers
 {
-    public class SearchPackagesHandler : HandlerBase
+    public class SearchHandler
     {
-        public class SearchResult
+        private readonly PartyConfiguration _config;
+
+        public SearchHandler(PartyConfiguration config)
         {
-            public bool Trusted { get; internal set; }
-            public RegistryScript Script { get; internal set; }
-            public Scene[] Scenes { get; internal set; }
+            _config = config;
         }
 
-        public SearchPackagesHandler(PartyConfiguration config)
-        : base(config)
+        public IEnumerable<SearchResult> Execute(Registry.Registry registry, SavesMap saves, string query, bool showUsage)
         {
-        }
-
-        public async IAsyncEnumerable<SearchResult> ExecuteAsync(string query, bool showUsage)
-        {
-            var client = new RegistryLoader(Config.Registry.Urls);
-            Registry.Registry registry = null;
-            SavesMap map = null;
-            await Task.WhenAll(
-                ((Func<Task>)(async () => { registry = await client.Acquire().ConfigureAwait(false); }))(),
-                ((Func<Task>)(async () => { map = showUsage ? await ScanLocalScripts().ConfigureAwait(false) : null; }))()
-            ).ConfigureAwait(false);
             foreach (var package in registry.Scripts)
             {
                 if (!string.IsNullOrEmpty(query))
@@ -40,12 +27,12 @@ namespace Party.Shared.Commands
                         continue;
                     }
                 }
-                var trusted = package.Versions.SelectMany(v => v.Files).All(f => Config.Registry.TrustedDomains.Any(t => f.Url.StartsWith(t)));
+                var trusted = package.Versions.SelectMany(v => v.Files).All(f => _config.Registry.TrustedDomains.Any(t => f.Url.StartsWith(t)));
                 Scene[] scenes = null;
                 if (showUsage)
                 {
                     var scripts = package.Versions?.SelectMany(v => v.Files ?? new List<RegistryFile>()).Select(f => f.GetIdentifier());
-                    scenes = scripts?.Select(s => map.ScriptMaps.GetValueOrDefault(s)).Where(r => r != null && r.Scenes != null).SelectMany(r => r.Scenes).Distinct().ToArray();
+                    scenes = scripts?.Select(s => saves.ScriptMaps.GetValueOrDefault(s)).Where(r => r != null && r.Scenes != null).SelectMany(r => r.Scenes).Distinct().ToArray();
                 }
                 yield return new SearchResult
                 {

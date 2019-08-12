@@ -2,14 +2,13 @@
 using System.CommandLine.Invocation;
 using System.Linq;
 using System.Threading.Tasks;
-using Party.Shared.Commands;
-using Party.Shared.Discovery;
+using Party.Shared;
 
 namespace Party.CLI.Commands
 {
     public class StatusCommand : CommandBase
     {
-        public static Command CreateCommand(IRenderer output, PartyConfiguration config)
+        public static Command CreateCommand(IRenderer output, PartyConfiguration config, PartyController controller)
         {
             var command = new Command("status", "Shows the state of the current scripts and scenes");
             AddCommonOptions(command);
@@ -17,23 +16,21 @@ namespace Party.CLI.Commands
 
             command.Handler = CommandHandler.Create(async (string saves, bool scenes) =>
             {
-                await new StatusCommand(output, config, saves).ExecuteAsync(scenes);
+                await new StatusCommand(output, config, saves, controller).ExecuteAsync(scenes);
             });
             return command;
         }
 
-        public StatusCommand(IRenderer output, PartyConfiguration config, string saves) : base(output, config, saves)
+        public StatusCommand(IRenderer output, PartyConfiguration config, string saves, PartyController controller) : base(output, config, saves, controller)
         {
         }
 
         private async Task ExecuteAsync(bool scenes)
         {
-            var savesDirectory = Config.VirtAMate.SavesDirectory;
-            var ignore = Config.Scanning.Ignore;
-            var map = await SavesResolver.Resolve(SavesScanner.Scan(savesDirectory, ignore)).ConfigureAwait(false);
+            var saves = await Controller.GetSavesAsync();
 
             await Output.WriteLineAsync("Scripts:");
-            foreach (var scriptMap in map.ScriptMaps.OrderBy(sm => sm.Key))
+            foreach (var scriptMap in saves.ScriptMaps.OrderBy(sm => sm.Key))
             {
                 await Output.WriteLineAsync($"- {scriptMap.Value.Name} ({Pluralize(scriptMap.Value.Scripts.Count(), "copy", "copies")} used by {Pluralize(scriptMap.Value.Scenes.Count(), "scene", "scenes")})");
 

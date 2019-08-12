@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Party.CLI.Commands;
+using Party.Shared;
 
 namespace Party.CLI
 {
@@ -22,10 +23,13 @@ namespace Party.CLI
             config.VirtAMate.SavesDirectory = Path.GetFullPath(config.VirtAMate.SavesDirectory, AppContext.BaseDirectory);
 
             var output = new ConsoleRenderer(Console.Out);
+
+            var controller = new PartyController(config);
+
             var rootCommand = new RootCommand("Party: A Virt-A-Mate Package Manager") {
-                SearchCommand.CreateCommand(output, config),
-                StatusCommand.CreateCommand(output, config),
-                PublishCommand.CreateCommand(output, config)
+                SearchCommand.CreateCommand(output, config, controller),
+                StatusCommand.CreateCommand(output, config, controller),
+                PublishCommand.CreateCommand(output, config, controller)
             };
 
             // For CoreRT:

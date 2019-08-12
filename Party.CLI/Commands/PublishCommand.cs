@@ -3,13 +3,13 @@ using System.CommandLine.Builder;
 using System.CommandLine.Invocation;
 using System.IO;
 using System.Threading.Tasks;
-using Party.Shared.Commands;
+using Party.Shared;
 
 namespace Party.CLI.Commands
 {
     public class PublishCommand : CommandBase
     {
-        public static Command CreateCommand(IRenderer output, PartyConfiguration config)
+        public static Command CreateCommand(IRenderer output, PartyConfiguration config, PartyController controller)
         {
             var command = new Command("publish", "Prepares files for publishing");
             AddCommonOptions(command);
@@ -17,20 +17,18 @@ namespace Party.CLI.Commands
 
             command.Handler = CommandHandler.Create(async (string saves, string input) =>
             {
-                await new PublishCommand(output, config, saves).ExecuteAsync(input);
+                await new PublishCommand(output, config, saves, controller).ExecuteAsync(input);
             });
             return command;
         }
 
-        public PublishCommand(IRenderer output, PartyConfiguration config, string saves) : base(output, config, saves)
+        public PublishCommand(IRenderer output, PartyConfiguration config, string saves, PartyController controller) : base(output, config, saves, controller)
         {
         }
 
         private async Task ExecuteAsync(string input)
         {
-            var command = new BuildPackageJsonHandler(Config);
-
-            var result = await command.ExecuteAsync(Path.GetFullPath(input)).ConfigureAwait(false);
+            var result = await Controller.Publish(input).ConfigureAwait(false);
 
             await Output.WriteLineAsync("JSON Template:");
             await Output.WriteLineAsync(result.Formatted);

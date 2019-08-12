@@ -6,9 +6,14 @@ using Party.Shared.Resources;
 
 namespace Party.Shared.Discovery
 {
-    public static class SavesResolver
+    public class SavesResolver
     {
-        public static async Task<SavesMap> Resolve(IEnumerable<Resource> resources)
+        public SavesResolver()
+        {
+
+        }
+
+        public async Task<SavesMap> Resolve(IEnumerable<Resource> resources)
         {
             var all = resources.ToList();
             var map = new SavesMap();

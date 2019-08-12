@@ -10,7 +10,8 @@ namespace Party.Shared.Tests.Discovery
         [Test]
         public void CanListAllResources()
         {
-            var resources = SavesScanner.Scan(TestContext.GetTestsSavesDirectory(), new string[0]).ToList();
+            var scanner = new SavesScanner(TestContext.GetTestsSavesDirectory(), new string[0]);
+            var resources = scanner.Scan().ToList();
 
             Assert.That(
                 resources.OfType<Scene>().Select(r => r.Location.RelativePath),

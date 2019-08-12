@@ -5,8 +5,6 @@
     <AssemblyName>party</AssemblyName>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <IlcInvariantGlobalization>true</IlcInvariantGlobalization>
-    <RootAllApplicationAssemblies>false</RootAllApplicationAssemblies>
-    <IlcGenerateStackTraceData>false</IlcGenerateStackTraceData>
     <IlcOptimizationPreference>Speed</IlcOptimizationPreference>
   </PropertyGroup>
 

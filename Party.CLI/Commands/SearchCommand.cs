@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using System.CommandLine;
+﻿using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.Threading.Tasks;
-using Party.Shared.Commands;
+using Party.Shared;
 
 namespace Party.CLI.Commands
 {
@@ -15,7 +14,7 @@ namespace Party.CLI.Commands
             ScenesList
         }
 
-        public static Command CreateCommand(IRenderer output, PartyConfiguration config)
+        public static Command CreateCommand(IRenderer output, PartyConfiguration config, PartyController controller)
         {
             var command = new Command("search", "Search for scripts and packages in the registry");
             AddCommonOptions(command);
@@ -24,22 +23,25 @@ namespace Party.CLI.Commands
 
             command.Handler = CommandHandler.Create(async (string saves, string query, ShowOptions show) =>
             {
-                await new SearchCommand(output, config, saves).ExecuteAsync(query, show);
+                await new SearchCommand(output, config, saves, controller).ExecuteAsync(query, show);
             });
             return command;
         }
 
-        public SearchCommand(IRenderer output, PartyConfiguration config, string saves) : base(output, config, saves)
+        public SearchCommand(IRenderer output, PartyConfiguration config, string saves, PartyController controller) : base(output, config, saves, controller)
         {
         }
 
 
         private async Task ExecuteAsync(string query, ShowOptions show)
         {
-            var command = new SearchPackagesHandler(Config);
+            var registryTask = Controller.GetRegistryAsync();
+            var savesTask = Controller.GetSavesAsync();
+            await Task.WhenAll();
+            var registry = await registryTask;
+            var saves = await savesTask;
 
-            var results = new List<SearchPackagesHandler.SearchResult>();
-            await foreach (var result in command.ExecuteAsync(query, show != ShowOptions.ScriptOnly).ConfigureAwait(false))
+            foreach (var result in Controller.Search(registry, saves, query, show != ShowOptions.ScriptOnly))
             {
                 var script = result.Script;
                 var latestVersion = script.GetLatestVersion();

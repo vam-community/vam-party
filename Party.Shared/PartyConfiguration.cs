@@ -1,4 +1,4 @@
-namespace Party.Shared.Commands
+namespace Party.Shared
 {
     public class PartyConfiguration
     {

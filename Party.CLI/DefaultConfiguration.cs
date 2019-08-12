@@ -1,4 +1,5 @@
-using Party.Shared.Commands;
+using System.IO;
+using Party.Shared;
 
 namespace Party.CLI
 {
@@ -14,7 +15,7 @@ namespace Party.CLI
                 },
                 Scanning = new PartyConfigurationScanning
                 {
-                    Ignore = new[] { "scene\\MeshedVR", "Person", "Downloads" }
+                    Ignore = new[] { Path.Combine("scene", "MeshedVR"), "Person", "Downloads" }
                 },
                 Registry = new PartyConfigurationRegistry
                 {

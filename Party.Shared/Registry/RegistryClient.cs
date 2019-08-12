@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -7,16 +7,16 @@ using Newtonsoft.Json;
 
 namespace Party.Shared.Registry
 {
-    public class RegistryLoader
+    public class RegistryClient
     {
         private static HttpClient _http = new HttpClient();
         private readonly string[] _urls;
 
-        public RegistryLoader(string[] urls)
+        public RegistryClient(string[] urls)
         {
             _urls = urls;
         }
-        public async Task<Registry> Acquire()
+        public async Task<Registry> AcquireAsync()
         {
             if (_urls.Length == 0)
             {
