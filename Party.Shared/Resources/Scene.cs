@@ -8,13 +8,18 @@ namespace Party.Shared.Resources
 {
     public class Scene : Resource
     {
-        public override string Type { get => "scene"; }
+        public List<Script> Scripts { get; } = new List<Script>();
 
-        public Scene(VamLocation path, IHashCache cache) : base(path, cache)
+        public Scene(string fullPath) : base(fullPath)
         {
         }
 
-        public async IAsyncEnumerable<Script> GetScriptsAsync()
+        internal void References(Script script)
+        {
+            Scripts.Add(script);
+        }
+
+        public async IAsyncEnumerable<string> GetScriptsAsync()
         {
             var json = await ParseAsync().ConfigureAwait(false);
             var atoms = (JArray)json["atoms"];
@@ -31,7 +36,11 @@ namespace Party.Shared.Resources
                         if (plugins == null) { continue; }
                         foreach (var plugin in plugins.Properties())
                         {
-                            yield return new Script(VamLocation.RelativeTo(Location, (string)plugin.Value), Cache);
+                            var relativePath = (string)plugin.Value;
+                            if (relativePath != null)
+                            {
+                                yield return relativePath;
+                            }
                         }
                     }
                 }
@@ -40,7 +49,7 @@ namespace Party.Shared.Resources
 
         private async Task<JObject> ParseAsync()
         {
-            using (var file = File.OpenText(Location.FullPath))
+            using (var file = File.OpenText(FullPath))
             using (var reader = new JsonTextReader(file))
             {
                 return (JObject)await JToken.ReadFromAsync(reader).ConfigureAwait(false);

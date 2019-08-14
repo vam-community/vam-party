@@ -4,19 +4,21 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Party.Shared.Results;
 
-namespace Party.Shared.Registry
+namespace Party.Shared.Handlers
 {
-    public class RegistryClient
+    public class RegistryHandler
     {
-        private static HttpClient _http = new HttpClient();
+        private static HttpClient _http;
         private readonly string[] _urls;
 
-        public RegistryClient(string[] urls)
+        public RegistryHandler(HttpClient http, string[] urls)
         {
-            _urls = urls;
+            _http = http ?? throw new ArgumentNullException(nameof(http));
+            _urls = urls ?? throw new ArgumentNullException(nameof(urls));
         }
-        public async Task<Registry> AcquireAsync()
+        public async Task<RegistryResult> AcquireAsync()
         {
             if (_urls.Length == 0)
             {
@@ -25,7 +27,7 @@ namespace Party.Shared.Registry
             return Merge(await Task.WhenAll(_urls.Select(AcquireOne)).ConfigureAwait(false));
         }
 
-        private Registry Merge(Registry[] registries)
+        private RegistryResult Merge(RegistryResult[] registries)
         {
             var registry = registries[0];
             foreach (var additional in registries.Skip(1))
@@ -52,7 +54,7 @@ namespace Party.Shared.Registry
             return registry;
         }
 
-        private static async Task<Registry> AcquireOne(string url)
+        private static async Task<RegistryResult> AcquireOne(string url)
         {
             if (Uri.IsWellFormedUriString(url, UriKind.Absolute))
             {
@@ -75,12 +77,12 @@ namespace Party.Shared.Registry
             }
         }
 
-        private static Registry Deserialize(StreamReader streamReader)
+        private static RegistryResult Deserialize(StreamReader streamReader)
         {
             using (var jsonTestReader = new JsonTextReader(streamReader))
             {
                 var jsonSerializer = new JsonSerializer();
-                var registry = jsonSerializer.Deserialize<Registry>(jsonTestReader);
+                var registry = jsonSerializer.Deserialize<RegistryResult>(jsonTestReader);
                 return registry;
             }
         }

@@ -1,55 +1,23 @@
-using System;
 using System.IO;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Party.Shared.Resources
 {
     public abstract class Resource
     {
-        public VamLocation Location { get; }
-        protected readonly IHashCache Cache;
+        public string FullPath { get; }
+        public string Hash { get; }
+        public string Name { get => Path.GetFileName(FullPath); }
 
-        public abstract string Type { get; }
-
-        protected Resource(VamLocation path, IHashCache cache)
+        protected Resource(string fullPath, string hash = null)
         {
-            Location = path;
-            Cache = cache;
-        }
-
-        public Task<string> GetHashAsync()
-        {
-            return Cache.GetOrCreate(Location.FullPath, async _ => await GetHashInternalAsync().ConfigureAwait(false));
-        }
-
-        private async Task<string> GetHashInternalAsync()
-        {
-            try
-            {
-                var content = string.Join('\n', await File.ReadAllLinesAsync(Location.FullPath).ConfigureAwait(false));
-                var bytes = Encoding.UTF8.GetBytes(content);
-                using (var sha256Hash = SHA256.Create())
-                {
-                    byte[] checksum = sha256Hash.ComputeHash(bytes);
-                    return BitConverter.ToString(checksum).Replace("-", String.Empty);
-                }
-            }
-            catch (DirectoryNotFoundException)
-            {
-                return null;
-            }
-            catch (FileNotFoundException)
-            {
-                return null;
-            }
+            FullPath = fullPath;
+            Hash = hash;
         }
 
         public string GetIdentifier()
         {
             // TODO: Instead, pre-calculate the hash
-            return $"{Location.Filename}!${GetHashAsync().Result}";
+            return Hash != null ? $"{System.IO.Path.GetFileName(FullPath)}{Hash}" : FullPath;
         }
     }
 }

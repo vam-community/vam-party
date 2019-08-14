@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Party.Shared.Discovery;
-using Party.Shared.Registry;
 using Party.Shared.Resources;
 using Party.Shared.Results;
 
@@ -13,10 +11,10 @@ namespace Party.Shared.Handlers
 
         public SearchHandler(PartyConfiguration config)
         {
-            _config = config;
+            _config = config ?? throw new System.ArgumentNullException(nameof(config));
         }
 
-        public IEnumerable<SearchResult> Execute(Registry.Registry registry, SavesMap saves, string query, bool showUsage)
+        public IEnumerable<SearchResult> SearchAsync(RegistryResult registry, SavesMapResult saves, string query, bool showUsage)
         {
             foreach (var package in registry.Scripts)
             {
@@ -28,22 +26,25 @@ namespace Party.Shared.Handlers
                     }
                 }
                 var trusted = package.Versions.SelectMany(v => v.Files).All(f => _config.Registry.TrustedDomains.Any(t => f.Url.StartsWith(t)));
+                Script[] scripts = null;
                 Scene[] scenes = null;
                 if (showUsage)
                 {
-                    var scripts = package.Versions?.SelectMany(v => v.Files ?? new List<RegistryFile>()).Select(f => f.GetIdentifier());
-                    scenes = scripts?.Select(s => saves.ScriptMaps.GetValueOrDefault(s)).Where(r => r != null && r.Scenes != null).SelectMany(r => r.Scenes).Distinct().ToArray();
+                    var allVersionsIdentifiers = package.Versions?.SelectMany(v => v.Files ?? new List<RegistryResult.RegistryFile>()).Select(f => f.GetIdentifier());
+                    scripts = allVersionsIdentifiers.Select(id => saves.IdentifierScriptMap.GetValueOrDefault(id)).Where(s => s != null).Distinct().ToArray();
+                    scenes = scripts.SelectMany(s => s.Scenes).Distinct().ToArray();
                 }
                 yield return new SearchResult
                 {
-                    Script = package,
+                    Package = package,
                     Trusted = trusted,
+                    Scripts = scripts,
                     Scenes = scenes
                 };
             }
         }
 
-        private bool MatchesQuery(RegistryScript package, string query)
+        private bool MatchesQuery(RegistryResult.RegistryScript package, string query)
         {
             if (package.Name.Contains(query))
             {

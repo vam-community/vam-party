@@ -43,7 +43,7 @@ namespace Party.CLI.Commands
 
             foreach (var result in Controller.Search(registry, saves, query, show != ShowOptions.ScriptOnly))
             {
-                var script = result.Script;
+                var script = result.Package;
                 var latestVersion = script.GetLatestVersion();
                 var trustNotice = result.Trusted ? "" : " [NOT TRUSTED]";
                 var scenes = show != ShowOptions.ScriptOnly ? "" : $" (used in {Pluralize(result.Scenes?.Length ?? 0, "scene", "scenes")}";
@@ -59,7 +59,7 @@ namespace Party.CLI.Commands
                         foreach (var scene in result.Scenes)
                         {
                             // TODO: Show the version used in each scene
-                            await Output.WriteLineAsync($"- {scene.Location.RelativePath}");
+                            await Output.WriteLineAsync($"- {Controller.GetRelativePath(scene.FullPath)}");
                         }
                     }
                 }

@@ -1,6 +1,6 @@
 using System.Linq;
 using NUnit.Framework;
-using Party.Shared.Discovery;
+using Party.Shared.Handlers;
 using Party.Shared.Resources;
 
 namespace Party.Shared.Tests.Discovery
