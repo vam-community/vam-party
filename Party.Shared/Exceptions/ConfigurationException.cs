@@ -6,7 +6,6 @@ namespace Party.Shared.Exceptions
 
         public ConfigurationException(string message) : base(message)
         {
-
         }
     }
 }

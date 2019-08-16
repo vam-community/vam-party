@@ -9,6 +9,7 @@ namespace Party.Shared.Results
         public class RegistryScript
         {
             public RegistryScriptAuthor Author { get; set; }
+            // TODO: Ensure this only contains valid characters
             public string Name { get; set; }
             public string Description { get; set; }
             public string Homepage { get; set; }
@@ -37,6 +38,7 @@ namespace Party.Shared.Results
 
         public class RegistryFile
         {
+            // TODO: Ensure this only contains valid characters
             public string Filename { get; set; }
             public string Url { get; set; }
             public RegistryFileHash Hash { get; set; }

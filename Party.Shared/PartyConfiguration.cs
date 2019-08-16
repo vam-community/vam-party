@@ -15,6 +15,7 @@ namespace Party.Shared
     public class PartyConfigurationScanning
     {
         public string[] Ignore { get; set; }
+        public string PackagesFolder { get; set; }
     }
 
     public class PartyConfigurationRegistry

@@ -6,7 +6,9 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Party.Shared.Handlers;
+using Party.Shared.Resources;
 using Party.Shared.Results;
+using Party.Shared.Utils;
 
 namespace Party.Shared
 {
@@ -45,14 +47,24 @@ namespace Party.Shared
             return new SearchHandler(_config).SearchAsync(registry, saves, query, showUsage);
         }
 
-        public object GetRelativePath(string fullPath)
+        public Task<InstalledPackageInfoResult> GetInstalledPackageInfo(string name, RegistryResult.RegistryScriptVersion version)
         {
-            if (!fullPath.StartsWith(_config.VirtAMate.SavesDirectory))
+            return new PackageStatusHandler(_config, _fs).GetInstalledPackageInfo(name, version);
+        }
+
+        public string GetRelativePath(string fullPath)
+        {
+            return GetRelativePath(fullPath, _config.VirtAMate.SavesDirectory);
+        }
+
+        public string GetRelativePath(string fullPath, string parentPath)
+        {
+            if (!fullPath.StartsWith(parentPath))
             {
                 throw new UnauthorizedAccessException($"Only paths within the saves directory are allowed: '{fullPath}'");
             }
 
-            return fullPath.Substring(_config.VirtAMate.SavesDirectory.Length).TrimStart(Path.DirectorySeparatorChar);
+            return fullPath.Substring(parentPath.Length).TrimStart(Path.DirectorySeparatorChar);
         }
     }
 }

@@ -6,7 +6,6 @@ namespace Party.Shared.Exceptions
 
         public UserInputException(string message) : base(message)
         {
-
         }
     }
 }

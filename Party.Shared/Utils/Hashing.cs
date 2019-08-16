@@ -10,6 +10,8 @@ namespace Party.Shared.Utils
 {
     public class Hashing
     {
+        public static string Type => "sha256";
+
         public static Task<string> GetHashAsync(IFileSystem fs, string path)
         {
             IEnumerable<string> lines;

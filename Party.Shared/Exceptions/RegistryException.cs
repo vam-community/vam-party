@@ -6,7 +6,6 @@ namespace Party.Shared.Exceptions
 
         public RegistryException(string message) : base(message)
         {
-
         }
     }
 }
