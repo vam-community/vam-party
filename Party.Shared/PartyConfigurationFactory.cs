@@ -1,11 +1,10 @@
 using System.IO;
-using Party.Shared;
 
-namespace Party.CLI
+namespace Party.Shared
 {
-    public static class DefaultConfiguration
+    public static class PartyConfigurationFactory
     {
-        public static PartyConfiguration Get()
+        public static PartyConfiguration Create()
         {
             return new PartyConfiguration
             {

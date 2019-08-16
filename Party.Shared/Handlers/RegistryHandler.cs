@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Party.Shared.Exceptions;
 using Party.Shared.Results;
 
 namespace Party.Shared.Handlers
@@ -22,7 +23,7 @@ namespace Party.Shared.Handlers
         {
             if (_urls.Length == 0)
             {
-                throw new NotSupportedException("At least one registry must be configured");
+                throw new ConfigurationException("At least one registry must be configured");
             }
             return Merge(await Task.WhenAll(_urls.Select(AcquireOne)).ConfigureAwait(false));
         }

@@ -10,9 +10,9 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/Party.CLI/bin/Debug/netcoreapp3.0/Name your assembly here.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/Party.CLI",
+            "program": "${workspaceFolder}/Party.CLI/bin/Debug/netcoreapp3.0/party.dll",
+            "args": ["${input:commandName}"],
+            "cwd": "${workspaceFolder}",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
             "console": "internalConsole",
             "stopAtEntry": false
@@ -23,5 +23,14 @@
             "request": "attach",
             "processId": "${command:pickProcess}"
         }
-    ]
+    ],
+	"inputs": [
+		{
+			"id": "commandName",
+            "type": "pickString",
+            "options": ["search", "get", "publish", "status"],
+			"default": "search",
+			"description": "The command name to debug"
+		}
+	]
 }

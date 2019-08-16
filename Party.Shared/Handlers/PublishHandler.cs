@@ -5,6 +5,7 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Party.Shared.Exceptions;
 using Party.Shared.Results;
 using Party.Shared.Utils;
 
@@ -30,7 +31,7 @@ namespace Party.Shared.Handlers
             var savesDirectory = _config.VirtAMate.SavesDirectory;
             if (!path.StartsWith(savesDirectory))
             {
-                throw new UnauthorizedAccessException($"Path must be inside the saves directory: {path}");
+                throw new UserInputException($"Path must be inside the saves directory: {path}");
             }
 
             var attrs = _fs.File.GetAttributes(path);
@@ -57,12 +58,12 @@ namespace Party.Shared.Handlers
             }
             else
             {
-                throw new InvalidOperationException("Specified file is neither a directory nor a file");
+                throw new UserInputException("Specified file is neither a directory nor a file");
             }
 
             if (files.Length == 0)
             {
-                throw new InvalidOperationException("No files were found with either a .cs or a .cslist extension");
+                throw new UserInputException("No files were found with either a .cs or a .cslist extension");
             }
 
             var registryFiles = new List<RegistryResult.RegistryFile>();
