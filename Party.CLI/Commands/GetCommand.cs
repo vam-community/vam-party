@@ -1,6 +1,7 @@
 ﻿using System;
 using System.CommandLine;
 using System.CommandLine.Invocation;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
@@ -18,14 +19,14 @@ namespace Party.CLI.Commands
             command.AddOption(new Option("--version", "Choose a specific version to install") { Argument = new Argument<string>("version", null) });
             command.AddOption(new Option("--noop", "Do not install, just check what it will do"));
 
-            command.Handler = CommandHandler.Create(async (string saves, string package, string version, bool noop) =>
+            command.Handler = CommandHandler.Create(async (DirectoryInfo saves, string package, string version, bool noop) =>
             {
                 await new GetCommand(output, config, saves, controller).ExecuteAsync(package, version, noop);
             });
             return command;
         }
 
-        public GetCommand(IRenderer output, PartyConfiguration config, string saves, PartyController controller) : base(output, config, saves, controller)
+        public GetCommand(IRenderer output, PartyConfiguration config, DirectoryInfo saves, PartyController controller) : base(output, config, saves, controller)
         {
         }
 
@@ -55,7 +56,7 @@ namespace Party.CLI.Commands
                 }
             }
 
-            var filesStatuses = await Controller.GetInstalledPackageInfo(registryPackage.Name, registryPackageVersion);
+            var filesStatuses = await Controller.GetInstalledPackageInfoAsync(registryPackage.Name, registryPackageVersion);
 
             var distinctStatuses = filesStatuses.Files.Select(f => f.Status).Distinct().ToList();
 
@@ -87,7 +88,15 @@ namespace Party.CLI.Commands
                 return;
             }
 
-            throw new NotImplementedException("");
+            var installResult = await Controller.InstallPackageAsync(filesStatuses);
+
+            await Output.WriteLineAsync($"Installed package {registryPackage.Name} v{registryPackageVersion.Version} by {registryPackage.Author.Name ?? "Anonymous"}");
+            await Output.WriteLineAsync($"Files downloaded in {filesStatuses.InstallFolder}:");
+            foreach (var file in installResult.Files)
+            {
+
+                await Output.WriteLineAsync($"- {Controller.GetRelativePath(file.Path, filesStatuses.InstallFolder)}");
+            }
         }
     }
 }

@@ -15,14 +15,14 @@ namespace Party.CLI.Commands
             AddCommonOptions(command);
             command.AddArgument(new Argument<string>("input", null));
 
-            command.Handler = CommandHandler.Create(async (string saves, string input) =>
+            command.Handler = CommandHandler.Create(async (DirectoryInfo saves, string input) =>
             {
                 await new PublishCommand(output, config, saves, controller).ExecuteAsync(input);
             });
             return command;
         }
 
-        public PublishCommand(IRenderer output, PartyConfiguration config, string saves, PartyController controller) : base(output, config, saves, controller)
+        public PublishCommand(IRenderer output, PartyConfiguration config, DirectoryInfo saves, PartyController controller) : base(output, config, saves, controller)
         {
         }
 

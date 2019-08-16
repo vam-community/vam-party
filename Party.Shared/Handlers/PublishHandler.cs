@@ -31,7 +31,7 @@ namespace Party.Shared.Handlers
             var savesDirectory = _config.VirtAMate.SavesDirectory;
             if (!path.StartsWith(savesDirectory))
             {
-                throw new UserInputException($"Path must be inside the saves directory: {path}");
+                throw new UserInputException($"Path must be inside the saves directory.\nPath: {path}\nSaves: {savesDirectory}");
             }
 
             var attrs = _fs.File.GetAttributes(path);

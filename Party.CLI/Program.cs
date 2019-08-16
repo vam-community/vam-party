@@ -29,7 +29,7 @@ namespace Party.CLI
 
             var controller = new PartyController(config);
 
-            var rootCommand = new RootCommand("Party: A Virt-A-Mate Package Manager") {
+            var rootCommand = new RootCommand("Party: A Virt-A-Mate package manager") {
                 SearchCommand.CreateCommand(output, config, controller),
                 StatusCommand.CreateCommand(output, config, controller),
                 PublishCommand.CreateCommand(output, config, controller),

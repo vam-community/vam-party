@@ -1,5 +1,6 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Invocation;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
@@ -14,14 +15,14 @@ namespace Party.CLI.Commands
             AddCommonOptions(command);
             command.AddOption(new Option("--scenes", "Show scenes information") { Argument = new Argument<string>() });
 
-            command.Handler = CommandHandler.Create(async (string saves, bool scenes) =>
+            command.Handler = CommandHandler.Create(async (DirectoryInfo saves, bool scenes) =>
             {
                 await new StatusCommand(output, config, saves, controller).ExecuteAsync(scenes);
             });
             return command;
         }
 
-        public StatusCommand(IRenderer output, PartyConfiguration config, string saves, PartyController controller) : base(output, config, saves, controller)
+        public StatusCommand(IRenderer output, PartyConfiguration config, DirectoryInfo saves, PartyController controller) : base(output, config, saves, controller)
         {
         }
 

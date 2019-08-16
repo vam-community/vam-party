@@ -47,9 +47,14 @@ namespace Party.Shared
             return new SearchHandler(_config).SearchAsync(registry, saves, query, showUsage);
         }
 
-        public Task<InstalledPackageInfoResult> GetInstalledPackageInfo(string name, RegistryResult.RegistryScriptVersion version)
+        public Task<InstalledPackageInfoResult> GetInstalledPackageInfoAsync(string name, RegistryResult.RegistryScriptVersion version)
         {
-            return new PackageStatusHandler(_config, _fs).GetInstalledPackageInfo(name, version);
+            return new PackageStatusHandler(_config, _fs).GetInstalledPackageInfoAsync(name, version);
+        }
+
+        public Task<InstalledPackageInfoResult> InstallPackageAsync(InstalledPackageInfoResult info)
+        {
+            return new InstallPackageHandler(_config, _fs, _http).InstallPackageAsync(info);
         }
 
         public string GetRelativePath(string fullPath)

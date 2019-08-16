@@ -12,17 +12,19 @@ namespace Party.CLI.Commands
         protected readonly PartyConfiguration Config;
         protected readonly PartyController Controller;
 
-        protected CommandBase(IRenderer output, PartyConfiguration config, string saves, PartyController controller)
+        protected CommandBase(IRenderer output, PartyConfiguration config, DirectoryInfo saves, PartyController controller)
         {
             Output = output;
             Config = GetConfig(config, saves);
             Controller = controller;
         }
 
-        private static PartyConfiguration GetConfig(PartyConfiguration config, string saves)
+        private static PartyConfiguration GetConfig(PartyConfiguration config, DirectoryInfo saves)
         {
-            if (!string.IsNullOrEmpty(saves))
-                config.VirtAMate.SavesDirectory = Path.GetFullPath(saves, Environment.CurrentDirectory);
+            if (saves != null)
+            {
+                config.VirtAMate.SavesDirectory = Path.GetFullPath(saves.FullName, Environment.CurrentDirectory);
+            }
             return config;
         }
 

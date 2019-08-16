@@ -19,7 +19,7 @@ namespace Party.Shared.Handlers
             _fs = fs ?? throw new ArgumentNullException(nameof(fs));
         }
 
-        public async Task<InstalledPackageInfoResult> GetInstalledPackageInfo(string name, RegistryResult.RegistryScriptVersion version)
+        public async Task<InstalledPackageInfoResult> GetInstalledPackageInfoAsync(string name, RegistryResult.RegistryScriptVersion version)
         {
             var basePath = Path.GetFullPath(_config.Scanning.PackagesFolder, _config.VirtAMate.SavesDirectory);
             if (!basePath.StartsWith(_config.VirtAMate.SavesDirectory))

@@ -8,6 +8,5 @@ namespace Party.Shared.Exceptions
         public PackageInstallationException(string message) : base(message)
         {
         }
-
     }
 }

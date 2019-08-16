@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,7 +28,7 @@ namespace Party.Shared.Utils
             {
                 return null;
             }
-            return Task.FromResult(GetHash(lines));
+            return Task.FromResult(GetHash(lines.Where(l => !string.IsNullOrEmpty(l))));
         }
 
         public static string GetHash(IEnumerable<string> lines)

@@ -1,5 +1,6 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Invocation;
+using System.IO;
 using System.Threading.Tasks;
 using Party.Shared;
 
@@ -21,14 +22,14 @@ namespace Party.CLI.Commands
             command.AddArgument(new Argument<string>("query", null));
             command.AddOption(new Option("--show", "Include usage information from scenes") { Argument = new Argument<ShowOptions>(() => ShowOptions.ScriptOnly) });
 
-            command.Handler = CommandHandler.Create(async (string saves, string query, ShowOptions show) =>
+            command.Handler = CommandHandler.Create(async (DirectoryInfo saves, string query, ShowOptions show) =>
             {
                 await new SearchCommand(output, config, saves, controller).ExecuteAsync(query, show);
             });
             return command;
         }
 
-        public SearchCommand(IRenderer output, PartyConfiguration config, string saves, PartyController controller) : base(output, config, saves, controller)
+        public SearchCommand(IRenderer output, PartyConfiguration config, DirectoryInfo saves, PartyController controller) : base(output, config, saves, controller)
         {
         }
 
