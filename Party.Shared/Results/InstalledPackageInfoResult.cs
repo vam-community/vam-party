@@ -16,7 +16,7 @@ namespace Party.Shared.Results
         {
             public string Path { get; set; }
             public FileStatus Status { get; set; }
-            public RegistryResult.RegistryFile RegistryFile { get; set; }
+            public RegistryFile RegistryFile { get; set; }
         }
     }
 }

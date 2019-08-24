@@ -44,10 +44,10 @@ namespace Party.Shared
 
         public IEnumerable<SearchResult> Search(RegistryResult registry, SavesMapResult saves, string query, bool showUsage)
         {
-            return new SearchHandler(_config).SearchAsync(registry, saves, query, showUsage);
+            return new SearchHandler(_config).Search(registry, saves, query, showUsage);
         }
 
-        public Task<InstalledPackageInfoResult> GetInstalledPackageInfoAsync(string name, RegistryResult.RegistryScriptVersion version)
+        public Task<InstalledPackageInfoResult> GetInstalledPackageInfoAsync(string name, RegistryScriptVersion version)
         {
             return new PackageStatusHandler(_config, _fs).GetInstalledPackageInfoAsync(name, version);
         }

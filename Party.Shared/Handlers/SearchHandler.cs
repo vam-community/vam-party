@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Party.Shared.Resources;
 using Party.Shared.Results;
@@ -14,7 +15,7 @@ namespace Party.Shared.Handlers
             _config = config ?? throw new System.ArgumentNullException(nameof(config));
         }
 
-        public IEnumerable<SearchResult> SearchAsync(RegistryResult registry, SavesMapResult saves, string query, bool showUsage)
+        public IEnumerable<SearchResult> Search(RegistryResult registry, SavesMapResult saves, string query, bool showUsage)
         {
             foreach (var package in registry.Scripts)
             {
@@ -30,7 +31,7 @@ namespace Party.Shared.Handlers
                 Scene[] scenes = null;
                 if (showUsage)
                 {
-                    var allVersionsIdentifiers = package.Versions?.SelectMany(v => v.Files ?? new List<RegistryResult.RegistryFile>()).Select(f => f.GetIdentifier());
+                    var allVersionsIdentifiers = package.Versions?.SelectMany(v => v.Files ?? new List<RegistryFile>()).Select(f => f.GetIdentifier());
                     scripts = allVersionsIdentifiers.Select(id => saves.IdentifierScriptMap.GetValueOrDefault(id)).Where(s => s != null).Distinct().ToArray();
                     scenes = scripts.SelectMany(s => s.Scenes).Distinct().ToArray();
                 }
@@ -44,21 +45,21 @@ namespace Party.Shared.Handlers
             }
         }
 
-        private bool MatchesQuery(RegistryResult.RegistryScript package, string query)
+        private bool MatchesQuery(RegistryScript package, string query)
         {
-            if (package.Name.Contains(query))
+            if (package.Name.Contains(query, StringComparison.InvariantCultureIgnoreCase))
             {
                 return true;
             }
-            if (package.Author?.Name?.Contains(query) ?? false)
+            if (package.Author?.Name?.Contains(query, StringComparison.InvariantCultureIgnoreCase) ?? false)
             {
                 return true;
             }
-            if (package.Description?.Contains(query) ?? false)
+            if (package.Description?.Contains(query, StringComparison.InvariantCultureIgnoreCase) ?? false)
             {
                 return true;
             }
-            if (package.Tags?.Any(tag => tag.Contains(query)) ?? false)
+            if (package.Tags?.Any(tag => tag.Contains(query, StringComparison.InvariantCultureIgnoreCase)) ?? false)
             {
                 return true;
             }

@@ -66,14 +66,14 @@ namespace Party.Shared.Handlers
                 throw new UserInputException("No files were found with either a .cs or a .cslist extension");
             }
 
-            var registryFiles = new List<RegistryResult.RegistryFile>();
+            var registryFiles = new List<RegistryFile>();
             foreach (var file in files.OrderBy(s => s))
             {
-                registryFiles.Add(new RegistryResult.RegistryFile
+                registryFiles.Add(new RegistryFile
                 {
                     Filename = Path.GetFileName(file),
                     Url = "",
-                    Hash = new RegistryResult.RegistryFileHash
+                    Hash = new RegistryFileHash
                     {
                         Type = "sha256",
                         Value = await Hashing.GetHashAsync(_fs, file).ConfigureAwait(false)
@@ -81,9 +81,9 @@ namespace Party.Shared.Handlers
                 });
             }
 
-            var scriptJson = new RegistryResult.RegistryScript
+            var scriptJson = new RegistryScript
             {
-                Author = new RegistryResult.RegistryScriptAuthor
+                Author = new RegistryScriptAuthor
                 {
                     Name = "User Name",
                     Profile = "https://"
@@ -93,8 +93,8 @@ namespace Party.Shared.Handlers
                 Tags = new List<string>(new[] { "" }),
                 Homepage = "https://...",
                 Repository = "https://...",
-                Versions = new List<RegistryResult.RegistryScriptVersion> {
-                    new RegistryResult.RegistryScriptVersion{
+                Versions = new List<RegistryScriptVersion> {
+                    new RegistryScriptVersion{
                         Version = "0.0.0",
                         Files = registryFiles
                     }

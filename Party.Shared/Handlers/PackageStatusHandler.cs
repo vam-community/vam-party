@@ -19,7 +19,7 @@ namespace Party.Shared.Handlers
             _fs = fs ?? throw new ArgumentNullException(nameof(fs));
         }
 
-        public async Task<InstalledPackageInfoResult> GetInstalledPackageInfoAsync(string name, RegistryResult.RegistryScriptVersion version)
+        public async Task<InstalledPackageInfoResult> GetInstalledPackageInfoAsync(string name, RegistryScriptVersion version)
         {
             var basePath = Path.GetFullPath(_config.Scanning.PackagesFolder, _config.VirtAMate.SavesDirectory);
             if (!basePath.StartsWith(_config.VirtAMate.SavesDirectory))
@@ -39,7 +39,7 @@ namespace Party.Shared.Handlers
             };
         }
 
-        private async Task<InstalledPackageInfoResult.InstalledFileInfo> GetPackageFileInfo(string installPath, RegistryResult.RegistryFile file)
+        private async Task<InstalledPackageInfoResult.InstalledFileInfo> GetPackageFileInfo(string installPath, RegistryFile file)
         {
             var filePath = Path.Combine(installPath, file.Filename);
             var fileInfo = new InstalledPackageInfoResult.InstalledFileInfo
