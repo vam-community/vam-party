@@ -6,8 +6,8 @@ namespace Party.Shared.Results
 {
     public class SavesMapResult
     {
-        public IReadOnlyDictionary<string, Script> IdentifierScriptMap { get; internal set; }
+        public IReadOnlyDictionary<string, Script> IdentifierScriptMap { get; set; }
         public Script[] Scripts { get => IdentifierScriptMap.Values.ToArray(); }
-        public Scene[] Scenes { get; internal set; }
+        public Scene[] Scenes { get; set; }
     }
 }
