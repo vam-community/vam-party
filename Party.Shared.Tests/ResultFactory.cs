@@ -61,7 +61,7 @@ namespace Party.Shared
             map.Add(script.FullPath, script);
             return (new SavesMapResult
             {
-                IdentifierScriptMap = map,
+                ScriptsByFilename = map,
                 Scenes = scenes
             }, script);
         }
@@ -70,6 +70,7 @@ namespace Party.Shared
         {
             private List<Script> _scripts = new List<Script>();
             private List<Scene> _scenes = new List<Scene>();
+            private List<string> _errors = new List<string>();
 
             public SavesMapBuilder WithScript(Script script, out Script outScript)
             {
@@ -96,8 +97,9 @@ namespace Party.Shared
             {
                 return new SavesMapResult
                 {
-                    IdentifierScriptMap = _scripts.ToDictionary(s => s.FullPath, s => s),
-                    Scenes = _scenes.ToArray()
+                    ScriptsByFilename = _scripts.ToDictionary(s => s.FullPath, s => s),
+                    Scenes = _scenes.ToArray(),
+                    Errors = _errors.ToArray()
                 };
             }
         }

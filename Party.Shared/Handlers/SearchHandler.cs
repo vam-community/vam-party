@@ -37,7 +37,7 @@ namespace Party.Shared.Handlers
                 {
                     // TODO: We should consider all files from a specific version of plugin together
                     var allFilesFromAllVersions = package.Versions?.SelectMany(v => v.Files ?? new List<RegistryFile>());
-                    scripts = allFilesFromAllVersions.SelectMany(regFile => saves.IdentifierScriptMap.Values.Where(saveFile => saveFile.Hash == regFile.Hash.Value)).Distinct().ToArray();
+                    scripts = allFilesFromAllVersions.SelectMany(regFile => saves.ScriptsByFilename.Values.Where(saveFile => saveFile.Hash == regFile.Hash.Value)).Distinct().ToArray();
                     scenes = scripts.SelectMany(s => s.Scenes).Distinct().ToArray();
                 }
                 yield return new SearchResult

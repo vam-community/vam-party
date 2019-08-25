@@ -17,7 +17,7 @@ namespace Party.Shared.Resources
         public string GetIdentifier()
         {
             // TODO: Instead, pre-calculate the hash
-            return Hash != null ? $"{System.IO.Path.GetFileName(FullPath)}{Hash}" : FullPath;
+            return Hash != null ? $"{Path.GetFileName(FullPath)}{Hash}" : FullPath;
         }
     }
 }

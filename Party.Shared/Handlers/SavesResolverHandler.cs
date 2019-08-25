@@ -27,6 +27,7 @@ namespace Party.Shared.Handlers
             var scriptTasks = new List<Task<Script>>();
             var sceneFiles = new List<string>();
             var scriptListFiles = new List<string>();
+            var vamDirectory = _fs.DirectoryInfo.FromDirectoryName(_savesDirectory).Parent.FullName;
 
             foreach (var file in _fs.Directory.EnumerateFiles(_savesDirectory, "*.*", SearchOption.AllDirectories))
             {
@@ -52,7 +53,7 @@ namespace Party.Shared.Handlers
                 }
             }
 
-            var scriptsDict = (await Task.WhenAll(scriptTasks).ConfigureAwait(false)).ToDictionary(x => x.FullPath, x => x);
+            var scriptsByFilename = (await Task.WhenAll(scriptTasks).ConfigureAwait(false)).ToDictionary(x => x.FullPath, x => x);
             var scenes = new List<Scene>();
             var errors = new List<string>();
 
@@ -62,10 +63,10 @@ namespace Party.Shared.Handlers
                 var scriptRefPaths = await ScriptList.GetScriptsAsync(scriptListFile);
                 foreach (var scriptRefRelativePath in scriptRefPaths)
                 {
-                    var fullPath = Path.GetFullPath(scriptRefRelativePath, System.IO.Path.GetDirectoryName(scriptListFile));
-                    if (scriptsDict.TryGetValue(fullPath, out var scriptRef))
+                    var fullPath = Path.GetFullPath(scriptRefRelativePath, vamDirectory);
+                    if (scriptsByFilename.TryGetValue(fullPath, out var scriptRef))
                     {
-                        scriptsDict.Remove(fullPath);
+                        scriptsByFilename.Remove(fullPath);
                         scriptRefs.Add(scriptRef);
                     }
                     else
@@ -78,7 +79,7 @@ namespace Party.Shared.Handlers
                 if (scriptRefs != null)
                 {
                     var scriptList = new ScriptList(scriptListFile, Hashing.GetHash(scriptRefPaths), scriptRefs.ToArray());
-                    scriptsDict.Add(scriptListFile, scriptList);
+                    scriptsByFilename.Add(scriptListFile, scriptList);
                 }
             }
 
@@ -88,8 +89,8 @@ namespace Party.Shared.Handlers
                 scenes.Add(scene);
                 await foreach (var scriptRefRelativePath in scene.GetScriptsAsync(_fs).ConfigureAwait(false))
                 {
-                    var fullPath = Path.GetFullPath(scriptRefRelativePath, System.IO.Path.GetDirectoryName(sceneFile));
-                    if (scriptsDict.TryGetValue(fullPath, out var scriptRef))
+                    var fullPath = Path.GetFullPath(scriptRefRelativePath, vamDirectory);
+                    if (scriptsByFilename.TryGetValue(fullPath, out var scriptRef))
                     {
                         scene.References(scriptRef);
                         scriptRef.ReferencedBy(scene);
@@ -105,8 +106,9 @@ namespace Party.Shared.Handlers
 
             return new SavesMapResult
             {
+                Errors = errors.ToArray(),
                 // TODO: Is this dictionary really useful?
-                IdentifierScriptMap = scriptsDict,
+                ScriptsByFilename = scriptsByFilename,
                 // TODO: This is never actually used, for now
                 Scenes = scenes.ToArray()
             };
