@@ -30,8 +30,8 @@ namespace Party.CLI.Commands
         {
             var result = await Controller.Publish(input).ConfigureAwait(false);
 
-            await Output.WriteLineAsync("JSON Template:");
-            await Output.WriteLineAsync(result.Formatted);
+            Output.WriteLine("JSON Template:");
+            Output.WriteLine(result.Formatted);
         }
     }
 }

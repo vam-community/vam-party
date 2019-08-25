@@ -30,16 +30,16 @@ namespace Party.CLI.Commands
         {
             var saves = await Controller.GetSavesAsync();
 
-            await Output.WriteLineAsync("Scripts:");
+            Output.WriteLine("Scripts:");
             foreach (var script in saves.Scripts.OrderBy(sm => sm.FullPath))
             {
-                await Output.WriteLineAsync($"- {script.Name} (used in {Pluralize(script.Scenes?.Count() ?? 0, "scene", "scenes")})");
+                Output.WriteLine($"- {script.Name} (used in {Pluralize(script.Scenes?.Count() ?? 0, "scene", "scenes")})");
 
                 if (scenes && script.Scenes != null)
                 {
                     foreach (var scene in script.Scenes)
                     {
-                        await Output.WriteLineAsync($"  - {Controller.GetRelativePath(scene.FullPath)}");
+                        Output.WriteLine($"  - {Controller.GetRelativePath(scene.FullPath)}");
                     }
                 }
             }

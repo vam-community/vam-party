@@ -69,6 +69,7 @@ namespace Party.CLI
                 return HandleError(exc);
             }
 
+            await output.WhenComplete();
             return 0;
         }
 

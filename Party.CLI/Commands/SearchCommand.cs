@@ -33,7 +33,6 @@ namespace Party.CLI.Commands
         {
         }
 
-
         private async Task ExecuteAsync(string query, ShowOptions show)
         {
             var registryTask = Controller.GetRegistryAsync();
@@ -48,19 +47,19 @@ namespace Party.CLI.Commands
                 var latestVersion = script.GetLatestVersion();
                 var trustNotice = result.Trusted ? "" : " [NOT TRUSTED]";
                 var scenes = show != ShowOptions.ScriptOnly ? "" : $" (used in {Pluralize(result.Scenes?.Length ?? 0, "scene", "scenes")}";
-                await Output.WriteLineAsync($"{script.Name} {latestVersion.Version ?? "-"} by {script.Author.Name}{trustNotice}");
+                Output.WriteLine($"{script.Name} {latestVersion.Version ?? "-"} by {script.Author.Name}{trustNotice}");
                 if (show == ShowOptions.ScenesList)
                 {
                     if ((result.Scenes?.Length ?? 0) == 0)
                     {
-                        await Output.WriteLineAsync("- Not used by any scenes");
+                        Output.WriteLine("- Not used by any scenes");
                     }
                     else
                     {
                         foreach (var scene in result.Scenes)
                         {
                             // TODO: Show the version used in each scene
-                            await Output.WriteLineAsync($"- {Controller.GetRelativePath(scene.FullPath)}");
+                            Output.WriteLine($"- {Controller.GetRelativePath(scene.FullPath)}");
                         }
                     }
                 }

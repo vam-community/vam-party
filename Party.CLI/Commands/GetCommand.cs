@@ -77,25 +77,25 @@ namespace Party.CLI.Commands
 
             if (noop)
             {
-                await Output.WriteLineAsync($"Package {registryPackage.Name} v{registryPackageVersion.Version} by {registryPackage.Author.Name ?? "Anonymous"}");
-                await Output.WriteLineAsync($"Files will be downloaded in {filesStatuses.InstallFolder}:");
+                Output.WriteLine($"Package {registryPackage.Name} v{registryPackageVersion.Version} by {registryPackage.Author.Name ?? "Anonymous"}");
+                Output.WriteLine($"Files will be downloaded in {filesStatuses.InstallFolder}:");
                 foreach (var file in filesStatuses.Files)
                 {
-                    await Output.WriteLineAsync($"- Path: {Controller.GetRelativePath(file.Path, filesStatuses.InstallFolder)}");
-                    await Output.WriteLineAsync($"  Hash: {file.RegistryFile.Hash} ({file.RegistryFile.Hash.Type})");
-                    await Output.WriteLineAsync($"  Url:  {file.RegistryFile.Url}");
+                    Output.WriteLine($"- Path: {Controller.GetRelativePath(file.Path, filesStatuses.InstallFolder)}");
+                    Output.WriteLine($"  Hash: {file.RegistryFile.Hash} ({file.RegistryFile.Hash.Type})");
+                    Output.WriteLine($"  Url:  {file.RegistryFile.Url}");
                 }
                 return;
             }
 
             var installResult = await Controller.InstallPackageAsync(filesStatuses);
 
-            await Output.WriteLineAsync($"Installed package {registryPackage.Name} v{registryPackageVersion.Version} by {registryPackage.Author.Name ?? "Anonymous"}");
-            await Output.WriteLineAsync($"Files downloaded in {filesStatuses.InstallFolder}:");
+            Output.WriteLine($"Installed package {registryPackage.Name} v{registryPackageVersion.Version} by {registryPackage.Author.Name ?? "Anonymous"}");
+            Output.WriteLine($"Files downloaded in {filesStatuses.InstallFolder}:");
             foreach (var file in installResult.Files)
             {
 
-                await Output.WriteLineAsync($"- {Controller.GetRelativePath(file.Path, filesStatuses.InstallFolder)}");
+                Output.WriteLine($"- {Controller.GetRelativePath(file.Path, filesStatuses.InstallFolder)}");
             }
         }
     }
