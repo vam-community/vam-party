@@ -95,7 +95,7 @@ namespace Party.Shared.Handlers
             var saves = ResultFactory.SavesMap()
                 .WithScript(new Script(@"C:\VaM\Saves\MyScript (Copy).cs", "12345"), out var saveScript)
                 .Referencing(new Scene(@"C:\VaM\Saves\My Scene 1.json"), out var saveScene1)
-                .NotReferencing(new Scene(@"C:\VaM\Saves\My Scene 2.json"))
+                .WithScene(new Scene(@"C:\VaM\Saves\My Scene 2.json"))
                 .Build();
 
             var result = _handler.Search(registry, saves, "", true);

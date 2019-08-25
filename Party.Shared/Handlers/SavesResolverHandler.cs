@@ -85,7 +85,8 @@ namespace Party.Shared.Handlers
             foreach (var sceneFile in sceneFiles)
             {
                 var scene = new Scene(sceneFile);
-                await foreach (var scriptRefRelativePath in scene.GetScriptsAsync().ConfigureAwait(false))
+                scenes.Add(scene);
+                await foreach (var scriptRefRelativePath in scene.GetScriptsAsync(_fs).ConfigureAwait(false))
                 {
                     var fullPath = Path.GetFullPath(scriptRefRelativePath, System.IO.Path.GetDirectoryName(sceneFile));
                     if (scriptsDict.TryGetValue(fullPath, out var scriptRef))
@@ -106,6 +107,7 @@ namespace Party.Shared.Handlers
             {
                 // TODO: Is this dictionary really useful?
                 IdentifierScriptMap = scriptsDict,
+                // TODO: This is never actually used, for now
                 Scenes = scenes.ToArray()
             };
         }

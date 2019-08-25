@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using System.IO;
+using System.IO.Abstractions;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -19,9 +19,9 @@ namespace Party.Shared.Resources
             Scripts.Add(script);
         }
 
-        public async IAsyncEnumerable<string> GetScriptsAsync()
+        public async IAsyncEnumerable<string> GetScriptsAsync(IFileSystem fs)
         {
-            var json = await ParseAsync().ConfigureAwait(false);
+            var json = await ParseAsync(fs).ConfigureAwait(false);
             var atoms = (JArray)json["atoms"];
             if (atoms == null) { yield break; }
             foreach (var atom in atoms)
@@ -47,9 +47,9 @@ namespace Party.Shared.Resources
             }
         }
 
-        private async Task<JObject> ParseAsync()
+        private async Task<JObject> ParseAsync(IFileSystem fs)
         {
-            using (var file = File.OpenText(FullPath))
+            using (var file = fs.File.OpenText(FullPath))
             using (var reader = new JsonTextReader(file))
             {
                 return (JObject)await JToken.ReadFromAsync(reader).ConfigureAwait(false);

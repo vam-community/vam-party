@@ -86,7 +86,7 @@ namespace Party.Shared
                 return this;
             }
 
-            public SavesMapBuilder NotReferencing(Scene scene)
+            public SavesMapBuilder WithScene(Scene scene)
             {
                 _scenes.Add(scene);
                 return this;
