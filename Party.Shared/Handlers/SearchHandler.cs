@@ -17,6 +17,10 @@ namespace Party.Shared.Handlers
 
         public IEnumerable<SearchResult> Search(RegistryResult registry, SavesMapResult saves, string query, bool showUsage)
         {
+            if (registry is null) throw new ArgumentNullException(nameof(registry));
+            if (registry?.Scripts is null) throw new ArgumentException("registry does not have any scripts", nameof(registry));
+            if (saves is null) throw new ArgumentNullException(nameof(saves));
+
             foreach (var package in registry.Scripts)
             {
                 if (!string.IsNullOrEmpty(query))
@@ -26,13 +30,14 @@ namespace Party.Shared.Handlers
                         continue;
                     }
                 }
-                var trusted = package.Versions.SelectMany(v => v.Files).All(f => _config.Registry.TrustedDomains.Any(t => f.Url.StartsWith(t)));
+                var trusted = package.Versions?.SelectMany(v => v.Files).All(f => _config.Registry.TrustedDomains.Any(t => f.Url.StartsWith(t))) ?? false;
                 Script[] scripts = null;
                 Scene[] scenes = null;
                 if (showUsage)
                 {
-                    var allVersionsIdentifiers = package.Versions?.SelectMany(v => v.Files ?? new List<RegistryFile>()).Select(f => f.GetIdentifier());
-                    scripts = allVersionsIdentifiers.Select(id => saves.IdentifierScriptMap.GetValueOrDefault(id)).Where(s => s != null).Distinct().ToArray();
+                    // TODO: We should consider all files from a specific version of plugin together
+                    var allFilesFromAllVersions = package.Versions?.SelectMany(v => v.Files ?? new List<RegistryFile>());
+                    scripts = allFilesFromAllVersions.SelectMany(regFile => saves.IdentifierScriptMap.Values.Where(saveFile => saveFile.Hash == regFile.Hash.Value)).Distinct().ToArray();
                     scenes = scripts.SelectMany(s => s.Scenes).Distinct().ToArray();
                 }
                 yield return new SearchResult
@@ -47,7 +52,7 @@ namespace Party.Shared.Handlers
 
         private bool MatchesQuery(RegistryScript package, string query)
         {
-            if (package.Name.Contains(query, StringComparison.InvariantCultureIgnoreCase))
+            if (package.Name?.Contains(query, StringComparison.InvariantCultureIgnoreCase) ?? false)
             {
                 return true;
             }

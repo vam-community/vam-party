@@ -104,6 +104,7 @@ namespace Party.Shared.Handlers
 
             return new SavesMapResult
             {
+                // TODO: Is this dictionary really useful?
                 IdentifierScriptMap = scriptsDict,
                 Scenes = scenes.ToArray()
             };

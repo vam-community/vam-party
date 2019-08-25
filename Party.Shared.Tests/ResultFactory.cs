@@ -1,10 +1,13 @@
+using System.Collections.Generic;
 using System.Linq;
+using Party.Shared.Resources;
 using Party.Shared.Results;
 
 namespace Party.Shared
 {
     public static class ResultFactory
     {
+        #region Registry
         public static RegistryResult Reg(params RegistryScript[] scripts)
         {
             return new RegistryResult
@@ -43,5 +46,61 @@ namespace Party.Shared
                 Url = url
             };
         }
+        #endregion
+
+        #region Saves Map
+        public static SavesMapBuilder SavesMap()
+        {
+            return new SavesMapBuilder();
+        }
+
+        public static (SavesMapResult, Script) SavesMap(Script script, params Scene[] scenes)
+        {
+            var map = new Dictionary<string, Script>();
+            script.Scenes.AddRange(scenes);
+            map.Add(script.FullPath, script);
+            return (new SavesMapResult
+            {
+                IdentifierScriptMap = map,
+                Scenes = scenes
+            }, script);
+        }
+
+        public class SavesMapBuilder
+        {
+            private List<Script> _scripts = new List<Script>();
+            private List<Scene> _scenes = new List<Scene>();
+
+            public SavesMapBuilder WithScript(Script script, out Script outScript)
+            {
+                _scripts.Add(script);
+                outScript = script;
+                return this;
+            }
+
+            public SavesMapBuilder Referencing(Scene scene, out Scene outScene)
+            {
+                _scripts.Last().Scenes.Add(scene);
+                _scenes.Add(scene);
+                outScene = scene;
+                return this;
+            }
+
+            public SavesMapBuilder NotReferencing(Scene scene)
+            {
+                _scenes.Add(scene);
+                return this;
+            }
+
+            public SavesMapResult Build()
+            {
+                return new SavesMapResult
+                {
+                    IdentifierScriptMap = _scripts.ToDictionary(s => s.FullPath, s => s),
+                    Scenes = _scenes.ToArray()
+                };
+            }
+        }
+        #endregion
     }
 }
