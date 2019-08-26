@@ -22,8 +22,13 @@ namespace Party.Shared.Handlers
             _fs = fs ?? throw new ArgumentNullException(nameof(fs));
         }
 
-        public async Task<PublishResult> PublishAsync(string path)
+        public async Task<PublishResult> PublishAsync(RegistryScript script, RegistryScriptVersion version, string path)
         {
+            // TODO: Validate fields, especially the version and name
+            if (script is null) throw new ArgumentNullException(nameof(script));
+            if (version is null) throw new ArgumentNullException(nameof(version));
+            if (path is null) throw new ArgumentNullException(nameof(path));
+
             if (!Path.IsPathRooted(path))
             {
                 throw new InvalidOperationException($"Path must be rooted prior to being sent to this handler: {path}");
@@ -81,29 +86,25 @@ namespace Party.Shared.Handlers
                 });
             }
 
-            var scriptJson = new RegistryScript
+            if (script.Versions == null)
             {
-                Author = new RegistryScriptAuthor
+                script.Versions = new[] { version }.ToList();
+            }
+            else
+            {
+                if (script.Versions.Any(v => v.Version == version.Version))
                 {
-                    Name = "User Name",
-                    Profile = "https://"
-                },
-                Name = name,
-                Description = "",
-                Tags = new List<string>(new[] { "" }),
-                Homepage = "https://...",
-                Repository = "https://...",
-                Versions = new List<RegistryScriptVersion> {
-                    new RegistryScriptVersion{
-                        Version = "0.0.0",
-                        Files = registryFiles
-                    }
+                    throw new UserInputException("This version already exists in the registry.");
                 }
-            };
+
+                version.Files = registryFiles;
+                script.Versions.Insert(0, version);
+            }
+
 
             return new PublishResult
             {
-                Formatted = JsonConvert.SerializeObject(scriptJson, Formatting.Indented)
+                Formatted = JsonConvert.SerializeObject(script, Formatting.Indented)
             };
         }
     }

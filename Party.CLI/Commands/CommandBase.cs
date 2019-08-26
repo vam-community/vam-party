@@ -8,13 +8,13 @@ namespace Party.CLI.Commands
 {
     public abstract class CommandBase
     {
-        protected readonly IRenderer Output;
+        protected readonly IRenderer Renderer;
         protected readonly PartyConfiguration Config;
         protected readonly PartyController Controller;
 
-        protected CommandBase(IRenderer output, PartyConfiguration config, DirectoryInfo saves, PartyController controller)
+        protected CommandBase(IRenderer renderer, PartyConfiguration config, DirectoryInfo saves, PartyController controller)
         {
-            Output = output;
+            Renderer = renderer;
             Config = GetConfig(config, saves);
             Controller = controller;
         }

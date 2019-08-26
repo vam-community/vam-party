@@ -9,7 +9,7 @@ namespace Party.CLI.Commands
 {
     public class StatusCommand : CommandBase
     {
-        public static Command CreateCommand(IRenderer output, PartyConfiguration config, PartyController controller)
+        public static Command CreateCommand(IRenderer renderer, PartyConfiguration config, PartyController controller)
         {
             var command = new Command("status", "Shows the state of the current scripts and scenes");
             AddCommonOptions(command);
@@ -17,12 +17,12 @@ namespace Party.CLI.Commands
 
             command.Handler = CommandHandler.Create(async (DirectoryInfo saves, bool scenes) =>
             {
-                await new StatusCommand(output, config, saves, controller).ExecuteAsync(scenes);
+                await new StatusCommand(renderer, config, saves, controller).ExecuteAsync(scenes);
             });
             return command;
         }
 
-        public StatusCommand(IRenderer output, PartyConfiguration config, DirectoryInfo saves, PartyController controller) : base(output, config, saves, controller)
+        public StatusCommand(IRenderer renderer, PartyConfiguration config, DirectoryInfo saves, PartyController controller) : base(renderer, config, saves, controller)
         {
         }
 
@@ -30,16 +30,16 @@ namespace Party.CLI.Commands
         {
             var saves = await Controller.GetSavesAsync();
 
-            Output.WriteLine("Scripts:");
+            Renderer.WriteLine("Scripts:");
             foreach (var script in saves.Scripts.OrderBy(sm => sm.FullPath))
             {
-                Output.WriteLine($"- {script.Name} (used in {Pluralize(script.Scenes?.Count() ?? 0, "scene", "scenes")})");
+                Renderer.WriteLine($"- {script.Name} (used in {Pluralize(script.Scenes?.Count() ?? 0, "scene", "scenes")})");
 
                 if (scenes && script.Scenes != null)
                 {
                     foreach (var scene in script.Scenes)
                     {
-                        Output.WriteLine($"  - {Controller.GetRelativePath(scene.FullPath)}");
+                        Renderer.WriteLine($"  - {Controller.GetRelativePath(scene.FullPath)}");
                     }
                 }
             }

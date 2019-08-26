@@ -25,15 +25,15 @@ namespace Party.CLI
             rootConfig.Bind(config);
             config.VirtAMate.SavesDirectory = Path.GetFullPath(config.VirtAMate.SavesDirectory, AppContext.BaseDirectory);
 
-            var output = new ConsoleRenderer(Console.Out);
+            var renderer = new ConsoleRenderer(Console.Out, Console.In);
 
             var controller = new PartyController(config);
 
             var rootCommand = new RootCommand("Party: A Virt-A-Mate package manager") {
-                SearchCommand.CreateCommand(output, config, controller),
-                StatusCommand.CreateCommand(output, config, controller),
-                PublishCommand.CreateCommand(output, config, controller),
-                GetCommand.CreateCommand(output, config, controller)
+                SearchCommand.CreateCommand(renderer, config, controller),
+                StatusCommand.CreateCommand(renderer, config, controller),
+                PublishCommand.CreateCommand(renderer, config, controller),
+                GetCommand.CreateCommand(renderer, config, controller)
             };
 
             // For CoreRT:
@@ -69,7 +69,7 @@ namespace Party.CLI
                 return HandleError(exc);
             }
 
-            await output.WhenComplete();
+            await renderer.WhenCompleteAsync();
             return 0;
         }
 

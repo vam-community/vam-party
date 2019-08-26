@@ -37,9 +37,9 @@ namespace Party.Shared
             return new SavesResolverHandler(_fs, _config.VirtAMate.SavesDirectory, _config.Scanning.Ignore).AnalyzeSaves();
         }
 
-        public Task<PublishResult> Publish(string path)
+        public Task<PublishResult> Publish(RegistryScript script, RegistryScriptVersion version, string path)
         {
-            return new PublishHandler(_config, _fs).PublishAsync(path);
+            return new PublishHandler(_config, _fs).PublishAsync(script, version, path);
         }
 
         public IEnumerable<SearchResult> Search(RegistryResult registry, SavesMapResult saves, string query, bool showUsage)

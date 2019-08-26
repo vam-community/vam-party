@@ -15,7 +15,7 @@ namespace Party.CLI.Commands
             ScenesList
         }
 
-        public static Command CreateCommand(IRenderer output, PartyConfiguration config, PartyController controller)
+        public static Command CreateCommand(IRenderer renderer, PartyConfiguration config, PartyController controller)
         {
             var command = new Command("search", "Search for scripts and packages in the registry");
             AddCommonOptions(command);
@@ -24,12 +24,12 @@ namespace Party.CLI.Commands
 
             command.Handler = CommandHandler.Create(async (DirectoryInfo saves, string query, ShowOptions show) =>
             {
-                await new SearchCommand(output, config, saves, controller).ExecuteAsync(query, show);
+                await new SearchCommand(renderer, config, saves, controller).ExecuteAsync(query, show);
             });
             return command;
         }
 
-        public SearchCommand(IRenderer output, PartyConfiguration config, DirectoryInfo saves, PartyController controller) : base(output, config, saves, controller)
+        public SearchCommand(IRenderer renderer, PartyConfiguration config, DirectoryInfo saves, PartyController controller) : base(renderer, config, saves, controller)
         {
         }
 
@@ -47,19 +47,19 @@ namespace Party.CLI.Commands
                 var latestVersion = script.GetLatestVersion();
                 var trustNotice = result.Trusted ? "" : " [NOT TRUSTED]";
                 var scenes = show != ShowOptions.ScriptOnly ? "" : $" (used in {Pluralize(result.Scenes?.Length ?? 0, "scene", "scenes")}";
-                Output.WriteLine($"{script.Name} {latestVersion.Version ?? "-"} by {script.Author.Name}{trustNotice}");
+                Renderer.WriteLine($"{script.Name} {latestVersion.Version ?? "-"} by {script.Author.Name}{trustNotice}");
                 if (show == ShowOptions.ScenesList)
                 {
                     if ((result.Scenes?.Length ?? 0) == 0)
                     {
-                        Output.WriteLine("- Not used by any scenes");
+                        Renderer.WriteLine("- Not used by any scenes");
                     }
                     else
                     {
                         foreach (var scene in result.Scenes)
                         {
                             // TODO: Show the version used in each scene
-                            Output.WriteLine($"- {Controller.GetRelativePath(scene.FullPath)}");
+                            Renderer.WriteLine($"- {Controller.GetRelativePath(scene.FullPath)}");
                         }
                     }
                 }

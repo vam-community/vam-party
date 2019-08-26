@@ -11,7 +11,7 @@ namespace Party.CLI.Commands
 {
     public class GetCommand : CommandBase
     {
-        public static Command CreateCommand(IRenderer output, PartyConfiguration config, PartyController controller)
+        public static Command CreateCommand(IRenderer renderer, PartyConfiguration config, PartyController controller)
         {
             var command = new Command("get", "Downloads a package (script) into the saves folder");
             AddCommonOptions(command);
@@ -21,12 +21,12 @@ namespace Party.CLI.Commands
 
             command.Handler = CommandHandler.Create(async (DirectoryInfo saves, string package, string version, bool noop) =>
             {
-                await new GetCommand(output, config, saves, controller).ExecuteAsync(package, version, noop);
+                await new GetCommand(renderer, config, saves, controller).ExecuteAsync(package, version, noop);
             });
             return command;
         }
 
-        public GetCommand(IRenderer output, PartyConfiguration config, DirectoryInfo saves, PartyController controller) : base(output, config, saves, controller)
+        public GetCommand(IRenderer renderer, PartyConfiguration config, DirectoryInfo saves, PartyController controller) : base(renderer, config, saves, controller)
         {
         }
 
@@ -77,25 +77,25 @@ namespace Party.CLI.Commands
 
             if (noop)
             {
-                Output.WriteLine($"Package {registryPackage.Name} v{registryPackageVersion.Version} by {registryPackage.Author.Name ?? "Anonymous"}");
-                Output.WriteLine($"Files will be downloaded in {filesStatuses.InstallFolder}:");
+                Renderer.WriteLine($"Package {registryPackage.Name} v{registryPackageVersion.Version} by {registryPackage.Author.Name ?? "Anonymous"}");
+                Renderer.WriteLine($"Files will be downloaded in {filesStatuses.InstallFolder}:");
                 foreach (var file in filesStatuses.Files)
                 {
-                    Output.WriteLine($"- Path: {Controller.GetRelativePath(file.Path, filesStatuses.InstallFolder)}");
-                    Output.WriteLine($"  Hash: {file.RegistryFile.Hash} ({file.RegistryFile.Hash.Type})");
-                    Output.WriteLine($"  Url:  {file.RegistryFile.Url}");
+                    Renderer.WriteLine($"- Path: {Controller.GetRelativePath(file.Path, filesStatuses.InstallFolder)}");
+                    Renderer.WriteLine($"  Hash: {file.RegistryFile.Hash} ({file.RegistryFile.Hash.Type})");
+                    Renderer.WriteLine($"  Url:  {file.RegistryFile.Url}");
                 }
                 return;
             }
 
             var installResult = await Controller.InstallPackageAsync(filesStatuses);
 
-            Output.WriteLine($"Installed package {registryPackage.Name} v{registryPackageVersion.Version} by {registryPackage.Author.Name ?? "Anonymous"}");
-            Output.WriteLine($"Files downloaded in {filesStatuses.InstallFolder}:");
+            Renderer.WriteLine($"Installed package {registryPackage.Name} v{registryPackageVersion.Version} by {registryPackage.Author.Name ?? "Anonymous"}");
+            Renderer.WriteLine($"Files downloaded in {filesStatuses.InstallFolder}:");
             foreach (var file in installResult.Files)
             {
 
-                Output.WriteLine($"- {Controller.GetRelativePath(file.Path, filesStatuses.InstallFolder)}");
+                Renderer.WriteLine($"- {Controller.GetRelativePath(file.Path, filesStatuses.InstallFolder)}");
             }
         }
     }
