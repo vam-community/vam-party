@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared.Resources;
 using Party.Shared.Results;
+using Party.Shared.Serializers;
 using Party.Shared.Utils;
 
 namespace Party.Shared.Handlers
@@ -28,6 +29,9 @@ namespace Party.Shared.Handlers
             var sceneFiles = new List<string>();
             var scriptListFiles = new List<string>();
             var vamDirectory = _fs.DirectoryInfo.FromDirectoryName(_savesDirectory).Parent.FullName;
+
+            var scriptListSerializer = new ScriptListSerializer();
+            var sceneSerializer = new SceneSerializer();
 
             foreach (var file in _fs.Directory.EnumerateFiles(_savesDirectory, "*.*", SearchOption.AllDirectories))
             {
@@ -60,10 +64,10 @@ namespace Party.Shared.Handlers
             foreach (var scriptListFile in scriptListFiles)
             {
                 var scriptRefs = new List<Script>();
-                var scriptRefPaths = await ScriptList.GetScriptsAsync(scriptListFile);
+                var scriptRefPaths = await scriptListSerializer.GetScriptsAsync(_fs, scriptListFile);
                 foreach (var scriptRefRelativePath in scriptRefPaths)
                 {
-                    var fullPath = Path.GetFullPath(scriptRefRelativePath, vamDirectory);
+                    var fullPath = Path.GetFullPath(scriptRefRelativePath, Path.GetDirectoryName(scriptListFile));
                     if (scriptsByFilename.TryGetValue(fullPath, out var scriptRef))
                     {
                         scriptsByFilename.Remove(fullPath);
@@ -87,9 +91,11 @@ namespace Party.Shared.Handlers
             {
                 var scene = new Scene(sceneFile);
                 scenes.Add(scene);
-                await foreach (var scriptRefRelativePath in scene.GetScriptsAsync(_fs).ConfigureAwait(false))
+                await foreach (var scriptRefRelativePath in sceneSerializer.GetScriptsAsync(_fs, sceneFile).ConfigureAwait(false))
                 {
-                    var fullPath = Path.GetFullPath(scriptRefRelativePath, vamDirectory);
+                    var fullPath = scriptRefRelativePath.Contains('/')
+                        ? Path.GetFullPath(scriptRefRelativePath, vamDirectory)
+                        : Path.GetFullPath(scriptRefRelativePath, Path.GetDirectoryName(sceneFile));
                     if (scriptsByFilename.TryGetValue(fullPath, out var scriptRef))
                     {
                         scene.References(scriptRef);
