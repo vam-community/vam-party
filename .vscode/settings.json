@@ -1,5 +1,7 @@
 {
   "files.exclude": {
     "obj": true
-  }
+  },
+  "omnisharp.enableEditorConfigSupport": true,
+  "omnisharp.enableRoslynAnalyzers": true
 }
