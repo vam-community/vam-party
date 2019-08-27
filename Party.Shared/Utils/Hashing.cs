@@ -28,12 +28,12 @@ namespace Party.Shared.Utils
             {
                 return null;
             }
-            return Task.FromResult(GetHash(lines.Where(l => !string.IsNullOrEmpty(l))));
+            return Task.FromResult(GetHash(lines));
         }
 
         public static string GetHash(IEnumerable<string> lines)
         {
-            var content = string.Join('\n', lines);
+            var content = string.Join('\n', lines.Where(l => !string.IsNullOrEmpty(l)));
             var bytes = Encoding.UTF8.GetBytes(content);
             using (var sha256Hash = SHA256.Create())
             {
