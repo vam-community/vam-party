@@ -8,16 +8,10 @@ namespace Party.Shared.Resources
         public string Hash { get; }
         public string Name { get => Path.GetFileName(FullPath); }
 
-        protected Resource(string fullPath, string hash = null)
+        protected Resource(string fullPath, string hash)
         {
             FullPath = fullPath;
             Hash = hash;
-        }
-
-        public string GetIdentifier()
-        {
-            // TODO: Instead, pre-calculate the hash
-            return Hash != null ? $"{Path.GetFileName(FullPath)}{Hash}" : FullPath;
         }
     }
 }

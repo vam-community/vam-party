@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Party.Shared.Utils
 {
-    public class Hashing
+    public static class Hashing
     {
         public static string Type => "sha256";
 

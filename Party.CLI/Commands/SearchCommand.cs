@@ -41,13 +41,15 @@ namespace Party.CLI.Commands
             var registry = await registryTask;
             var saves = await savesTask;
 
+            PrintWarnings(saves.Errors);
+
             foreach (var result in Controller.Search(registry, saves, query, show != ShowOptions.ScriptOnly))
             {
                 var script = result.Package;
                 var latestVersion = script.GetLatestVersion();
                 var trustNotice = result.Trusted ? "" : " [NOT TRUSTED]";
                 var scenes = show != ShowOptions.ScriptOnly ? "" : $" (used in {Pluralize(result.Scenes?.Length ?? 0, "scene", "scenes")}";
-                Renderer.WriteLine($"{script.Name} {latestVersion.Version ?? "-"} by {script.Author.Name}{trustNotice}");
+                Renderer.WriteLine($"{script.Name} {latestVersion.Version ?? "-"} by {script.Author.Name}{trustNotice}{scenes}");
                 if (show == ShowOptions.ScenesList)
                 {
                     if ((result.Scenes?.Length ?? 0) == 0)

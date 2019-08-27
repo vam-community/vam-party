@@ -30,7 +30,7 @@ namespace Party.Shared.Handlers
             var files = new List<InstalledPackageInfoResult.InstalledFileInfo>();
             foreach (var file in version.Files)
             {
-                files.Add(await GetPackageFileInfo(installPath, file));
+                files.Add(await GetPackageFileInfo(installPath, file).ConfigureAwait(false));
             }
             return new InstalledPackageInfoResult
             {

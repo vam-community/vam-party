@@ -11,7 +11,7 @@ namespace Party.Shared.Handlers
 {
     public class RegistryHandler
     {
-        private static HttpClient _http;
+        private readonly HttpClient _http;
         private readonly string[] _urls;
 
         public RegistryHandler(HttpClient http, string[] urls)
@@ -55,11 +55,11 @@ namespace Party.Shared.Handlers
             return registry;
         }
 
-        private static async Task<RegistryResult> AcquireOne(string url)
+        private async Task<RegistryResult> AcquireOne(string url)
         {
             if (Uri.IsWellFormedUriString(url, UriKind.Absolute))
             {
-                using var response = await _http.GetAsync(url);
+                using var response = await _http.GetAsync(url).ConfigureAwait(false);
                 response.EnsureSuccessStatusCode();
                 using var streamReader = new StreamReader(await response.Content.ReadAsStreamAsync().ConfigureAwait(false));
                 return Deserialize(streamReader);

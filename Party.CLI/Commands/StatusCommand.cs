@@ -30,6 +30,8 @@ namespace Party.CLI.Commands
         {
             var saves = await Controller.GetSavesAsync();
 
+            PrintWarnings(saves.Errors);
+
             Renderer.WriteLine("Scripts:");
             foreach (var script in saves.Scripts.OrderBy(sm => sm.FullPath))
             {

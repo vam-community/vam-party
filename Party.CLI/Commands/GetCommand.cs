@@ -60,20 +60,7 @@ namespace Party.CLI.Commands
 
             var distinctStatuses = filesStatuses.Files.Select(f => f.Status).Distinct().ToList();
 
-            if (distinctStatuses.Count == 1)
-            {
-                switch (distinctStatuses.FirstOrDefault())
-                {
-                    case Shared.Results.InstalledPackageInfoResult.FileStatus.Installed:
-                        throw new UserInputException("Plugin already installed");
-                    case Shared.Results.InstalledPackageInfoResult.FileStatus.HashMismatch:
-                        throw new PackageInstallationException("Installed plugin does not match the registry version. Did you modified it?");
-                }
-            }
-            else if (distinctStatuses.Count > 1)
-            {
-                throw new PackageInstallationException("The installed plugin has been either partially installed or was modified. Try deleting the installed package folder and try again.");
-            }
+            ValidateStatuses(distinctStatuses);
 
             if (noop)
             {
@@ -96,6 +83,29 @@ namespace Party.CLI.Commands
             {
 
                 Renderer.WriteLine($"- {Controller.GetRelativePath(file.Path, filesStatuses.InstallFolder)}");
+            }
+        }
+
+        private static void ValidateStatuses(System.Collections.Generic.List<Shared.Results.InstalledPackageInfoResult.FileStatus> distinctStatuses)
+        {
+            if (distinctStatuses.Count > 1)
+            {
+                throw new PackageInstallationException("The installed plugin has been either partially installed or was modified. Try deleting the installed package folder and try again.");
+            }
+
+            if (distinctStatuses.Count == 0)
+            {
+                throw new PackageInstallationException("No files were found in this package.");
+            }
+
+            switch (distinctStatuses.FirstOrDefault())
+            {
+                case Shared.Results.InstalledPackageInfoResult.FileStatus.Installed:
+                    throw new UserInputException("Plugin already installed");
+                case Shared.Results.InstalledPackageInfoResult.FileStatus.HashMismatch:
+                    throw new PackageInstallationException("Installed plugin does not match the registry version. Did you modified it?");
+                default:
+                    return;
             }
         }
     }

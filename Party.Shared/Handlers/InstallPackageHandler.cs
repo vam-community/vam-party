@@ -36,7 +36,7 @@ namespace Party.Shared.Handlers
                     Path = file.Path,
                     RegistryFile = file.RegistryFile
                 };
-                using var response = await _httpClient.GetAsync(file.RegistryFile.Url);
+                using var response = await _httpClient.GetAsync(file.RegistryFile.Url).ConfigureAwait(false);
                 response.EnsureSuccessStatusCode();
                 var content = await response.Content.ReadAsStringAsync();
                 var lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);

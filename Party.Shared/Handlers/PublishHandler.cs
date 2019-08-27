@@ -13,12 +13,12 @@ namespace Party.Shared.Handlers
 {
     public class PublishHandler
     {
-        private readonly PartyConfiguration _config;
+        private readonly string _savesDirectory;
         private readonly IFileSystem _fs;
 
-        public PublishHandler(PartyConfiguration config, IFileSystem fs)
+        public PublishHandler(string savesDirectory, IFileSystem fs)
         {
-            _config = config ?? throw new ArgumentNullException(nameof(config));
+            _savesDirectory = savesDirectory ?? throw new ArgumentNullException(nameof(savesDirectory));
             _fs = fs ?? throw new ArgumentNullException(nameof(fs));
         }
 
@@ -33,31 +33,26 @@ namespace Party.Shared.Handlers
             {
                 throw new InvalidOperationException($"Path must be rooted prior to being sent to this handler: {path}");
             }
-            var savesDirectory = _config.VirtAMate.SavesDirectory;
-            if (!path.StartsWith(savesDirectory))
+            if (!path.StartsWith(_savesDirectory))
             {
-                throw new UserInputException($"Path must be inside the saves directory.\nPath: {path}\nSaves: {savesDirectory}");
+                throw new UserInputException($"Path must be inside the saves directory.\nPath: {path}\nSaves: {_savesDirectory}");
             }
 
             var attrs = _fs.File.GetAttributes(path);
             string[] files;
-            string name;
             var types = new[] { ".cs", ".cslist" };
             if (attrs.HasFlag(FileAttributes.Directory))
             {
-                name = Path.GetFileName(path.TrimEnd(Path.DirectorySeparatorChar));
                 files = _fs.Directory.GetFiles(path).Where(f => types.Contains(Path.GetExtension(f))).ToArray();
             }
             else if (attrs.HasFlag(FileAttributes.Normal))
             {
                 if (types.Contains(Path.GetExtension(path)))
                 {
-                    name = Path.GetFileNameWithoutExtension(path);
                     files = new[] { path };
                 }
                 else
                 {
-                    name = null;
                     files = new string[0];
                 }
             }

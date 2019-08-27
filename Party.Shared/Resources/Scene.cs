@@ -1,8 +1,4 @@
 using System.Collections.Generic;
-using System.IO.Abstractions;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Party.Shared.Resources
 {
@@ -10,7 +6,7 @@ namespace Party.Shared.Resources
     {
         public List<Script> Scripts { get; } = new List<Script>();
 
-        public Scene(string fullPath) : base(fullPath)
+        public Scene(string fullPath) : base(fullPath, null)
         {
         }
 

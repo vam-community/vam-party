@@ -13,7 +13,7 @@ using Party.Shared.Exceptions;
 
 namespace Party.CLI
 {
-    public class Program
+    public static class Program
     {
         public static async Task<int> Main(string[] args)
         {
@@ -25,7 +25,7 @@ namespace Party.CLI
             rootConfig.Bind(config);
             config.VirtAMate.SavesDirectory = Path.GetFullPath(config.VirtAMate.SavesDirectory, AppContext.BaseDirectory);
 
-            var renderer = new ConsoleRenderer(Console.Out, Console.In);
+            var renderer = new ConsoleRenderer(Console.Out, Console.In, (ConsoleColor color) => Console.ForegroundColor = color, () => Console.ResetColor());
 
             var controller = new PartyController(config);
 
@@ -67,17 +67,16 @@ namespace Party.CLI
 
             if (exc != null)
             {
-                return HandleError(exc);
+                return HandleError(renderer, exc);
             }
 
             await renderer.WhenCompleteAsync();
             return 0;
         }
 
-        private static int HandleError(Exception exc)
+        private static int HandleError(ConsoleRenderer renderer, Exception exc)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            try
+            using (renderer.WithColor(ConsoleColor.Red))
             {
                 if (exc is PartyException partyExc)
                 {
@@ -93,10 +92,6 @@ namespace Party.CLI
 
                 ExceptionDispatchInfo.Capture(exc).Throw();
                 return 1;
-            }
-            finally
-            {
-                Console.ResetColor();
             }
         }
     }

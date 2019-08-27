@@ -5,10 +5,10 @@ using Party.Shared.Results;
 
 namespace Party.Shared
 {
-    public static class ResultFactory
+    internal static class ResultFactory
     {
         #region Registry
-        public static RegistryResult Reg(params RegistryScript[] scripts)
+        internal static RegistryResult Reg(params RegistryScript[] scripts)
         {
             return new RegistryResult
             {
@@ -16,7 +16,7 @@ namespace Party.Shared
             };
         }
 
-        public static RegistryScript RegScript(string name, params RegistryScriptVersion[] versions)
+        internal static RegistryScript RegScript(string name, params RegistryScriptVersion[] versions)
         {
             return new RegistryScript
             {
@@ -25,7 +25,7 @@ namespace Party.Shared
             };
         }
 
-        public static RegistryScriptVersion RegVer(string version, params RegistryFile[] files)
+        internal static RegistryScriptVersion RegVer(string version, params RegistryFile[] files)
         {
             return new RegistryScriptVersion
             {
@@ -34,7 +34,7 @@ namespace Party.Shared
             };
         }
 
-        public static RegistryFile RegFile(string filename, string hash, string url)
+        internal static RegistryFile RegFile(string filename, string hash, string url)
         {
             return new RegistryFile
             {
@@ -49,37 +49,25 @@ namespace Party.Shared
         #endregion
 
         #region Saves Map
-        public static SavesMapBuilder SavesMap()
+        internal static SavesMapBuilder SavesMap()
         {
             return new SavesMapBuilder();
         }
 
-        public static (SavesMapResult, Script) SavesMap(Script script, params Scene[] scenes)
-        {
-            var map = new Dictionary<string, Script>();
-            script.Scenes.AddRange(scenes);
-            map.Add(script.FullPath, script);
-            return (new SavesMapResult
-            {
-                ScriptsByFilename = map,
-                Scenes = scenes
-            }, script);
-        }
-
-        public class SavesMapBuilder
+        internal class SavesMapBuilder
         {
             private readonly List<Script> _scripts = new List<Script>();
             private readonly List<Scene> _scenes = new List<Scene>();
             private readonly List<string> _errors = new List<string>();
 
-            public SavesMapBuilder WithScript(Script script, out Script outScript)
+            internal SavesMapBuilder WithScript(Script script, out Script outScript)
             {
                 _scripts.Add(script);
                 outScript = script;
                 return this;
             }
 
-            public SavesMapBuilder Referencing(Scene scene, out Scene outScene)
+            internal SavesMapBuilder Referencing(Scene scene, out Scene outScene)
             {
                 _scripts.Last().Scenes.Add(scene);
                 _scenes.Add(scene);
@@ -87,13 +75,13 @@ namespace Party.Shared
                 return this;
             }
 
-            public SavesMapBuilder WithScene(Scene scene)
+            internal SavesMapBuilder WithScene(Scene scene)
             {
                 _scenes.Add(scene);
                 return this;
             }
 
-            public SavesMapResult Build()
+            internal SavesMapResult Build()
             {
                 return new SavesMapResult
                 {

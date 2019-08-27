@@ -33,6 +33,19 @@ namespace Party.CLI.Commands
             command.AddOption(new Option("--saves", "Specify the Saves folder to use") { Argument = new Argument<DirectoryInfo>().ExistingOnly() });
         }
 
+        protected void PrintWarnings(string[] errors)
+        {
+            if (errors == null) return;
+
+            using (Renderer.WithColor(ConsoleColor.Yellow))
+            {
+                foreach (var error in errors)
+                {
+                    Renderer.WriteLine(error);
+                }
+            }
+        }
+
         protected static string Pluralize(int count, string singular, string plural)
         {
             if (count == 1)

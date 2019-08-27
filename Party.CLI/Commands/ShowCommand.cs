@@ -50,6 +50,8 @@ namespace Party.CLI.Commands
                 throw new RegistryException("Package does not have any versions");
             }
 
+            PrintWarnings(saves.Errors);
+
             Renderer.WriteLine($"Package {registryPackage.Name}, by {registryPackage.Author?.Name ?? "Anonymous"}");
             if (registryPackage.Description != null)
             {

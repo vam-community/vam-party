@@ -31,7 +31,7 @@ namespace Party.Shared.Handlers
 
             var result = _handler.Search(registry, saves, "", false);
 
-            PartyAssertions.AreDeepEqual(new SearchResult[]
+            PartyAssertions.AreDeepEqual(new[]
             {
                 new SearchResult
                 {

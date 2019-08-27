@@ -6,7 +6,7 @@ namespace Party.Shared.Exceptions
     {
         public virtual int Code => 10;
 
-        public PartyException(string message) : base(message)
+        protected PartyException(string message) : base(message)
         {
         }
     }

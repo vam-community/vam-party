@@ -37,7 +37,7 @@ namespace Party.Shared
 
         public Task<PublishResult> Publish(RegistryScript script, RegistryScriptVersion version, string path)
         {
-            return new PublishHandler(_config, _fs).PublishAsync(script, version, path);
+            return new PublishHandler(_config.VirtAMate.SavesDirectory, _fs).PublishAsync(script, version, path);
         }
 
         public IEnumerable<SearchResult> Search(RegistryResult registry, SavesMapResult saves, string query, bool showUsage)
