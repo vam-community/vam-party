@@ -6,18 +6,16 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Party.Shared.Handlers;
-using Party.Shared.Resources;
 using Party.Shared.Results;
-using Party.Shared.Utils;
 
 namespace Party.Shared
 {
     public class PartyController
     {
         private static string Version { get; } = typeof(PartyController).Assembly.GetName().Version.ToString();
-        private PartyConfiguration _config;
-        private HttpClient _http;
-        private IFileSystem _fs;
+        private readonly PartyConfiguration _config;
+        private readonly HttpClient _http;
+        private readonly IFileSystem _fs;
 
         public PartyController(PartyConfiguration config)
         {
@@ -54,7 +52,7 @@ namespace Party.Shared
 
         public Task<InstalledPackageInfoResult> InstallPackageAsync(InstalledPackageInfoResult info)
         {
-            return new InstallPackageHandler(_config, _fs, _http).InstallPackageAsync(info);
+            return new InstallPackageHandler(_fs, _http).InstallPackageAsync(info);
         }
 
         public string GetRelativePath(string fullPath)

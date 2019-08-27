@@ -59,33 +59,25 @@ namespace Party.Shared.Handlers
         {
             if (Uri.IsWellFormedUriString(url, UriKind.Absolute))
             {
-                using (var response = await _http.GetAsync(url))
-                {
-                    response.EnsureSuccessStatusCode();
-                    using (var streamReader = new StreamReader(await response.Content.ReadAsStreamAsync().ConfigureAwait(false)))
-                    {
-                        return Deserialize(streamReader);
-                    }
-                }
+                using var response = await _http.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+                using var streamReader = new StreamReader(await response.Content.ReadAsStreamAsync().ConfigureAwait(false));
+                return Deserialize(streamReader);
             }
             else
             {
-                using (var fileStream = File.OpenRead(Path.Combine(AppContext.BaseDirectory, url)))
-                using (var streamReader = new StreamReader(fileStream))
-                {
-                    return Deserialize(streamReader);
-                }
+                using var fileStream = File.OpenRead(Path.Combine(AppContext.BaseDirectory, url));
+                using var streamReader = new StreamReader(fileStream);
+                return Deserialize(streamReader);
             }
         }
 
         private static RegistryResult Deserialize(StreamReader streamReader)
         {
-            using (var jsonTestReader = new JsonTextReader(streamReader))
-            {
-                var jsonSerializer = new JsonSerializer();
-                var registry = jsonSerializer.Deserialize<RegistryResult>(jsonTestReader);
-                return registry;
-            }
+            using var jsonTestReader = new JsonTextReader(streamReader);
+            var jsonSerializer = new JsonSerializer();
+            var registry = jsonSerializer.Deserialize<RegistryResult>(jsonTestReader);
+            return registry;
         }
     }
 }

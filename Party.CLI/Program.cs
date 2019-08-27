@@ -31,9 +31,10 @@ namespace Party.CLI
 
             var rootCommand = new RootCommand("Party: A Virt-A-Mate package manager") {
                 SearchCommand.CreateCommand(renderer, config, controller),
+                GetCommand.CreateCommand(renderer, config, controller),
+                ShowCommand.CreateCommand(renderer, config, controller),
                 StatusCommand.CreateCommand(renderer, config, controller),
                 PublishCommand.CreateCommand(renderer, config, controller),
-                GetCommand.CreateCommand(renderer, config, controller)
             };
 
             // For CoreRT:

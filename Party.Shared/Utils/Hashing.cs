@@ -35,11 +35,9 @@ namespace Party.Shared.Utils
         {
             var content = string.Join('\n', lines.Where(l => !string.IsNullOrEmpty(l)));
             var bytes = Encoding.UTF8.GetBytes(content);
-            using (var sha256Hash = SHA256.Create())
-            {
-                byte[] checksum = sha256Hash.ComputeHash(bytes);
-                return BitConverter.ToString(checksum).Replace("-", String.Empty);
-            }
+            using var sha256Hash = SHA256.Create();
+            byte[] checksum = sha256Hash.ComputeHash(bytes);
+            return BitConverter.ToString(checksum).Replace("-", String.Empty);
         }
     }
 }

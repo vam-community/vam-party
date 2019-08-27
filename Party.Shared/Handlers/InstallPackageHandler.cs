@@ -12,13 +12,11 @@ namespace Party.Shared.Handlers
 {
     public class InstallPackageHandler
     {
-        private readonly PartyConfiguration _config;
         private readonly IFileSystem _fs;
         private readonly HttpClient _httpClient;
 
-        public InstallPackageHandler(PartyConfiguration config, IFileSystem fs, HttpClient httpClient)
+        public InstallPackageHandler(IFileSystem fs, HttpClient httpClient)
         {
-            _config = config ?? throw new ArgumentNullException(nameof(config));
             _fs = fs ?? throw new ArgumentNullException(nameof(fs));
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         }
@@ -38,20 +36,18 @@ namespace Party.Shared.Handlers
                     Path = file.Path,
                     RegistryFile = file.RegistryFile
                 };
-                using (var response = await _httpClient.GetAsync(file.RegistryFile.Url))
+                using var response = await _httpClient.GetAsync(file.RegistryFile.Url);
+                response.EnsureSuccessStatusCode();
+                var content = await response.Content.ReadAsStringAsync();
+                var lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                var hash = Hashing.GetHash(lines);
+                if (hash != file.RegistryFile.Hash.Value)
                 {
-                    response.EnsureSuccessStatusCode();
-                    var content = await response.Content.ReadAsStringAsync();
-                    var lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                    var hash = Hashing.GetHash(lines);
-                    if (hash != file.RegistryFile.Hash.Value)
-                    {
-                        throw new PackageInstallationException($"Hash mismatch between registry file '{file.RegistryFile.Filename}' ({file.RegistryFile.Hash.Value}) and downloaded file '{file.RegistryFile.Url}' ({hash})");
-                    }
-                    _fs.File.WriteAllText(file.Path, content);
-                    fileResult.Status = InstalledPackageInfoResult.FileStatus.Installed;
-                    files.Add(fileResult);
+                    throw new PackageInstallationException($"Hash mismatch between registry file '{file.RegistryFile.Filename}' ({file.RegistryFile.Hash.Value}) and downloaded file '{file.RegistryFile.Url}' ({hash})");
                 }
+                _fs.File.WriteAllText(file.Path, content);
+                fileResult.Status = InstalledPackageInfoResult.FileStatus.Installed;
+                files.Add(fileResult);
             }
             return new InstalledPackageInfoResult
             {

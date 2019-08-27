@@ -38,11 +38,9 @@ namespace Party.Shared.Serializers
 
         private async Task<JObject> ParseAsync(IFileSystem fs, string path)
         {
-            using (var file = fs.File.OpenText(path))
-            using (var reader = new JsonTextReader(file))
-            {
-                return (JObject)await JToken.ReadFromAsync(reader).ConfigureAwait(false);
-            }
+            using var file = fs.File.OpenText(path);
+            using var reader = new JsonTextReader(file);
+            return (JObject)await JToken.ReadFromAsync(reader).ConfigureAwait(false);
         }
     }
 }

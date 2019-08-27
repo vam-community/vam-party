@@ -68,9 +68,9 @@ namespace Party.Shared
 
         public class SavesMapBuilder
         {
-            private List<Script> _scripts = new List<Script>();
-            private List<Scene> _scenes = new List<Scene>();
-            private List<string> _errors = new List<string>();
+            private readonly List<Script> _scripts = new List<Script>();
+            private readonly List<Scene> _scenes = new List<Scene>();
+            private readonly List<string> _errors = new List<string>();
 
             public SavesMapBuilder WithScript(Script script, out Script outScript)
             {
