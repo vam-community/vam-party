@@ -10,7 +10,19 @@ using Party.Shared.Results;
 
 namespace Party.Shared
 {
-    public class PartyController
+    public interface IPartyController
+    {
+        Task<RegistryResult> GetRegistryAsync();
+        Task<SavesMapResult> GetSavesAsync();
+        Task<PublishResult> Publish(RegistryScript script, RegistryScriptVersion version, string path);
+        IEnumerable<SearchResult> Search(RegistryResult registry, SavesMapResult saves, string query, bool showUsage);
+        Task<InstalledPackageInfoResult> GetInstalledPackageInfoAsync(string name, RegistryScriptVersion version);
+        Task<InstalledPackageInfoResult> InstallPackageAsync(InstalledPackageInfoResult info);
+        string GetRelativePath(string fullPath);
+        string GetRelativePath(string fullPath, string parentPath);
+    }
+
+    public class PartyController : IPartyController
     {
         private static string Version { get; } = typeof(PartyController).Assembly.GetName().Version.ToString();
         private readonly PartyConfiguration _config;

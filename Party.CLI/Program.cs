@@ -13,7 +13,7 @@ using Party.Shared.Exceptions;
 
 namespace Party.CLI
 {
-    public static class Program
+    public class Program
     {
         public static async Task<int> Main(string[] args)
         {
@@ -21,20 +21,36 @@ namespace Party.CLI
                 .SetBasePath(Path.Combine(AppContext.BaseDirectory))
                 .AddJsonFile("party.settings.json", optional: true, reloadOnChange: false)
                 .Build();
-            var config = PartyConfigurationFactory.Create();
+            var config = PartyConfigurationFactory.Create(AppContext.BaseDirectory);
             rootConfig.Bind(config);
-            config.VirtAMate.SavesDirectory = Path.GetFullPath(config.VirtAMate.SavesDirectory, AppContext.BaseDirectory);
 
-            var renderer = new ConsoleRenderer(Console.Out, Console.In, (ConsoleColor color) => Console.ForegroundColor = color, () => Console.ResetColor());
+            var renderer = new ConsoleRenderer(Console.Out, Console.In, Console.Error, (ConsoleColor color) => Console.ForegroundColor = color, () => Console.ResetColor());
 
             var controller = new PartyController(config);
 
+            return await new Program(renderer, config, controller).Execute(args).ConfigureAwait(false);
+        }
+
+        private readonly IRenderer _renderer;
+        private readonly PartyConfiguration _config;
+        private readonly IPartyController _controller;
+
+        public Program(IRenderer renderer, PartyConfiguration config, IPartyController controller)
+        {
+            _renderer = renderer;
+            _config = config;
+            _controller = controller;
+        }
+
+        public async Task<int> Execute(string[] args)
+        {
+
             var rootCommand = new RootCommand("Party: A Virt-A-Mate package manager") {
-                SearchCommand.CreateCommand(renderer, config, controller),
-                GetCommand.CreateCommand(renderer, config, controller),
-                ShowCommand.CreateCommand(renderer, config, controller),
-                StatusCommand.CreateCommand(renderer, config, controller),
-                PublishCommand.CreateCommand(renderer, config, controller),
+                SearchCommand.CreateCommand(_renderer, _config, _controller),
+                GetCommand.CreateCommand(_renderer, _config, _controller),
+                ShowCommand.CreateCommand(_renderer, _config, _controller),
+                StatusCommand.CreateCommand(_renderer, _config, _controller),
+                PublishCommand.CreateCommand(_renderer, _config, _controller),
             };
 
             // For CoreRT:
@@ -51,14 +67,14 @@ namespace Party.CLI
                        .UseDebugDirective()
 #endif
                        .UseSuggestDirective()
-                       .RegisterWithDotnetSuggest()
+                       //.RegisterWithDotnetSuggest()
                        .UseTypoCorrections()
                        .UseParseErrorReporting()
                        .UseExceptionHandler((e, ctx) => exc = e)
                        .CancelOnProcessTermination()
                        .Build();
 
-                await parser.InvokeAsync(args);
+                await parser.InvokeAsync(args, _renderer);
             }
             catch (Exception e)
             {
@@ -67,32 +83,32 @@ namespace Party.CLI
 
             if (exc != null)
             {
-                return HandleError(renderer, exc);
+                return HandleError(exc);
             }
 
-            await renderer.WhenCompleteAsync();
+            await _renderer.WhenCompleteAsync();
             return 0;
         }
 
-        private static int HandleError(ConsoleRenderer renderer, Exception exc)
+        private int HandleError(Exception exc)
         {
-            using (renderer.WithColor(ConsoleColor.Red))
+            using (_renderer.WithColor(ConsoleColor.Red))
             {
                 if (exc is PartyException partyExc)
                 {
-                    Console.Error.WriteLine(partyExc.Message);
+                    _renderer.Error.WriteLine(partyExc.Message);
                     return partyExc.Code;
                 }
 
                 if (exc is UnauthorizedAccessException unauthorizedExc)
                 {
-                    Console.Error.WriteLine(unauthorizedExc.Message);
+                    _renderer.Error.WriteLine(unauthorizedExc.Message);
                     return 2;
                 }
-
-                ExceptionDispatchInfo.Capture(exc).Throw();
-                return 1;
             }
+
+            ExceptionDispatchInfo.Capture(exc).Throw();
+            return 1;
         }
     }
 }

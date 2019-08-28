@@ -11,7 +11,7 @@ namespace Party.CLI.Commands
 {
     public class GetCommand : CommandBase
     {
-        public static Command CreateCommand(IRenderer renderer, PartyConfiguration config, PartyController controller)
+        public static Command CreateCommand(IRenderer renderer, PartyConfiguration config, IPartyController controller)
         {
             var command = new Command("get", "Downloads a package (script) into the saves folder");
             AddCommonOptions(command);
@@ -26,7 +26,7 @@ namespace Party.CLI.Commands
             return command;
         }
 
-        public GetCommand(IRenderer renderer, PartyConfiguration config, DirectoryInfo saves, PartyController controller) : base(renderer, config, saves, controller)
+        public GetCommand(IRenderer renderer, PartyConfiguration config, DirectoryInfo saves, IPartyController controller) : base(renderer, config, saves, controller)
         {
         }
 

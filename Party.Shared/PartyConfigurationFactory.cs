@@ -4,11 +4,11 @@ namespace Party.Shared
 {
     public static class PartyConfigurationFactory
     {
-        public static PartyConfiguration Create()
+        public static PartyConfiguration Create(string baseDirectory)
         {
             return new PartyConfiguration
             {
-                VirtAMate = new PartyConfigurationVirtAMate
+                VirtAMate = new PartyConfigurationVirtAMate(baseDirectory)
                 {
                     SavesDirectory = "Saves"
                 },

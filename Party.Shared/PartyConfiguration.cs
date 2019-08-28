@@ -1,3 +1,5 @@
+using System.IO;
+
 namespace Party.Shared
 {
     public class PartyConfiguration
@@ -9,7 +11,18 @@ namespace Party.Shared
 
     public class PartyConfigurationVirtAMate
     {
-        public string SavesDirectory { get; set; }
+        private readonly string _baseDirectory;
+        private string _savesDirectory;
+
+        public PartyConfigurationVirtAMate(string baseDirectory)
+        {
+            _baseDirectory = baseDirectory;
+        }
+        public string SavesDirectory
+        {
+            get => _savesDirectory;
+            set => _savesDirectory = Path.GetFullPath(value, _baseDirectory);
+        }
     }
 
     public class PartyConfigurationScanning

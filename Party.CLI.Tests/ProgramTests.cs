@@ -3,14 +3,14 @@ using System.Threading.Tasks;
 
 namespace Party.CLI
 {
-	public class ProgramTests
-	{
-		[Test]
-		public async Task CanGetVersion()
-		{
-            var  result = await Program.Main(new [] { "--version" });
+    public class ProgramTests
+    {
+        [Test]
+        public async Task CanInitializeAllDependencies()
+        {
+            var result = await Program.Main(new[] { "--version" });
 
             Assert.That(result, Is.EqualTo(0));
-		}
-	}
+        }
+    }
 }

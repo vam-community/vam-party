@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.CommandLine;
 using System.IO;
 using System.Threading.Tasks;
 
 namespace Party.CLI
 {
-    public interface IRenderer
+    public interface IRenderer : IConsole
     {
         IDisposable WithColor(ConsoleColor color);
         void WriteLine(string text);
@@ -18,16 +19,33 @@ namespace Party.CLI
         private List<Task> _writing = new List<Task>();
         private readonly TextWriter _output;
         private readonly TextReader _input;
+        private readonly TextWriter _error;
         private readonly Action<ConsoleColor> _setColor;
         private readonly Action _resetColor;
 
-        public ConsoleRenderer(TextWriter output, TextReader input, Action<ConsoleColor> setColor, Action resetColor)
+        public ConsoleRenderer(TextWriter output, TextReader input, TextWriter error, Action<ConsoleColor> setColor, Action resetColor)
         {
+            _error = error ?? throw new ArgumentNullException(nameof(error));
+            Error = StandardStreamWriter.Create(_error);
+
             _output = output ?? throw new ArgumentNullException(nameof(output));
+            Out = StandardStreamWriter.Create(_output);
+
             _input = input ?? throw new ArgumentNullException(nameof(input));
+
             _setColor = setColor ?? throw new ArgumentNullException(nameof(setColor));
             _resetColor = resetColor ?? throw new ArgumentNullException(nameof(resetColor));
         }
+
+        public IStandardStreamWriter Error { get; }
+
+        public bool IsErrorRedirected => Console.IsErrorRedirected;
+
+        public IStandardStreamWriter Out { get; }
+
+        public bool IsOutputRedirected => Console.IsOutputRedirected;
+
+        public bool IsInputRedirected => Console.IsInputRedirected;
 
         public IDisposable WithColor(ConsoleColor color)
         {

@@ -11,7 +11,7 @@ namespace Party.CLI.Commands
 {
     public class ShowCommand : CommandBase
     {
-        public static Command CreateCommand(IRenderer renderer, PartyConfiguration config, PartyController controller)
+        public static Command CreateCommand(IRenderer renderer, PartyConfiguration config, IPartyController controller)
         {
             var command = new Command("show", "Show information about a package");
             AddCommonOptions(command);
@@ -24,7 +24,7 @@ namespace Party.CLI.Commands
             return command;
         }
 
-        public ShowCommand(IRenderer renderer, PartyConfiguration config, DirectoryInfo saves, PartyController controller) : base(renderer, config, saves, controller)
+        public ShowCommand(IRenderer renderer, PartyConfiguration config, DirectoryInfo saves, IPartyController controller) : base(renderer, config, saves, controller)
         {
         }
 

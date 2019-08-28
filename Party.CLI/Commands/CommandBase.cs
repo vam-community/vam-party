@@ -10,9 +10,9 @@ namespace Party.CLI.Commands
     {
         protected readonly IRenderer Renderer;
         protected readonly PartyConfiguration Config;
-        protected readonly PartyController Controller;
+        protected readonly IPartyController Controller;
 
-        protected CommandBase(IRenderer renderer, PartyConfiguration config, DirectoryInfo saves, PartyController controller)
+        protected CommandBase(IRenderer renderer, PartyConfiguration config, DirectoryInfo saves, IPartyController controller)
         {
             Renderer = renderer;
             Config = GetConfig(config, saves);
@@ -35,13 +35,13 @@ namespace Party.CLI.Commands
 
         protected void PrintWarnings(string[] errors)
         {
-            if (errors == null) return;
+            if (errors == null || errors.Length == 0) return;
 
             using (Renderer.WithColor(ConsoleColor.Yellow))
             {
                 foreach (var error in errors)
                 {
-                    Renderer.WriteLine(error);
+                    Renderer.Error.WriteLine(error);
                 }
             }
         }

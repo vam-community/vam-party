@@ -15,7 +15,7 @@ namespace Party.CLI.Commands
             ScenesList
         }
 
-        public static Command CreateCommand(IRenderer renderer, PartyConfiguration config, PartyController controller)
+        public static Command CreateCommand(IRenderer renderer, PartyConfiguration config, IPartyController controller)
         {
             var command = new Command("search", "Search for scripts and packages in the registry");
             AddCommonOptions(command);
@@ -29,7 +29,7 @@ namespace Party.CLI.Commands
             return command;
         }
 
-        public SearchCommand(IRenderer renderer, PartyConfiguration config, DirectoryInfo saves, PartyController controller) : base(renderer, config, saves, controller)
+        public SearchCommand(IRenderer renderer, PartyConfiguration config, DirectoryInfo saves, IPartyController controller) : base(renderer, config, saves, controller)
         {
         }
 
