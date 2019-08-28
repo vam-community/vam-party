@@ -23,6 +23,7 @@ namespace Party.Shared.Handlers
 
         public async Task Add(Registry registry, RegistryScript script, RegistryScriptVersion version, string path)
         {
+            // TODO: Instead of passing a script, return an empty script and fill it upstream
             // TODO: Validate fields, especially the version and name
             if (script is null) throw new ArgumentNullException(nameof(script));
             if (version is null) throw new ArgumentNullException(nameof(version));
@@ -80,6 +81,16 @@ namespace Party.Shared.Handlers
                 });
             }
 
+            var versionFileHashes = registryFiles.Select(f => f.Hash.Value).ToArray();
+            var versionWithSameHashes = registry.Scripts
+                .SelectMany(script => script.Versions.Select(version => (script, version)))
+                .FirstOrDefault(x => x.version.Files.Count == versionFileHashes.Length && x.version.Files.All(f => versionFileHashes.Contains(f.Hash.Value)));
+
+            if (versionWithSameHashes.version != null)
+            {
+                throw new UserInputException($"This version contains exactly the same file count and file hashes as {versionWithSameHashes.script.Name} v{versionWithSameHashes.version.Version}.");
+            }
+
             if (script.Versions == null)
             {
                 script.Versions = new[] { version }.ToList();
@@ -89,13 +100,6 @@ namespace Party.Shared.Handlers
                 if (script.Versions.Any(v => v.Version == version.Version))
                 {
                     throw new UserInputException("This version already exists in the registry.");
-                }
-
-                var versionFileHashes = registryFiles.Select(f => f.Hash.Value).ToArray();
-                var versionWithSameHashes = script.Versions.FirstOrDefault(v => v.Files.Count == versionFileHashes.Length && v.Files.All(f => versionFileHashes.Contains(f.Hash.Value)));
-                if (versionWithSameHashes != null)
-                {
-                    throw new UserInputException($"This version contains exactly the same file count and file hashes as {versionWithSameHashes.Version}.");
                 }
 
                 script.Versions.Insert(0, version);

@@ -68,14 +68,19 @@ namespace Party.CLI.Commands
             else
             {
                 Renderer.WriteLine("Looks like a new package in the registry! Please provide some information about this new package, or press CTRL+C if you want to abort.");
+                var author = new RegistryScriptAuthor
+                {
+                    Name = await Renderer.AskAsync("Author Name: ")
+                };
+                var existingAuthor = registry.Scripts.Where(s => s.Author != null).Select(s => s.Author).FirstOrDefault(a => a.Name.Equals(author.Name, StringComparison.InvariantCultureIgnoreCase));
+                if (!string.IsNullOrEmpty(existingAuthor.Profile))
+                    author.Profile = await Renderer.AskAsync($"Author Profile URL ({existingAuthor.Profile}): ") ?? existingAuthor.Profile;
+                else
+                    author.Profile = await Renderer.AskAsync("Author Profile URL ");
                 script = new RegistryScript
                 {
                     Name = name,
-                    Author = new RegistryScriptAuthor
-                    {
-                        Name = await Renderer.AskAsync("Author Name: "),
-                        Profile = await Renderer.AskAsync("Author Profile URL: ")
-                    },
+                    Author = author,
                     Description = await Renderer.AskAsync("Description: "),
                     Tags = (await Renderer.AskAsync("Tags (comma-separated list): ")).Split(',').Select(x => x.Trim()).Where(x => x != "").ToList(),
                     Homepage = await Renderer.AskAsync("Package Homepage URL: "),
