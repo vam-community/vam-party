@@ -12,14 +12,15 @@ namespace Party.Shared
 {
     public interface IPartyController
     {
-        Task<RegistryResult> GetRegistryAsync();
+        Task<Registry> GetRegistryAsync(params string[] registries);
         Task<SavesMapResult> GetSavesAsync();
-        Task<PublishResult> Publish(RegistryScript script, RegistryScriptVersion version, string path);
-        IEnumerable<SearchResult> Search(RegistryResult registry, SavesMapResult saves, string query, bool showUsage);
+        Task<PublishResult> Publish(Registry registry, RegistryScript script, RegistryScriptVersion version, string path, bool generateCompleteRegistry);
+        IEnumerable<SearchResult> Search(Registry registry, SavesMapResult saves, string query, bool showUsage);
         Task<InstalledPackageInfoResult> GetInstalledPackageInfoAsync(string name, RegistryScriptVersion version);
         Task<InstalledPackageInfoResult> InstallPackageAsync(InstalledPackageInfoResult info);
         string GetRelativePath(string fullPath);
         string GetRelativePath(string fullPath, string parentPath);
+        void SaveToFile(string data, string path);
     }
 
     public class PartyController : IPartyController
@@ -37,9 +38,9 @@ namespace Party.Shared
             _http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Party", Version));
         }
 
-        public Task<RegistryResult> GetRegistryAsync()
+        public Task<Registry> GetRegistryAsync(params string[] registries)
         {
-            return new RegistryHandler(_http, _config.Registry.Urls).AcquireAsync();
+            return new RegistryHandler(_http, _config.Registry.Urls).AcquireAsync(registries);
         }
 
         public Task<SavesMapResult> GetSavesAsync()
@@ -47,12 +48,12 @@ namespace Party.Shared
             return new SavesResolverHandler(_fs, _config.VirtAMate.SavesDirectory, _config.Scanning.Ignore).AnalyzeSaves();
         }
 
-        public Task<PublishResult> Publish(RegistryScript script, RegistryScriptVersion version, string path)
+        public Task<PublishResult> Publish(Registry registry, RegistryScript script, RegistryScriptVersion version, string path, bool generateCompleteRegistry)
         {
-            return new PublishHandler(_config.VirtAMate.SavesDirectory, _fs).PublishAsync(script, version, path);
+            return new PublishHandler(_config.VirtAMate.SavesDirectory, _fs).PublishAsync(registry, script, version, path, generateCompleteRegistry);
         }
 
-        public IEnumerable<SearchResult> Search(RegistryResult registry, SavesMapResult saves, string query, bool showUsage)
+        public IEnumerable<SearchResult> Search(Registry registry, SavesMapResult saves, string query, bool showUsage)
         {
             return new SearchHandler(_config).Search(registry, saves, query, showUsage);
         }
@@ -80,6 +81,11 @@ namespace Party.Shared
             }
 
             return fullPath.Substring(parentPath.Length).TrimStart(Path.DirectorySeparatorChar);
+        }
+
+        public void SaveToFile(string data, string path)
+        {
+            _fs.File.WriteAllText(path, data);
         }
     }
 }

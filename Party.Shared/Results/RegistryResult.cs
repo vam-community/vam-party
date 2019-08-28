@@ -4,21 +4,21 @@ using System.Linq;
 namespace Party.Shared.Results
 {
 
-    public class RegistryResult
+    public class Registry
     {
         public List<RegistryScript> Scripts { get; set; }
     }
 
     public class RegistryScript
     {
-        public RegistryScriptAuthor Author { get; set; }
-        // TODO: Ensure this only contains valid characters
         public string Name { get; set; }
         public string Description { get; set; }
+        public List<string> Tags { get; set; }
+        public RegistryScriptAuthor Author { get; set; }
+        // TODO: Ensure this only contains valid characters
         public string Homepage { get; set; }
         public string Repository { get; set; }
         public List<RegistryScriptVersion> Versions { get; set; }
-        public List<string> Tags { get; set; }
 
         public RegistryScriptVersion GetLatestVersion()
         {
@@ -45,12 +45,6 @@ namespace Party.Shared.Results
         public string Filename { get; set; }
         public string Url { get; set; }
         public RegistryFileHash Hash { get; set; }
-
-        public string GetIdentifier()
-        {
-            // This should be a common util with Resource
-            return $"{Filename}:{Hash.Value ?? "-"}";
-        }
     }
 
     public class RegistryFileHash

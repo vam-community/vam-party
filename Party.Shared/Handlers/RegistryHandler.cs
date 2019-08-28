@@ -19,16 +19,17 @@ namespace Party.Shared.Handlers
             _http = http ?? throw new ArgumentNullException(nameof(http));
             _urls = urls ?? throw new ArgumentNullException(nameof(urls));
         }
-        public async Task<RegistryResult> AcquireAsync()
+        public async Task<Registry> AcquireAsync(string[] registries)
         {
-            if (_urls.Length == 0)
+            var urls = registries.Length > 0 ? registries : _urls;
+            if (urls.Length == 0)
             {
                 throw new ConfigurationException("At least one registry must be configured");
             }
-            return Merge(await Task.WhenAll(_urls.Select(AcquireOne)).ConfigureAwait(false));
+            return Merge(await Task.WhenAll(urls.Select(AcquireOne)).ConfigureAwait(false));
         }
 
-        private RegistryResult Merge(RegistryResult[] registries)
+        private Registry Merge(Registry[] registries)
         {
             var registry = registries[0];
             foreach (var additional in registries.Skip(1))
@@ -55,7 +56,7 @@ namespace Party.Shared.Handlers
             return registry;
         }
 
-        private async Task<RegistryResult> AcquireOne(string url)
+        private async Task<Registry> AcquireOne(string url)
         {
             if (Uri.IsWellFormedUriString(url, UriKind.Absolute))
             {
@@ -72,11 +73,11 @@ namespace Party.Shared.Handlers
             }
         }
 
-        private static RegistryResult Deserialize(StreamReader streamReader)
+        private static Registry Deserialize(StreamReader streamReader)
         {
             using var jsonTestReader = new JsonTextReader(streamReader);
             var jsonSerializer = new JsonSerializer();
-            var registry = jsonSerializer.Deserialize<RegistryResult>(jsonTestReader);
+            var registry = jsonSerializer.Deserialize<Registry>(jsonTestReader);
             return registry;
         }
     }

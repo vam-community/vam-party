@@ -8,9 +8,9 @@ namespace Party.Shared
     internal static class ResultFactory
     {
         #region Registry
-        internal static RegistryResult Reg(params RegistryScript[] scripts)
+        internal static Registry Reg(params RegistryScript[] scripts)
         {
-            return new RegistryResult
+            return new Registry
             {
                 Scripts = scripts.ToList()
             };

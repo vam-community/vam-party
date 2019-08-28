@@ -5,8 +5,10 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using Party.Shared.Exceptions;
 using Party.Shared.Results;
+using Party.Shared.Serializers;
 using Party.Shared.Utils;
 
 namespace Party.Shared.Handlers
@@ -22,7 +24,7 @@ namespace Party.Shared.Handlers
             _fs = fs ?? throw new ArgumentNullException(nameof(fs));
         }
 
-        public async Task<PublishResult> PublishAsync(RegistryScript script, RegistryScriptVersion version, string path)
+        public async Task<PublishResult> PublishAsync(Registry registry, RegistryScript script, RegistryScriptVersion version, string path, bool generateCompleteRegistry)
         {
             // TODO: Validate fields, especially the version and name
             if (script is null) throw new ArgumentNullException(nameof(script));
@@ -92,14 +94,34 @@ namespace Party.Shared.Handlers
                     throw new UserInputException("This version already exists in the registry.");
                 }
 
+                var versionFileHashes = registryFiles.Select(f => f.Hash.Value).ToArray();
+                var versionWithSameHashes = script.Versions.FirstOrDefault(v => v.Files.Count == versionFileHashes.Length && v.Files.All(f => versionFileHashes.Contains(f.Hash.Value)));
+                if (versionWithSameHashes != null)
+                {
+                    throw new UserInputException($"This version contains exactly the same file count and file hashes as {versionWithSameHashes.Version}.");
+                }
+
                 version.Files = registryFiles;
                 script.Versions.Insert(0, version);
             }
 
+            var indexOfScript = registry.Scripts.FindIndex(s => s.Name.Equals(script.Name, StringComparison.InvariantCultureIgnoreCase));
+            if (indexOfScript > -1)
+            {
+                registry.Scripts.RemoveAt(indexOfScript);
+                registry.Scripts.Insert(indexOfScript, script);
+            }
+            else
+            {
+                registry.Scripts.Add(script);
+            }
+
+            var serializer = new RegistrySerializer();
+            var formatted = generateCompleteRegistry ? serializer.Serialize(registry) : serializer.Serialize(script);
 
             return new PublishResult
             {
-                Formatted = JsonConvert.SerializeObject(script, Formatting.Indented)
+                Formatted = formatted
             };
         }
     }

@@ -11,7 +11,7 @@ namespace Party.CLI
         [Test]
         public async Task Show()
         {
-            _controller.Setup(x => x.GetRegistryAsync()).ReturnsAsync(new RegistryResult
+            _controller.Setup(x => x.GetRegistryAsync()).ReturnsAsync(new Registry
             {
                 Scripts = new[]
                 {
