@@ -19,7 +19,6 @@ namespace Party.Shared.Handlers
         {
             if (registry is null) throw new ArgumentNullException(nameof(registry));
             if (registry?.Scripts is null) throw new ArgumentException("registry does not have any scripts", nameof(registry));
-            if (saves is null) throw new ArgumentNullException(nameof(saves));
 
             foreach (var package in registry.Scripts)
             {

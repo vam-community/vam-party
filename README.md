@@ -14,41 +14,72 @@ Download `party.exe` from the [latest release](https://github.com/vam-community/
 
 ## Commands
 
-Commands can be invoked using `party command-name (arguments...)`. See below for examples.
+Commands can be invoked using `party command-name (arguments...)`. See below for examples; not every option is documented here.
 
 ### `help`
 
-You can show commands using `party help`, or help on a specific command using `party help command-name`.
+You can show commands using `party -h`, or help on a specific command using `party command-name -h`.
 
 ### `search`
 
-Search lists all packages from the registry.
+You can list packages from the registry:
 
     > party search
-    - some package by some user (v1.0.0)
-    - ...
+    - some-package 1.0.3 by Some User (used in 4 scenes)
 
-### `scripts`
+You can also search by keyword:
 
-Lists all scripts in your VaM installation.
+    > party search some-keyword
 
-    > party scripts
-    - SomeScript.cs (2 copies used by 3 scenes)
-    - ...
+If you want the command to run faster, you can opt-out of the saves folder analysis:
 
-### `scenes`
+    > party search some-keyword --show Basic
 
-Lists all scenes in your VaM installation.
+If a script contains files that are hosted on an untrusted server (i.e. a server that can track you), if will be flagged as `[untrusted]`.
 
-    > party scenes
-    - scene\Anonymous\Some Scene.json
+### `get`
 
-### `package`
+Downloads a script locally. This will also validate hashes to make sure there was no tampering:
 
-Prepares the output JSON for publishing on the registry.
+    > party get some-package
 
-    > party package Scripts\Anonymous\My Plugin.cs
-    { ... }
+You can also install a specific version:
+
+    > party get some-package --version 1.0.0
+
+### `publish`
+
+Helps publishing a new scene to the registry. First, clone [vam-registry](https://github.com/vam-community/vam-registry), and then you can run:
+
+    > party publish "C:\...\My Script.cs" --package-name my-package --package-version 1.0.0 --registry "C:\...\vam-registry\v1\index.json"
+
+You can also generate the JSON for your package directly in the console by omitting the `--registry` option. In this case, it will load registry information from GitHub directly.
+
+If you do not provide a version and package name, party will ask for one. If it's a new package, it will ask you for information such as tags, repository link, etc.
+
+### `status`
+
+Prints the list of all installed scripts, identify the ones that are out of date, and flag scenes that reference scripts from a folder other than the party installation folder.
+
+    > party status
+    Scripts:
+    - My Script.cs (used in 3 scenes)
+    - Cool Plugin.cslist (used in 0 scenes)
+
+This command is still under development, right now it will list every error in your saves folder (bad references, etc.) and list every single script without information about package or version.
+
+### `show`
+
+Shows more information about a specific package:
+
+    > party show some-package
+    Package some-package, by Some User
+    Description: This package does cool stuff
+    Tags: tag1, tag2
+    Repository: https://github.com/...
+    Homepage: https://www.reddit.com/r/VAMscenes/...
+    Files:
+    - My Script.cs
 
 ## Configuration
 

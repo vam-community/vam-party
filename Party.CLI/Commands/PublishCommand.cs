@@ -89,6 +89,11 @@ namespace Party.CLI.Commands
 
             var result = await Controller.Publish(registry, script, version, input, registryJson != null).ConfigureAwait(false);
 
+            foreach (var file in version.Files)
+            {
+                file.Url = await Renderer.AskAsync($"{file.Filename} URL: ");
+            }
+
             if (registryJson != null)
             {
                 Controller.SaveToFile(result.Formatted, registryJson.FullName);
