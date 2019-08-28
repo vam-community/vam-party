@@ -14,7 +14,7 @@ namespace Party.Shared
     {
         Task<Registry> GetRegistryAsync(params string[] registries);
         Task<SavesMapResult> GetSavesAsync();
-        Task<PublishResult> Publish(Registry registry, RegistryScript script, RegistryScriptVersion version, string path, bool generateCompleteRegistry);
+        Task AddToRegistry(Registry registry, RegistryScript script, RegistryScriptVersion version, string path);
         IEnumerable<SearchResult> Search(Registry registry, SavesMapResult saves, string query, bool showUsage);
         Task<InstalledPackageInfoResult> GetInstalledPackageInfoAsync(string name, RegistryScriptVersion version);
         Task<InstalledPackageInfoResult> InstallPackageAsync(InstalledPackageInfoResult info);
@@ -48,9 +48,9 @@ namespace Party.Shared
             return new SavesResolverHandler(_fs, _config.VirtAMate.SavesDirectory, _config.Scanning.Ignore).AnalyzeSaves();
         }
 
-        public Task<PublishResult> Publish(Registry registry, RegistryScript script, RegistryScriptVersion version, string path, bool generateCompleteRegistry)
+        public Task AddToRegistry(Registry registry, RegistryScript script, RegistryScriptVersion version, string path)
         {
-            return new PublishHandler(_config.VirtAMate.SavesDirectory, _fs).PublishAsync(registry, script, version, path, generateCompleteRegistry);
+            return new AddToRegistryHandler(_config.VirtAMate.SavesDirectory, _fs).Add(registry, script, version, path);
         }
 
         public IEnumerable<SearchResult> Search(Registry registry, SavesMapResult saves, string query, bool showUsage)

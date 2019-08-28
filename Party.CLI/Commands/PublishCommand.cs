@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Party.Shared;
 using Party.Shared.Exceptions;
 using Party.Shared.Results;
+using Party.Shared.Serializers;
 
 namespace Party.CLI.Commands
 {
@@ -49,7 +50,7 @@ namespace Party.CLI.Commands
                 registry = await Controller.GetRegistryAsync();
             }
 
-            var name = packageName ?? await Renderer.AskAsync("Package Name: ");
+            var name = (packageName ?? await Renderer.AskAsync("Package Name: ")).ToLowerInvariant();
             // TODO: Validate
             var script = registry.Scripts?.FirstOrDefault(s => s.Name?.Equals(name, StringComparison.InvariantCultureIgnoreCase) ?? false);
             if (script != null)
@@ -75,7 +76,7 @@ namespace Party.CLI.Commands
                         Name = await Renderer.AskAsync("Author Name: "),
                         Profile = await Renderer.AskAsync("Author Profile URL: ")
                     },
-                    Description = "",
+                    Description = await Renderer.AskAsync("Description: "),
                     Tags = (await Renderer.AskAsync("Tags (comma-separated list): ")).Split(',').Select(x => x.Trim()).Where(x => x != "").ToList(),
                     Homepage = await Renderer.AskAsync("Package Homepage URL: "),
                     Repository = await Renderer.AskAsync("Package Repository URL: ")
@@ -87,22 +88,23 @@ namespace Party.CLI.Commands
                 Version = packageVersion ?? await Renderer.AskAsync("Package Version (0.0.0): ")
             };
 
-            var result = await Controller.Publish(registry, script, version, input, registryJson != null).ConfigureAwait(false);
+            await Controller.AddToRegistry(registry, script, version, input).ConfigureAwait(false);
 
             foreach (var file in version.Files)
             {
                 file.Url = await Renderer.AskAsync($"{file.Filename} URL: ");
             }
 
+            var serializer = new RegistrySerializer();
             if (registryJson != null)
             {
-                Controller.SaveToFile(result.Formatted, registryJson.FullName);
+                Controller.SaveToFile(serializer.Serialize(registry), registryJson.FullName);
                 Renderer.WriteLine($"JSON written to {registryJson.FullName}");
             }
             else
             {
                 Renderer.WriteLine("JSON Template:");
-                Renderer.WriteLine(result.Formatted);
+                Renderer.WriteLine(serializer.Serialize(script));
             }
         }
     }

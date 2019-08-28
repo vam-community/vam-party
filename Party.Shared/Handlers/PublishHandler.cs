@@ -4,27 +4,24 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using Party.Shared.Exceptions;
 using Party.Shared.Results;
-using Party.Shared.Serializers;
 using Party.Shared.Utils;
 
 namespace Party.Shared.Handlers
 {
-    public class PublishHandler
+    public class AddToRegistryHandler
     {
         private readonly string _savesDirectory;
         private readonly IFileSystem _fs;
 
-        public PublishHandler(string savesDirectory, IFileSystem fs)
+        public AddToRegistryHandler(string savesDirectory, IFileSystem fs)
         {
             _savesDirectory = savesDirectory ?? throw new ArgumentNullException(nameof(savesDirectory));
             _fs = fs ?? throw new ArgumentNullException(nameof(fs));
         }
 
-        public async Task<PublishResult> PublishAsync(Registry registry, RegistryScript script, RegistryScriptVersion version, string path, bool generateCompleteRegistry)
+        public async Task Add(Registry registry, RegistryScript script, RegistryScriptVersion version, string path)
         {
             // TODO: Validate fields, especially the version and name
             if (script is null) throw new ArgumentNullException(nameof(script));
@@ -101,9 +98,10 @@ namespace Party.Shared.Handlers
                     throw new UserInputException($"This version contains exactly the same file count and file hashes as {versionWithSameHashes.Version}.");
                 }
 
-                version.Files = registryFiles;
                 script.Versions.Insert(0, version);
             }
+
+            version.Files = registryFiles;
 
             var indexOfScript = registry.Scripts.FindIndex(s => s.Name.Equals(script.Name, StringComparison.InvariantCultureIgnoreCase));
             if (indexOfScript > -1)
@@ -115,14 +113,6 @@ namespace Party.Shared.Handlers
             {
                 registry.Scripts.Add(script);
             }
-
-            var serializer = new RegistrySerializer();
-            var formatted = generateCompleteRegistry ? serializer.Serialize(registry) : serializer.Serialize(script);
-
-            return new PublishResult
-            {
-                Formatted = formatted
-            };
         }
     }
 }
