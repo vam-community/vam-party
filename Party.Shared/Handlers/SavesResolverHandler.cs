@@ -104,7 +104,6 @@ namespace Party.Shared.Handlers
                     else
                     {
                         errors.Add($"Scene '{sceneFile}' references a script that does not exist: '{fullPath}'");
-                        continue;
                     }
                 }
             }

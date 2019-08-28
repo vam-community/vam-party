@@ -52,7 +52,7 @@ namespace Party.CLI.Commands
                 Renderer.WriteLine($"{script.Name} {latestVersion.Version ?? "-"} by {script.Author.Name}{trustNotice}{scenes}");
                 if (show == ShowOptions.ScenesList)
                 {
-                    if ((result.Scenes?.Length ?? 0) == 0)
+                    if (result.Scenes == null || result.Scenes.Length == 0)
                     {
                         Renderer.WriteLine("- Not used by any scenes");
                     }

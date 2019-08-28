@@ -69,7 +69,7 @@ namespace Party.CLI.Commands
                 foreach (var file in filesStatuses.Files)
                 {
                     Renderer.WriteLine($"- Path: {Controller.GetRelativePath(file.Path, filesStatuses.InstallFolder)}");
-                    Renderer.WriteLine($"  Hash: {file.RegistryFile.Hash} ({file.RegistryFile.Hash.Type})");
+                    Renderer.WriteLine($"  Hash: {file.RegistryFile.Hash.Value} ({file.RegistryFile.Hash.Type})");
                     Renderer.WriteLine($"  Url:  {file.RegistryFile.Url}");
                 }
                 return;
