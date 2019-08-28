@@ -14,7 +14,7 @@ namespace Party.Shared
             var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
             {
                 {
-                     @"C:\VaM\Saves\Scene 1.json",
+                     @"C:\VaM\Saves\ADD_ME.cslist",
                      new MockFileData(string.Join("\n", new[]
                         {
                             "Script 1.cs",
@@ -24,7 +24,7 @@ namespace Party.Shared
                 ))},
             });
 
-            var result = await new ScriptListSerializer().GetScriptsAsync(fileSystem, @"C:\VaM\Saves\ADD_ME.cslit"));
+            var result = await new ScriptListSerializer().GetScriptsAsync(fileSystem, @"C:\VaM\Saves\ADD_ME.cslist");
 
             Assert.That(result, Is.EqualTo(new[] { "Script 1.cs", "Script 2.cs" }));
         }
