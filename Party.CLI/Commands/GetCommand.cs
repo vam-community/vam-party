@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.IO;
@@ -6,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
 using Party.Shared.Exceptions;
+using Party.Shared.Models;
 
 namespace Party.CLI.Commands
 {
@@ -86,7 +88,7 @@ namespace Party.CLI.Commands
             }
         }
 
-        private static void ValidateStatuses(System.Collections.Generic.List<Shared.Results.InstalledPackageInfoResult.FileStatus> distinctStatuses)
+        private static void ValidateStatuses(List<InstalledPackageInfoResult.FileStatus> distinctStatuses)
         {
             if (distinctStatuses.Count > 1)
             {
@@ -100,9 +102,9 @@ namespace Party.CLI.Commands
 
             switch (distinctStatuses.FirstOrDefault())
             {
-                case Shared.Results.InstalledPackageInfoResult.FileStatus.Installed:
+                case InstalledPackageInfoResult.FileStatus.Installed:
                     throw new UserInputException("Plugin already installed");
-                case Shared.Results.InstalledPackageInfoResult.FileStatus.HashMismatch:
+                case InstalledPackageInfoResult.FileStatus.HashMismatch:
                     throw new PackageInstallationException("Installed plugin does not match the registry version. Did you modified it?");
                 default:
                     return;

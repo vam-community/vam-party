@@ -1,6 +1,6 @@
 using Moq;
 using NUnit.Framework;
-using Party.Shared.Results;
+using Party.Shared.Models;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -39,7 +39,7 @@ namespace Party.CLI
                     }
                 }.ToList()
             });
-            _controller.Setup(x => x.GetSavesAsync()).ReturnsAsync(new SavesMapResult());
+            _controller.Setup(x => x.GetSavesAsync()).ReturnsAsync(new SavesMap());
 
             var result = await _program.Execute(new[] { "show", "cool-thing" });
 

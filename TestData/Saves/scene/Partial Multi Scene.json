@@ -6,13 +6,9 @@
             { 
                "id" : "PluginManager", 
                "plugins" : { 
-                  "plugin#0" : "My Script 1.cs"
+                  "plugin#0" : "Saves/Scripts/Multi Plugin/Multi Script 2.cs"
                }
-            }, 
-            { 
-               "id" : "plugin#0_MyScript1", 
-               "Some Setting" : "0.1234567"
-            }
+            },
          ]
       }
    ]

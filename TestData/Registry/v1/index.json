@@ -1,25 +1,92 @@
 {
   "scripts": [
     {
-      "name": "improved-pov",
-      "description": "Finally, possession feels right! Moves the camera to the correct position and prevents hair and face rendering.",
-      "tags": ["possession", "person"],
+      "name": "simple-script-1",
+      "description": "This is a simple package",
+      "tags": ["simple", "test"],
       "author": {
-        "name": "Acidbubbles",
-        "profile": "https://github.com/acidbubbles"
+        "name": "John Doe"
       },
-      "homepage": "https://github.com/acidbubbles/vam-improved-pov",
-      "repository": "https://github.com/acidbubbles/vam-improved-pov",
       "versions": [
         {
-          "version": "2.0.4",
+          "version": "1.0.0",
           "files": [
             {
-              "filename": "ImprovedPoV.cs",
-              "url": "https://github.com/acidbubbles/vam-improved-pov/releases/download/v2.0.4/ImprovedPoV.cs",
+              "filename": "Simple Script 1.cs",
+              "url": "https://github.com/vam-community/vam-party/raw/master/TestData/Saves/Scripts/My%20Script%201.cs",
               "hash": {
                 "type": "sha256",
-                "value": "814E416E6D2F517A35ADFE21CBD9589BC9D8BE9C9911AABA97B40578C9EECCA6"
+                "value": "B249529FEFB64007FA361EA2374248A83CA275AB01AB19B03C34A45219FB2A20"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "complex-plugin",
+      "description": "A plugin with a cslist and two files",
+      "tags": ["complex", "test"],
+      "author": {
+        "name": "Jane Smith"
+      },
+      "versions": [
+        {
+          "version": "0.0.1-alpha",
+          "files": [
+            {
+              "filename": "Complex Plugin.cslist",
+              "url": "https://github.com/vam-community/vam-party/raw/master/TestData/Saves/Scripts/Complex%20Plugin/Complex%20Plugin.cslist",
+              "hash": {
+                "type": "sha256",
+                "value": "C1C367B60893EBB22478AF6AF82E1A77EB78BDD8334FB339C0DBB1A0FA89F227"
+              }
+            },
+            {
+              "filename": "Complex Script 1.cs",
+              "url": "https://github.com/vam-community/vam-party/raw/master/TestData/Saves/Scripts/Complex%20Plugin/Complex%20Script%201.cs",
+              "hash": {
+                "type": "sha256",
+                "value": "8C18939A09A53D295BAE8CD28ED45720FF12841F32ACBE3B843767F2EB0B0811"
+              }
+            },
+            {
+              "filename": "Complex Script 2.cs",
+              "url": "https://github.com/vam-community/vam-party/raw/master/TestData/Saves/Scripts/Complex%20Plugin/Complex%20Script%202.cs",
+              "hash": {
+                "type": "sha256",
+                "value": "5EE72D08BE822B417D97F84A0880CB70B02B80031A1FA03776A6592AA3711838"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "multi-plugin",
+      "description": "This plugin contains two independent scripts",
+      "tags": ["multi", "test"],
+      "author": {
+        "name": "William Brown"
+      },
+      "versions": [
+        {
+          "version": "12.5.412",
+          "files": [
+            {
+              "filename": "Multi Script 1.cs",
+              "url": "https://github.com/vam-community/vam-party/raw/master/TestData/Saves/Scripts/Multi%20Plugin/Multi%20Script%201.cs",
+              "hash": {
+                "type": "sha256",
+                "value": "D09580C4F9060C444A970013FC228AD0F1052F38031701347B4BB629B24E0E74"
+              }
+            },
+            {
+              "filename": "Multi Script 2.cs",
+              "url": "https://github.com/vam-community/vam-party/raw/master/TestData/Saves/Scripts/Multi%20Plugin/Multi%20Script%202.cs",
+              "hash": {
+                "type": "sha256",
+                "value": "4AF3E406F92B9D4D075ABA37A626C4C28DAC5F91C5905CC3D2A02DE8C1FBA94C"
               }
             }
           ]

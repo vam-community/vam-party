@@ -6,16 +6,16 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Party.Shared.Handlers;
-using Party.Shared.Results;
+using Party.Shared.Models;
 
 namespace Party.Shared
 {
     public interface IPartyController
     {
         Task<Registry> GetRegistryAsync(params string[] registries);
-        Task<SavesMapResult> GetSavesAsync();
-        Task AddToRegistry(Registry registry, RegistryScript script, RegistryScriptVersion version, string path);
-        IEnumerable<SearchResult> Search(Registry registry, SavesMapResult saves, string query, bool showUsage);
+        Task<SavesMap> GetSavesAsync();
+        Task<(RegistryScript script, RegistryScriptVersion version)> AddToRegistry(Registry registry, string name, string path);
+        IEnumerable<SearchResult> Search(Registry registry, SavesMap saves, string query, bool showUsage);
         Task<InstalledPackageInfoResult> GetInstalledPackageInfoAsync(string name, RegistryScriptVersion version);
         Task<InstalledPackageInfoResult> InstallPackageAsync(InstalledPackageInfoResult info);
         string GetRelativePath(string fullPath);
@@ -43,17 +43,17 @@ namespace Party.Shared
             return new RegistryHandler(_http, _config.Registry.Urls).AcquireAsync(registries);
         }
 
-        public Task<SavesMapResult> GetSavesAsync()
+        public Task<SavesMap> GetSavesAsync()
         {
             return new SavesResolverHandler(_fs, _config.VirtAMate.SavesDirectory, _config.Scanning.Ignore).AnalyzeSaves();
         }
 
-        public Task AddToRegistry(Registry registry, RegistryScript script, RegistryScriptVersion version, string path)
+        public Task<(RegistryScript script, RegistryScriptVersion version)> AddToRegistry(Registry registry, string name, string path)
         {
-            return new AddToRegistryHandler(_config.VirtAMate.SavesDirectory, _fs).Add(registry, script, version, path);
+            return new AddToRegistryHandler(_config.VirtAMate.SavesDirectory, _fs).AddScriptVersionAsync(registry, name, path);
         }
 
-        public IEnumerable<SearchResult> Search(Registry registry, SavesMapResult saves, string query, bool showUsage)
+        public IEnumerable<SearchResult> Search(Registry registry, SavesMap saves, string query, bool showUsage)
         {
             return new SearchHandler(_config).Search(registry, saves, query, showUsage);
         }

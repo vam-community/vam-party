@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared.Exceptions;
-using Party.Shared.Results;
+using Party.Shared.Models;
 using Party.Shared.Utils;
 
 namespace Party.Shared.Handlers
 {
     public class AddToRegistryHandler
     {
+        private static readonly string[] _validFileExtensions = new[] { ".cs", ".cslist" };
         private readonly string _savesDirectory;
         private readonly IFileSystem _fs;
 
@@ -21,57 +21,56 @@ namespace Party.Shared.Handlers
             _fs = fs ?? throw new ArgumentNullException(nameof(fs));
         }
 
-        public async Task Add(Registry registry, RegistryScript script, RegistryScriptVersion version, string path)
+        public async Task<(RegistryScript script, RegistryScriptVersion version)> AddScriptVersionAsync(Registry registry, string name, string path)
         {
-            // TODO: Instead of passing a script, return an empty script and fill it upstream
-            // TODO: Validate fields, especially the version and name
-            if (script is null) throw new ArgumentNullException(nameof(script));
-            if (version is null) throw new ArgumentNullException(nameof(version));
+            if (registry is null) throw new ArgumentNullException(nameof(registry));
             if (path is null) throw new ArgumentNullException(nameof(path));
 
-            if (!Path.IsPathRooted(path))
+            if (!_fs.Path.IsPathRooted(path)) throw new InvalidOperationException($"Path must be rooted prior to being sent to this handler: {path}");
+            if (!path.StartsWith(_savesDirectory)) throw new UserInputException($"Path must be inside the saves directory.\nPath: {path}\nSaves: {_savesDirectory}");
+
+            var files = GetFiles(path);
+            if (files.Length == 0) throw new UserInputException($"No files were found with either a .cs or a .cslist extension in {path}");
+
+            var registryFiles = await BuildRegistryFilesList(files);
+            AssertNoDuplicates(registry, registryFiles);
+
+            var script = registry.Scripts.FirstOrDefault(s => s.Name == name);
+
+            if (script == null)
             {
-                throw new InvalidOperationException($"Path must be rooted prior to being sent to this handler: {path}");
-            }
-            if (!path.StartsWith(_savesDirectory))
-            {
-                throw new UserInputException($"Path must be inside the saves directory.\nPath: {path}\nSaves: {_savesDirectory}");
+                script = new RegistryScript { Name = name, Versions = new List<RegistryScriptVersion>() };
+                registry.Scripts.Add(script);
             }
 
-            var attrs = _fs.File.GetAttributes(path);
-            string[] files;
-            var types = new[] { ".cs", ".cslist" };
-            if (attrs.HasFlag(FileAttributes.Directory))
+            var version = new RegistryScriptVersion
             {
-                files = _fs.Directory.GetFiles(path).Where(f => types.Contains(Path.GetExtension(f))).ToArray();
-            }
-            else if (attrs.HasFlag(FileAttributes.Normal))
-            {
-                if (types.Contains(Path.GetExtension(path)))
-                {
-                    files = new[] { path };
-                }
-                else
-                {
-                    files = new string[0];
-                }
-            }
-            else
-            {
-                throw new UserInputException("Specified file is neither a directory nor a file");
-            }
+                Files = registryFiles
+            };
+            script.Versions.Insert(0, version);
 
-            if (files.Length == 0)
-            {
-                throw new UserInputException("No files were found with either a .cs or a .cslist extension");
-            }
+            return (script, version);
+        }
 
+        private static void AssertNoDuplicates(Registry registry, List<RegistryFile> files)
+        {
+            var versionFileHashes = files.Select(f => f.Hash.Value).ToArray();
+            var versionWithSameHashes = registry.Scripts
+                .SelectMany(script => script.Versions.Select(version => (script, version)))
+                .FirstOrDefault(x => x.version.Files.Count == versionFileHashes.Length && x.version.Files.All(f => versionFileHashes.Contains(f.Hash.Value)));
+
+            if (versionWithSameHashes.version != null)
+                throw new UserInputException($"This version contains exactly the same file count and file hashes as {versionWithSameHashes.script.Name} v{versionWithSameHashes.version.Version}.");
+        }
+
+        private async Task<List<RegistryFile>> BuildRegistryFilesList(string[] files)
+        {
             var registryFiles = new List<RegistryFile>();
             foreach (var file in files.OrderBy(s => s))
             {
                 registryFiles.Add(new RegistryFile
                 {
-                    Filename = Path.GetFileName(file),
+                    Filename = _fs.Path.GetFileName(file),
                     Url = "",
                     Hash = new RegistryFileHash
                     {
@@ -81,42 +80,18 @@ namespace Party.Shared.Handlers
                 });
             }
 
-            var versionFileHashes = registryFiles.Select(f => f.Hash.Value).ToArray();
-            var versionWithSameHashes = registry.Scripts
-                .SelectMany(script => script.Versions.Select(version => (script, version)))
-                .FirstOrDefault(x => x.version.Files.Count == versionFileHashes.Length && x.version.Files.All(f => versionFileHashes.Contains(f.Hash.Value)));
+            return registryFiles;
+        }
 
-            if (versionWithSameHashes.version != null)
-            {
-                throw new UserInputException($"This version contains exactly the same file count and file hashes as {versionWithSameHashes.script.Name} v{versionWithSameHashes.version.Version}.");
-            }
+        private string[] GetFiles(string path)
+        {
+            if (_fs.Directory.Exists(path))
+                return _fs.Directory.GetFiles(path).Where(f => _validFileExtensions.Contains(_fs.Path.GetExtension(f))).ToArray();
 
-            if (script.Versions == null)
-            {
-                script.Versions = new[] { version }.ToList();
-            }
-            else
-            {
-                if (script.Versions.Any(v => v.Version == version.Version))
-                {
-                    throw new UserInputException("This version already exists in the registry.");
-                }
+            if (_validFileExtensions.Contains(_fs.Path.GetExtension(path)) && _fs.File.Exists(path))
+                return new[] { path };
 
-                script.Versions.Insert(0, version);
-            }
-
-            version.Files = registryFiles;
-
-            var indexOfScript = registry.Scripts.FindIndex(s => s.Name.Equals(script.Name, StringComparison.InvariantCultureIgnoreCase));
-            if (indexOfScript > -1)
-            {
-                registry.Scripts.RemoveAt(indexOfScript);
-                registry.Scripts.Insert(indexOfScript, script);
-            }
-            else
-            {
-                registry.Scripts.Add(script);
-            }
+            return new string[0];
         }
     }
 }

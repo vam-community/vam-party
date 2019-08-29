@@ -1,7 +1,7 @@
 using System.Linq;
 using NUnit.Framework;
 using Party.Shared.Resources;
-using Party.Shared.Results;
+using Party.Shared.Models;
 
 namespace Party.Shared.Handlers
 {

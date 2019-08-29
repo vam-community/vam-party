@@ -1,4 +1,4 @@
-namespace Party.Shared.Results
+namespace Party.Shared.Models
 {
     public class InstalledPackageInfoResult
     {

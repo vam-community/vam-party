@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Party.Shared.Resources;
 
-namespace Party.Shared.Results
+namespace Party.Shared.Models
 {
-    public class SavesMapResult
+    public class SavesMap
     {
         public IReadOnlyDictionary<string, Script> ScriptsByFilename { get; set; }
         public Script[] Scripts { get => ScriptsByFilename.Values.ToArray(); }

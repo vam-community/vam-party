@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using Party.Shared.Results;
+using Party.Shared.Models;
 
 namespace Party.Shared.Serializers
 {
@@ -23,6 +23,7 @@ namespace Party.Shared.Serializers
             var serializerSettings = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented,
+                NullValueHandling = NullValueHandling.Ignore,
                 ContractResolver = new CamelCasePropertyNamesContractResolver(),
                 Converters = {
                     new StringArrayConverter()

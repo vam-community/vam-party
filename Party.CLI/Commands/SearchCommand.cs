@@ -3,7 +3,7 @@ using System.CommandLine.Invocation;
 using System.IO;
 using System.Threading.Tasks;
 using Party.Shared;
-using Party.Shared.Results;
+using Party.Shared.Models;
 
 namespace Party.CLI.Commands
 {
@@ -37,7 +37,7 @@ namespace Party.CLI.Commands
         private async Task ExecuteAsync(string query, ShowOptions show)
         {
             var registryTask = Controller.GetRegistryAsync();
-            var savesTask = show == ShowOptions.Basic ? Task.FromResult<SavesMapResult>(null) : Controller.GetSavesAsync();
+            var savesTask = show == ShowOptions.Basic ? Task.FromResult<SavesMap>(null) : Controller.GetSavesAsync();
             await Task.WhenAll();
             var registry = await registryTask;
             var saves = await savesTask;

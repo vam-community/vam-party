@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Threading.Tasks;
-using Party.Shared.Results;
+using Party.Shared.Models;
 using Party.Shared.Utils;
 
 namespace Party.Shared.Handlers

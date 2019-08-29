@@ -1,6 +1,6 @@
 using Party.Shared.Resources;
 
-namespace Party.Shared.Results
+namespace Party.Shared.Models
 {
     public class SearchResult
     {

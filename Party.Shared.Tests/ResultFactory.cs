@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Party.Shared.Resources;
-using Party.Shared.Results;
+using Party.Shared.Models;
 
 namespace Party.Shared
 {
@@ -81,9 +81,9 @@ namespace Party.Shared
                 return this;
             }
 
-            internal SavesMapResult Build()
+            internal SavesMap Build()
             {
-                return new SavesMapResult
+                return new SavesMap
                 {
                     ScriptsByFilename = _scripts.ToDictionary(s => s.FullPath, s => s),
                     Scenes = _scenes.ToArray(),

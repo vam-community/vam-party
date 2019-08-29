@@ -4,7 +4,7 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared.Resources;
-using Party.Shared.Results;
+using Party.Shared.Models;
 using Party.Shared.Serializers;
 using Party.Shared.Utils;
 
@@ -23,7 +23,7 @@ namespace Party.Shared.Handlers
             _ignoredPaths = ignoredPaths?.Select(path => Path.GetFullPath(path, savesDirectory)).ToArray() ?? new string[0];
         }
 
-        public async Task<SavesMapResult> AnalyzeSaves()
+        public async Task<SavesMap> AnalyzeSaves()
         {
             var scriptTasks = new List<Task<Script>>();
             var sceneFiles = new List<string>();
@@ -109,7 +109,7 @@ namespace Party.Shared.Handlers
             }
 
 
-            return new SavesMapResult
+            return new SavesMap
             {
                 Errors = errors.ToArray(),
                 // TODO: Is this dictionary really useful?

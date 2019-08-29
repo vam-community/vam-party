@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
-namespace Party.Shared.Results
+namespace Party.Shared.Models
 {
-
     public class Registry
     {
         public List<RegistryScript> Scripts { get; set; }
@@ -11,6 +11,8 @@ namespace Party.Shared.Results
 
     public class RegistryScript
     {
+        public static readonly Regex ValidNameRegex = new Regex(@"^[a-z][a-z0-9\-_]{2,127}$");
+
         public string Name { get; set; }
         public string Description { get; set; }
         public List<string> Tags { get; set; }
@@ -35,6 +37,8 @@ namespace Party.Shared.Results
 
     public class RegistryScriptVersion
     {
+        public static readonly Regex ValidVersionNameRegex = new Regex(@"^((0|[1-9][0-9]{0,3})\.){2}(0|[1-9][0-9]{0,3})(-[a-z0-9]{1,32})?$");
+
         public string Version { get; set; }
         public List<RegistryFile> Files { get; set; }
     }

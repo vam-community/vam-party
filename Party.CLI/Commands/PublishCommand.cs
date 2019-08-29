@@ -7,7 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
 using Party.Shared.Exceptions;
-using Party.Shared.Results;
+using Party.Shared.Models;
 using Party.Shared.Serializers;
 
 namespace Party.CLI.Commands
@@ -50,12 +50,17 @@ namespace Party.CLI.Commands
                 registry = await Controller.GetRegistryAsync();
             }
 
-            var name = (packageName ?? await Renderer.AskAsync("Package Name: ")).ToLowerInvariant();
-            // TODO: Validate
-            var script = registry.Scripts?.FirstOrDefault(s => s.Name?.Equals(name, StringComparison.InvariantCultureIgnoreCase) ?? false);
-            if (script != null)
+            var name = packageName ?? await Renderer.AskAsync("Package Name: ", false, RegistryScript.ValidNameRegex, "my-package").ConfigureAwait(false);
+
+            var (script, version) = await Controller.AddToRegistry(registry, name, Path.GetFullPath(input)).ConfigureAwait(false);
+
+            var isNew = script.Versions.Count == 1;
+
+            // TODO: Validate all fields
+            if (!isNew)
             {
                 Renderer.WriteLine($"This package already exists (by {script.Author?.Name ?? "Anonymous User"}), a new version will be added to it.");
+
                 if (script.Versions != null)
                 {
                     Renderer.WriteLine("Existing versions:");
@@ -65,35 +70,29 @@ namespace Party.CLI.Commands
                     }
                 }
             }
-            else
+
+            version.Version = packageVersion ?? await Renderer.AskAsync("Package Version: ", true, RegistryScriptVersion.ValidVersionNameRegex, "1.0.0");
+
+            if (isNew)
             {
                 Renderer.WriteLine("Looks like a new package in the registry! Please provide some information about this new package, or press CTRL+C if you want to abort.");
+
                 var author = new RegistryScriptAuthor
                 {
-                    Name = await Renderer.AskAsync("Author Name: ")
+                    Name = await Renderer.AskAsync("Author Name: ", true)
                 };
                 var existingAuthor = registry.Scripts.Where(s => s.Author != null).Select(s => s.Author).FirstOrDefault(a => a.Name.Equals(author.Name, StringComparison.InvariantCultureIgnoreCase));
-                if (!string.IsNullOrEmpty(existingAuthor.Profile))
+                if (!string.IsNullOrEmpty(existingAuthor?.Profile))
                     author.Profile = await Renderer.AskAsync($"Author Profile URL ({existingAuthor.Profile}): ") ?? existingAuthor.Profile;
                 else
                     author.Profile = await Renderer.AskAsync("Author Profile URL ");
-                script = new RegistryScript
-                {
-                    Name = name,
-                    Author = author,
-                    Description = await Renderer.AskAsync("Description: "),
-                    Tags = (await Renderer.AskAsync("Tags (comma-separated list): ")).Split(',').Select(x => x.Trim()).Where(x => x != "").ToList(),
-                    Homepage = await Renderer.AskAsync("Package Homepage URL: "),
-                    Repository = await Renderer.AskAsync("Package Repository URL: ")
-                };
+                script.Author = author;
+
+                script.Description = await Renderer.AskAsync("Description: ");
+                script.Tags = (await Renderer.AskAsync("Tags (comma-separated list): ")).Split(',').Select(x => x.Trim()).Where(x => x != "").ToList();
+                script.Homepage = await Renderer.AskAsync("Package Homepage URL: ");
+                script.Repository = await Renderer.AskAsync("Package Repository URL: ");
             }
-
-            var version = new RegistryScriptVersion
-            {
-                Version = packageVersion ?? await Renderer.AskAsync("Package Version (0.0.0): ")
-            };
-
-            await Controller.AddToRegistry(registry, script, version, input).ConfigureAwait(false);
 
             foreach (var file in version.Files)
             {

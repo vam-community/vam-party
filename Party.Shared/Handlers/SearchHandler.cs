@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Party.Shared.Resources;
-using Party.Shared.Results;
+using Party.Shared.Models;
 
 namespace Party.Shared.Handlers
 {
@@ -15,7 +15,7 @@ namespace Party.Shared.Handlers
             _config = config ?? throw new System.ArgumentNullException(nameof(config));
         }
 
-        public IEnumerable<SearchResult> Search(Registry registry, SavesMapResult saves, string query, bool showUsage)
+        public IEnumerable<SearchResult> Search(Registry registry, SavesMap saves, string query, bool showUsage)
         {
             if (registry is null) throw new ArgumentNullException(nameof(registry));
             if (registry?.Scripts is null) throw new ArgumentException("registry does not have any scripts", nameof(registry));

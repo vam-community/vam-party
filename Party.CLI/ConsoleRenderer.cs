@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.CommandLine;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Party.CLI
@@ -10,7 +11,7 @@ namespace Party.CLI
     {
         IDisposable WithColor(ConsoleColor color);
         void WriteLine(string text);
-        Task<string> AskAsync(string prompt);
+        Task<string> AskAsync(string prompt, bool mandatory = false, Regex regex = null, string sampleValue = null);
         Task WhenCompleteAsync();
     }
 
@@ -65,12 +66,50 @@ namespace Party.CLI
             await Task.WhenAll(tasks).ConfigureAwait(false);
         }
 
-        public async Task<string> AskAsync(string prompt)
+        public async Task<string> AskAsync(string prompt, bool mandatory = true, Regex regex = null, string sampleValue = null)
         {
             await WhenCompleteAsync().ConfigureAwait(false);
-            _output.Write(prompt);
-            var value = _input.ReadLine();
-            return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+            string value;
+            do
+            {
+                _output.Write(prompt);
+                value = _input.ReadLine();
+                value = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+            } while (!IsValueValid(value, mandatory, regex, sampleValue));
+            return value;
+        }
+
+        private bool IsValueValid(string value, bool mandatory, Regex regex, string sampleValue)
+        {
+            if (value == null)
+            {
+                if (mandatory)
+                {
+                    using (WithColor(ConsoleColor.Red))
+                    {
+                        _output.WriteLine("Please enter a value.");
+                    }
+                    return false;
+                }
+                return true;
+
+            }
+
+            if (regex == null)
+                return true;
+
+            if (!regex.IsMatch(value))
+            {
+                using (WithColor(ConsoleColor.Red))
+                {
+                    _output.WriteLine("This value is invalid.");
+                    if (sampleValue != null)
+                        _output.WriteLine($"Example: '{sampleValue}'");
+                }
+                return false;
+            }
+
+            return true;
         }
 
         private class ColorContext : IDisposable
