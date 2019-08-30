@@ -2,7 +2,9 @@
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.IO;
+using System.Threading.Tasks;
 using Party.Shared;
+using Party.Shared.Models;
 
 namespace Party.CLI.Commands
 {
@@ -33,26 +35,41 @@ namespace Party.CLI.Commands
             command.AddOption(new Option("--saves", "Specify the Saves folder to use") { Argument = new Argument<DirectoryInfo>().ExistingOnly() });
         }
 
-        protected void PrintWarnings(string[] errors)
+        protected async Task<(SavesMap, Registry)> GetSavesAndRegistryAsync()
         {
-            if (errors == null || errors.Length == 0) return;
+            var registryTask = Controller.GetRegistryAsync();
+            var savesTask = Controller.GetSavesAsync();
 
-            using (Renderer.WithColor(ConsoleColor.Yellow))
-            {
-                foreach (var error in errors)
-                {
-                    Renderer.Error.WriteLine(error);
-                }
-            }
+            await Task.WhenAll();
+
+            var registry = await registryTask;
+            var saves = await savesTask;
+            return (saves, registry);
         }
 
-        protected void PrintWarningsCount(string[] errors)
+        protected void PrintWarnings(bool details, string[] errors)
         {
             if (errors == null || errors.Length == 0) return;
 
-            using (Renderer.WithColor(ConsoleColor.Yellow))
+            if (details)
             {
-                Renderer.Error.WriteLine($"There were {errors.Length} errors in the saves folder. Run with --warnings to print them.");
+                using (Renderer.WithColor(ConsoleColor.Yellow))
+                {
+                    Renderer.WriteLine("Scene warnings:");
+                    foreach (var error in errors)
+                    {
+                        Renderer.Error.Write("  ");
+                        Renderer.Error.WriteLine(error);
+                    }
+                }
+                Renderer.WriteLine();
+            }
+            else
+            {
+                using (Renderer.WithColor(ConsoleColor.Yellow))
+                {
+                    Renderer.Error.WriteLine($"There were {errors.Length} errors in the saves folder. Run with --warnings to print them.");
+                }
             }
         }
 

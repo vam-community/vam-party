@@ -50,9 +50,9 @@ namespace Party.CLI.Commands
                 registry = await Controller.GetRegistryAsync();
             }
 
-            var name = packageName ?? await Renderer.AskAsync("Package Name: ", false, RegistryScript.ValidNameRegex, "my-package").ConfigureAwait(false);
+            var name = packageName ?? Renderer.Ask("Package Name: ", false, RegistryScript.ValidNameRegex, "my-package");
 
-            var (script, version) = await Controller.AddToRegistry(registry, name, Path.GetFullPath(input)).ConfigureAwait(false);
+            var (script, version) = await Controller.AddFilesToRegistryAsync(registry, name, Path.GetFullPath(input)).ConfigureAwait(false);
 
             var isNew = script.Versions.Count == 1;
 
@@ -71,7 +71,7 @@ namespace Party.CLI.Commands
                 }
             }
 
-            version.Version = packageVersion ?? await Renderer.AskAsync("Package Version: ", true, RegistryScriptVersion.ValidVersionNameRegex, "1.0.0");
+            version.Version = packageVersion ?? Renderer.Ask("Package Version: ", true, RegistryScriptVersion.ValidVersionNameRegex, "1.0.0");
 
             if (isNew)
             {
@@ -79,19 +79,19 @@ namespace Party.CLI.Commands
 
                 var author = new RegistryScriptAuthor
                 {
-                    Name = await Renderer.AskAsync("Author Name: ", true)
+                    Name = Renderer.Ask("Author Name: ", true)
                 };
                 var existingAuthor = registry.Scripts.Where(s => s.Author != null).Select(s => s.Author).FirstOrDefault(a => a.Name.Equals(author.Name, StringComparison.InvariantCultureIgnoreCase));
                 if (!string.IsNullOrEmpty(existingAuthor?.Profile))
-                    author.Profile = await Renderer.AskAsync($"Author Profile URL ({existingAuthor.Profile}): ") ?? existingAuthor.Profile;
+                    author.Profile = Renderer.Ask($"Author Profile URL ({existingAuthor.Profile}): ") ?? existingAuthor.Profile;
                 else
-                    author.Profile = await Renderer.AskAsync("Author Profile URL ");
+                    author.Profile = Renderer.Ask("Author Profile URL ");
                 script.Author = author;
 
-                script.Description = await Renderer.AskAsync("Description: ");
-                script.Tags = (await Renderer.AskAsync("Tags (comma-separated list): ")).Split(',').Select(x => x.Trim()).Where(x => x != "").ToList();
-                script.Homepage = await Renderer.AskAsync("Package Homepage URL: ");
-                script.Repository = await Renderer.AskAsync("Package Repository URL: ");
+                script.Description = Renderer.Ask("Description: ");
+                script.Tags = (Renderer.Ask("Tags (comma-separated list): ")).Split(',').Select(x => x.Trim()).Where(x => x != "").ToList();
+                script.Homepage = Renderer.Ask("Package Homepage URL: ");
+                script.Repository = Renderer.Ask("Package Repository URL: ");
             }
 
             string baseUrl = null;
@@ -100,11 +100,11 @@ namespace Party.CLI.Commands
                 if (baseUrl != null)
                 {
                     var url = $"{baseUrl}{file.Filename.Replace(" ", "%20")}";
-                    file.Url = await Renderer.AskAsync($"{file.Filename} URL ({url}): ") ?? url;
+                    file.Url = Renderer.Ask($"{file.Filename} URL ({url}): ") ?? url;
                 }
                 else
                 {
-                    file.Url = await Renderer.AskAsync($"{file.Filename} URL: ", true);
+                    file.Url = Renderer.Ask($"{file.Filename} URL: ", true);
                     if (file.Url.EndsWith("/" + file.Filename.Replace(" ", "%20")))
                     {
                         baseUrl = file.Url.Substring(0, file.Url.LastIndexOf("/") + 1);

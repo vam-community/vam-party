@@ -33,7 +33,7 @@ You can also search by keyword:
 
 If you want the command to run faster, you can opt-out of the saves folder analysis:
 
-    > party search some-keyword --show Basic
+    > party search some-keyword --no-usage
 
 If a script contains files that are hosted on an untrusted server (i.e. a server that can track you), if will be flagged as `[untrusted]`.
 
@@ -46,6 +46,20 @@ Downloads a script locally. This will also validate hashes to make sure there wa
 You can also install a specific version:
 
     > party get some-package --version 1.0.0
+
+### `fix`
+
+Scans for scenes referencing scripts that are available in the registry, and use them instead.
+
+    > party fix
+
+Since this can affect lots of files, you might want to make a dry run first, see what the script will do:
+
+    > party get fix --noop
+
+If you want the script to download matching packages, you can use `--get`:
+
+    > party get fix --get
 
 ### `publish`
 

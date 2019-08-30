@@ -1,9 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.CommandLine;
 using System.IO;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Party.CLI
 {
@@ -12,14 +10,14 @@ namespace Party.CLI
         IDisposable WithColor(ConsoleColor color);
         void Write(string text);
         void Write(string text, ConsoleColor color);
+        void WriteLine();
         void WriteLine(string text);
-        Task<string> AskAsync(string prompt, bool mandatory = false, Regex regex = null, string sampleValue = null);
-        Task WhenCompleteAsync();
+        void WriteLine(string text, ConsoleColor color);
+        string Ask(string prompt, bool mandatory = false, Regex regex = null, string sampleValue = null);
     }
 
     public class ConsoleRenderer : IRenderer
     {
-        private List<Task> _writing = new List<Task>();
         private readonly TextWriter _output;
         private readonly TextReader _input;
         private readonly TextWriter _error;
@@ -53,7 +51,7 @@ namespace Party.CLI
         public IDisposable WithColor(ConsoleColor color)
         {
             _setColor(color);
-            return new ColorContext(() => { _resetColor(); WhenCompleteAsync().ConfigureAwait(false).GetAwaiter().GetResult(); });
+            return new ColorContext(_resetColor);
         }
 
         public void Write(string text)
@@ -68,21 +66,25 @@ namespace Party.CLI
             _resetColor();
         }
 
+        public void WriteLine()
+        {
+            _output.WriteLine();
+        }
+
         public void WriteLine(string text)
         {
-            _writing.Add(_output.WriteLineAsync(text));
+            _output.WriteLine(text);
         }
 
-        public async Task WhenCompleteAsync()
+        public void WriteLine(string text, ConsoleColor color)
         {
-            var tasks = _writing;
-            _writing = new List<Task>();
-            await Task.WhenAll(tasks).ConfigureAwait(false);
+            _setColor(color);
+            _output.WriteLine(text);
+            _resetColor();
         }
 
-        public async Task<string> AskAsync(string prompt, bool mandatory = true, Regex regex = null, string sampleValue = null)
+        public string Ask(string prompt, bool mandatory = true, Regex regex = null, string sampleValue = null)
         {
-            await WhenCompleteAsync().ConfigureAwait(false);
             string value;
             do
             {
@@ -99,10 +101,7 @@ namespace Party.CLI
             {
                 if (mandatory)
                 {
-                    using (WithColor(ConsoleColor.Red))
-                    {
-                        _output.WriteLine("Please enter a value.");
-                    }
+                    _output.WriteLine("Please enter a value.", ConsoleColor.Red);
                     return false;
                 }
                 return true;

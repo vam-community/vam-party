@@ -16,10 +16,11 @@ namespace Party.CLI.Commands
             var command = new Command("show", "Show information about a package");
             AddCommonOptions(command);
             command.AddArgument(new Argument<string>("package", null));
+            command.AddOption(new Option("--warnings", "Show warnings such as broken scenes or missing scripts"));
 
-            command.Handler = CommandHandler.Create(async (DirectoryInfo saves, string package) =>
+            command.Handler = CommandHandler.Create(async (DirectoryInfo saves, string package, bool warnings) =>
             {
-                await new ShowCommand(renderer, config, saves, controller).ExecuteAsync(package);
+                await new ShowCommand(renderer, config, saves, controller).ExecuteAsync(package, warnings);
             });
             return command;
         }
@@ -28,13 +29,9 @@ namespace Party.CLI.Commands
         {
         }
 
-        private async Task ExecuteAsync(string package)
+        private async Task ExecuteAsync(string package, bool warnings)
         {
-            var registryTask = Controller.GetRegistryAsync();
-            var savesTask = Controller.GetSavesAsync();
-            await Task.WhenAll();
-            var registry = await registryTask;
-            var saves = await savesTask;
+            var (saves, registry) = await GetSavesAndRegistryAsync();
 
             var registryPackage = registry.Scripts?.FirstOrDefault(p => p.Name.Equals(package, StringComparison.InvariantCultureIgnoreCase));
 
@@ -50,7 +47,7 @@ namespace Party.CLI.Commands
                 throw new RegistryException("Package does not have any versions");
             }
 
-            PrintWarnings(saves.Errors);
+            PrintWarnings(warnings, saves.Errors);
 
             Renderer.WriteLine($"Package {registryPackage.Name}, by {registryPackage.Author?.Name ?? "Anonymous"}");
             if (registryPackage.Description != null)

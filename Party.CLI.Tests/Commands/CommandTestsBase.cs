@@ -22,8 +22,11 @@ namespace Party.CLI
             _out = new StringBuilder();
             var outWriter = StandardStreamWriter.Create(new StringWriter(_out));
             _renderer = new Mock<IRenderer>(MockBehavior.Strict);
+            _renderer.Setup(x => x.WriteLine()).Callback(() => _out.Append($"\n"));
             _renderer.Setup(x => x.WriteLine(It.IsAny<string>())).Callback((string line) => _out.Append($"{line}\n"));
-            _renderer.Setup(x => x.WhenCompleteAsync()).Returns(Task.CompletedTask);
+            _renderer.Setup(x => x.WriteLine(It.IsAny<string>(), It.IsAny<ConsoleColor>())).Callback((string line, ConsoleColor color) => _out.Append($"[color:{color}]{line}[/color]\n"));
+            _renderer.Setup(x => x.Write(It.IsAny<string>())).Callback((string text) => _out.Append($"text));
+            _renderer.Setup(x => x.Write(It.IsAny<string>(), It.IsAny<ConsoleColor>())).Callback((string text, ConsoleColor color) => _out.Append($"[color:{color}]{text}[/color]"));
             _renderer.Setup(x => x.WithColor(It.IsAny<ConsoleColor>())).Returns((ConsoleColor color) => new ColorStub(_out, color));
             _renderer.Setup(x => x.Out).Returns(outWriter);
             _renderer.Setup(x => x.Error).Returns(outWriter);

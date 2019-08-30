@@ -14,8 +14,8 @@ namespace Party.Shared
     {
         Task<Registry> GetRegistryAsync(params string[] registries);
         Task<SavesMap> GetSavesAsync();
-        Task<(RegistryScript script, RegistryScriptVersion version)> AddToRegistry(Registry registry, string name, string path);
-        IEnumerable<SearchResult> Search(Registry registry, SavesMap saves, string query, bool showUsage);
+        Task<(RegistryScript script, RegistryScriptVersion version)> AddFilesToRegistryAsync(Registry registry, string name, string path);
+        IEnumerable<SearchResult> Search(Registry registry, SavesMap saves, string query);
         Task<InstalledPackageInfoResult> GetInstalledPackageInfoAsync(string name, RegistryScriptVersion version);
         Task<InstalledPackageInfoResult> InstallPackageAsync(InstalledPackageInfoResult info);
         RegistrySavesMatch[] MatchSavesToRegistry(SavesMap saves, Registry registry);
@@ -49,14 +49,14 @@ namespace Party.Shared
             return new SavesResolverHandler(_fs, _config.VirtAMate.SavesDirectory, _config.Scanning.Ignore).AnalyzeSaves();
         }
 
-        public Task<(RegistryScript script, RegistryScriptVersion version)> AddToRegistry(Registry registry, string name, string path)
+        public Task<(RegistryScript script, RegistryScriptVersion version)> AddFilesToRegistryAsync(Registry registry, string name, string path)
         {
             return new AddToRegistryHandler(_config.VirtAMate.SavesDirectory, _fs).AddScriptVersionAsync(registry, name, path);
         }
 
-        public IEnumerable<SearchResult> Search(Registry registry, SavesMap saves, string query, bool showUsage)
+        public IEnumerable<SearchResult> Search(Registry registry, SavesMap saves, string query)
         {
-            return new SearchHandler(_config).Search(registry, saves, query, showUsage);
+            return new SearchHandler(_config).Search(registry, saves, query);
         }
 
         public Task<InstalledPackageInfoResult> GetInstalledPackageInfoAsync(string name, RegistryScriptVersion version)

@@ -9,23 +9,17 @@ namespace Party.CLI.Commands
 {
     public class SearchCommand : CommandBase
     {
-        public enum ShowOptions
-        {
-            Basic,
-            Overview,
-            Details
-        }
-
         public static Command CreateCommand(IRenderer renderer, PartyConfiguration config, IPartyController controller)
         {
             var command = new Command("search", "Search for scripts and packages in the registry");
             AddCommonOptions(command);
             command.AddArgument(new Argument<string>("query", null));
-            command.AddOption(new Option("--show", "Include usage information from scenes") { Argument = new Argument<ShowOptions>(() => ShowOptions.Basic) });
+            command.AddOption(new Option("--no-usage", "Do not show usage information from scenes (runs faster)"));
+            command.AddOption(new Option("--warnings", "Show warnings such as broken scenes or missing scripts"));
 
-            command.Handler = CommandHandler.Create(async (DirectoryInfo saves, string query, ShowOptions show) =>
+            command.Handler = CommandHandler.Create(async (DirectoryInfo saves, string query, bool noUsage, bool warnings) =>
             {
-                await new SearchCommand(renderer, config, saves, controller).ExecuteAsync(query, show);
+                await new SearchCommand(renderer, config, saves, controller).ExecuteAsync(query, noUsage, warnings);
             });
             return command;
         }
@@ -34,38 +28,23 @@ namespace Party.CLI.Commands
         {
         }
 
-        private async Task ExecuteAsync(string query, ShowOptions show)
+        private async Task ExecuteAsync(string query, bool noUsage, bool warnings)
         {
             var registryTask = Controller.GetRegistryAsync();
-            var savesTask = show == ShowOptions.Basic ? Task.FromResult<SavesMap>(null) : Controller.GetSavesAsync();
+            var savesTask = noUsage ? Task.FromResult<SavesMap>(null) : Controller.GetSavesAsync();
             await Task.WhenAll();
             var registry = await registryTask;
             var saves = await savesTask;
 
-            PrintWarnings(saves?.Errors);
+            PrintWarnings(warnings, saves?.Errors);
 
-            foreach (var result in Controller.Search(registry, saves, query, show != ShowOptions.Basic))
+            foreach (var result in Controller.Search(registry, saves, query))
             {
                 var script = result.Package;
                 var latestVersion = script.GetLatestVersion();
                 var trustNotice = result.Trusted ? "" : " [NOT TRUSTED]";
-                var scenes = show == ShowOptions.Basic ? "" : $" (used in {Pluralize(result.Scenes?.Length ?? 0, "scene", "scenes")})";
+                var scenes = noUsage ? "" : $" (used in {Pluralize(result.Scenes?.Length ?? 0, "scene", "scenes")})";
                 Renderer.WriteLine($"{script.Name} {latestVersion.Version ?? "-"} by {script.Author.Name}{trustNotice}{scenes}");
-                if (show == ShowOptions.Details)
-                {
-                    if (result.Scenes == null || result.Scenes.Length == 0)
-                    {
-                        Renderer.WriteLine("- Not used by any scenes");
-                    }
-                    else
-                    {
-                        foreach (var scene in result.Scenes)
-                        {
-                            // TODO: Show the version used in each scene
-                            Renderer.WriteLine($"- {Controller.GetRelativePath(scene.FullPath)}");
-                        }
-                    }
-                }
             }
         }
     }

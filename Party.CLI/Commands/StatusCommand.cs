@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
-using Party.Shared.Models;
 using Party.Shared.Resources;
 
 namespace Party.CLI.Commands
@@ -35,14 +34,11 @@ namespace Party.CLI.Commands
         private async Task ExecuteAsync(bool scenes, bool warnings, bool unregistered)
         {
             Renderer.WriteLine("Analyzing the saves folder and downloading the scripts list from the registry...");
-            var (saves, registry) = await GetSavesAndRegistry();
+            var (saves, registry) = await GetSavesAndRegistryAsync();
 
             var matches = Controller.MatchSavesToRegistry(saves, registry);
 
-            if (warnings)
-                PrintWarnings(saves.Errors);
-            else
-                PrintWarningsCount(saves.Errors);
+            PrintWarnings(warnings, saves.Errors);
 
             foreach (var match in matches)
             {
@@ -78,18 +74,6 @@ namespace Party.CLI.Commands
             {
                 Renderer.WriteLine($"- {Controller.GetRelativePath(scene.FullPath)}");
             }
-        }
-
-        private async Task<(SavesMap, Registry)> GetSavesAndRegistry()
-        {
-            var registryTask = Controller.GetRegistryAsync();
-            var savesTask = Controller.GetSavesAsync();
-
-            await Task.WhenAll();
-
-            var registry = await registryTask;
-            var saves = await savesTask;
-            return (saves, registry);
         }
     }
 }

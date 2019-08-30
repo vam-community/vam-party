@@ -50,6 +50,7 @@ namespace Party.CLI
                 GetCommand.CreateCommand(_renderer, _config, _controller),
                 ShowCommand.CreateCommand(_renderer, _config, _controller),
                 StatusCommand.CreateCommand(_renderer, _config, _controller),
+                FixCommand.CreateCommand(_renderer, _config, _controller),
                 PublishCommand.CreateCommand(_renderer, _config, _controller),
             };
 
@@ -57,23 +58,23 @@ namespace Party.CLI
             rootCommand.Name = Path.GetFileName(Environment.GetCommandLineArgs().FirstOrDefault()) ?? "party.exe";
 
             Exception exc = null;
+            var parser = new CommandLineBuilder(rootCommand)
+                .UseVersionOption()
+                .UseHelp()
+#if (DEBUG)
+                .UseParseDirective()
+                .UseDebugDirective()
+#endif
+                    .UseSuggestDirective()
+                //.RegisterWithDotnetSuggest()
+                .UseTypoCorrections()
+                .UseParseErrorReporting()
+                .UseExceptionHandler((e, ctx) => exc = e)
+                .CancelOnProcessTermination()
+                .Build();
+
             try
             {
-                var parser = new CommandLineBuilder(rootCommand)
-                       .UseVersionOption()
-                       .UseHelp()
-#if (DEBUG)
-                       .UseParseDirective()
-                       .UseDebugDirective()
-#endif
-                       .UseSuggestDirective()
-                       //.RegisterWithDotnetSuggest()
-                       .UseTypoCorrections()
-                       .UseParseErrorReporting()
-                       .UseExceptionHandler((e, ctx) => exc = e)
-                       .CancelOnProcessTermination()
-                       .Build();
-
                 await parser.InvokeAsync(args, _renderer);
             }
             catch (Exception e)
@@ -86,7 +87,6 @@ namespace Party.CLI
                 return HandleError(exc);
             }
 
-            await _renderer.WhenCompleteAsync();
             return 0;
         }
 

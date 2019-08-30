@@ -6,12 +6,8 @@
             { 
                "id" : "PluginManager", 
                "plugins" : { 
-                  "plugin#0" : "Saves/Scripts/Dot Not Existcs"
+                  "plugin#0" : "Saves/Scripts/Dot Not Exist.cs"
                }
-            }, 
-            { 
-               "id" : "plugin#0_SimpleScript1", 
-               "Some Setting" : "0.1234567"
             }
          ]
       }

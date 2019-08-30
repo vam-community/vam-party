@@ -60,7 +60,7 @@ namespace Party.CLI.Commands
 
             var filesStatuses = await Controller.GetInstalledPackageInfoAsync(registryPackage.Name, registryPackageVersion);
 
-            var distinctStatuses = filesStatuses.Files.Select(f => f.Status).Distinct().ToList();
+            var distinctStatuses = filesStatuses.DistinctStatuses();
 
             ValidateStatuses(distinctStatuses);
 
@@ -88,14 +88,14 @@ namespace Party.CLI.Commands
             }
         }
 
-        private static void ValidateStatuses(List<InstalledPackageInfoResult.FileStatus> distinctStatuses)
+        private static void ValidateStatuses(InstalledPackageInfoResult.FileStatus[] distinctStatuses)
         {
-            if (distinctStatuses.Count > 1)
+            if (distinctStatuses.Length > 1)
             {
                 throw new PackageInstallationException("The installed plugin has been either partially installed or was modified. Try deleting the installed package folder and try again.");
             }
 
-            if (distinctStatuses.Count == 0)
+            if (distinctStatuses.Length == 0)
             {
                 throw new PackageInstallationException("No files were found in this package.");
             }
