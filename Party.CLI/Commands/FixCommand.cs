@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
 using Party.Shared.Models;
+using Party.Shared.Serializers;
 
 namespace Party.CLI.Commands
 {
@@ -25,6 +26,8 @@ namespace Party.CLI.Commands
             });
             return command;
         }
+
+        private SceneSerializer _serializer = new SceneSerializer();
 
         public FixCommand(IRenderer renderer, PartyConfiguration config, DirectoryInfo saves, IPartyController controller) : base(renderer, config, saves, controller)
         {
@@ -101,8 +104,10 @@ namespace Party.CLI.Commands
             foreach (var scene in match.Local.Scenes)
             {
                 // TODO: Fix scene
+                // TODO: Do not fix scene if the scene is already fine
                 Renderer.Write($"  Updating scene \"{Controller.GetRelativePath(scene.FullPath)}\"...");
-                Renderer.WriteLine(" Not implemented yet.", ConsoleColor.Blue);
+                await Controller.UpdateScriptInSceneAsync(scene, match.Local, info);
+                Renderer.WriteLine(" Done!", ConsoleColor.Green);
             }
         }
 

@@ -44,9 +44,9 @@ namespace Party.CLI.Commands
             {
                 Renderer.Write(match.Script.Name, ConsoleColor.Green);
                 Renderer.Write(" ");
-                Renderer.Write(match.Version.Version, ConsoleColor.Gray);
+                Renderer.Write($"v{match.Version.Version}", ConsoleColor.Gray);
                 Renderer.Write(" ");
-                Renderer.Write($"\"match.File.Filename\"", ConsoleColor.DarkGray);
+                Renderer.Write($"\"{match.File.Filename}\"", ConsoleColor.DarkGray);
                 Renderer.Write(" ");
                 Renderer.Write($"referenced by {Pluralize(match.Local.Scenes?.Count() ?? 0, "scene", "scenes")}", ConsoleColor.DarkCyan);
                 Renderer.Write(Environment.NewLine);

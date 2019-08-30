@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Party.Shared.Handlers;
 using Party.Shared.Models;
+using Party.Shared.Resources;
 
 namespace Party.Shared
 {
@@ -19,6 +20,7 @@ namespace Party.Shared
         Task<InstalledPackageInfoResult> GetInstalledPackageInfoAsync(string name, RegistryScriptVersion version);
         Task<InstalledPackageInfoResult> InstallPackageAsync(InstalledPackageInfoResult info);
         RegistrySavesMatch[] MatchSavesToRegistry(SavesMap saves, Registry registry);
+        Task UpdateScriptInSceneAsync(Scene scene, Script local, InstalledPackageInfoResult info);
         string GetRelativePath(string fullPath);
         string GetRelativePath(string fullPath, string parentPath);
         void SaveToFile(string data, string path);
@@ -71,6 +73,11 @@ namespace Party.Shared
         public RegistrySavesMatch[] MatchSavesToRegistry(SavesMap saves, Registry registry)
         {
             return new RegistrySavesMatchHandler().Match(saves, registry);
+        }
+
+        public Task UpdateScriptInSceneAsync(Scene scene, Script local, InstalledPackageInfoResult info)
+        {
+            return new SceneUpdateHandler(_fs, _config.VirtAMate.SavesDirectory).UpdateScripts(scene, local, info);
         }
 
         public string GetRelativePath(string fullPath)
