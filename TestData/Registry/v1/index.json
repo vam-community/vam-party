@@ -92,6 +92,28 @@
           ]
         }
       ]
+    },
+    {
+      "name": "unused-script",
+      "tags": ["unused", "test"],
+      "author": {
+        "name": "John Doe"
+      },
+      "versions": [
+        {
+          "version": "1.0.0",
+          "files": [
+            {
+              "filename": "Unused Script 1.cs",
+              "url": "https://github.com/vam-community/vam-party/raw/3640bf85a6bb76b6cac6454501525b9bb5505ee2/TestData/Saves/Scripts/Unused%20Script%202.cs",
+              "hash": {
+                "type": "sha256",
+                "value": "B890546C710C1EA434087F60C9E58792A0FC4004F305C02A9540C052D9CFC23A"
+              }
+            }
+          ]
+        }
+      ]
     }
   ]
 }

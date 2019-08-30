@@ -1,0 +1,19 @@
+{ 
+   "atoms" : [ 
+      { 
+         "id" : "My Atom", 
+         "storables" : [ 
+            { 
+               "id" : "PluginManager", 
+               "plugins" : { 
+                  "plugin#0" : "Saves/Scripts/Dot Not Existcs"
+               }
+            }, 
+            { 
+               "id" : "plugin#0_SimpleScript1", 
+               "Some Setting" : "0.1234567"
+            }
+         ]
+      }
+   ]
+}

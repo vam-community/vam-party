@@ -94,9 +94,22 @@ namespace Party.CLI.Commands
                 script.Repository = await Renderer.AskAsync("Package Repository URL: ");
             }
 
+            string baseUrl = null;
             foreach (var file in version.Files)
             {
-                file.Url = await Renderer.AskAsync($"{file.Filename} URL: ");
+                if (baseUrl != null)
+                {
+                    var url = $"{baseUrl}{file.Filename.Replace(" ", "%20")}";
+                    file.Url = await Renderer.AskAsync($"{file.Filename} URL ({url}): ") ?? url;
+                }
+                else
+                {
+                    file.Url = await Renderer.AskAsync($"{file.Filename} URL: ", true);
+                    if (file.Url.EndsWith("/" + file.Filename.Replace(" ", "%20")))
+                    {
+                        baseUrl = file.Url.Substring(0, file.Url.LastIndexOf("/") + 1);
+                    }
+                }
             }
 
             var serializer = new RegistrySerializer();
