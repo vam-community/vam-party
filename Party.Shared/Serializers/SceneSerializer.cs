@@ -1,16 +1,30 @@
 using System.Collections.Generic;
 using System.IO.Abstractions;
+using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Party.Shared.Exceptions;
 
 namespace Party.Shared.Serializers
 {
     public class SceneSerializer
     {
-        public async IAsyncEnumerable<string> GetScriptsAsync(IFileSystem fs, string path)
+        public async Task<string[]> GetScriptsAsync(IFileSystem fs, string path)
         {
-            var json = await ParseAsync(fs, path).ConfigureAwait(false);
+            try
+            {
+                var json = await LoadJson(fs, path).ConfigureAwait(false);
+                return FindScriptsInJson(json).ToArray();
+            }
+            catch (JsonReaderException exc)
+            {
+                throw new SavesException($"There was an issue loading scene '{path}': {exc.Message}", exc);
+            }
+        }
+
+        private IEnumerable<string> FindScriptsInJson(JObject json)
+        {
             var atoms = (JArray)json["atoms"];
             if (atoms == null) { yield break; }
             foreach (var atom in atoms)
@@ -36,7 +50,7 @@ namespace Party.Shared.Serializers
             }
         }
 
-        private async Task<JObject> ParseAsync(IFileSystem fs, string path)
+        private async Task<JObject> LoadJson(IFileSystem fs, string path)
         {
             using var file = fs.File.OpenText(path);
             using var reader = new JsonTextReader(file);

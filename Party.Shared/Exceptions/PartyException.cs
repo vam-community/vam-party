@@ -9,5 +9,9 @@ namespace Party.Shared.Exceptions
         protected PartyException(string message) : base(message)
         {
         }
+
+        protected PartyException(string message, Exception inner) : base(message, inner)
+        {
+        }
     }
 }

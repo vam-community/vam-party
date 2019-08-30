@@ -7,6 +7,7 @@ using Party.Shared.Resources;
 using Party.Shared.Models;
 using Party.Shared.Serializers;
 using Party.Shared.Utils;
+using Party.Shared.Exceptions;
 
 namespace Party.Shared.Handlers
 {
@@ -91,20 +92,27 @@ namespace Party.Shared.Handlers
             {
                 var scene = new Scene(sceneFile);
                 scenes.Add(scene);
-                await foreach (var scriptRefRelativePath in sceneSerializer.GetScriptsAsync(_fs, sceneFile).ConfigureAwait(false))
+                try
                 {
-                    var fullPath = scriptRefRelativePath.Contains('/')
-                        ? Path.GetFullPath(scriptRefRelativePath, vamDirectory)
-                        : Path.GetFullPath(scriptRefRelativePath, Path.GetDirectoryName(sceneFile));
-                    if (scriptsByFilename.TryGetValue(fullPath, out var scriptRef))
+                    foreach (var scriptRefRelativePath in await sceneSerializer.GetScriptsAsync(_fs, sceneFile).ConfigureAwait(false))
                     {
-                        scene.References(scriptRef);
-                        scriptRef.ReferencedBy(scene);
+                        var fullPath = scriptRefRelativePath.Contains('/')
+                            ? Path.GetFullPath(scriptRefRelativePath, vamDirectory)
+                            : Path.GetFullPath(scriptRefRelativePath, Path.GetDirectoryName(sceneFile));
+                        if (scriptsByFilename.TryGetValue(fullPath, out var scriptRef))
+                        {
+                            scene.References(scriptRef);
+                            scriptRef.ReferencedBy(scene);
+                        }
+                        else
+                        {
+                            errors.Add($"Scene '{sceneFile}' references a script that does not exist: '{fullPath}'");
+                        }
                     }
-                    else
-                    {
-                        errors.Add($"Scene '{sceneFile}' references a script that does not exist: '{fullPath}'");
-                    }
+                }
+                catch (SavesException exc)
+                {
+                    errors.Add(exc.Message);
                 }
             }
 
