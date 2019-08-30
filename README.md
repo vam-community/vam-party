@@ -62,11 +62,12 @@ If you do not provide a version and package name, party will ask for one. If it'
 Prints the list of all installed scripts, identify the ones that are out of date, and flag scenes that reference scripts from a folder other than the party installation folder.
 
     > party status
-    Scripts:
-    - My Script.cs (used in 3 scenes)
-    - Cool Plugin.cslist (used in 0 scenes)
-
-This command is still under development, right now it will list every error in your saves folder (bad references, etc.) and list every single script without information about package or version.
+    Analyzing the saves folder and downloading the scripts list from the registry...
+    There were 3 errors in the saves folder. Run with --warnings to print them.
+    some-script 1.0.0 "Script Name.cs" (referenced by 2 scenes)
+    - scene\Some Scene.json
+    - scene\Some Other Scene.json
+    other-script 3.0.4 "My Script.cslist" (referenced by 0 scenes)
 
 ### `show`
 

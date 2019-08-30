@@ -50,9 +50,9 @@ namespace Party.CLI.Commands
                 Renderer.Write(" ");
                 Renderer.Write(match.Version.Version, ConsoleColor.Gray);
                 Renderer.Write(" ");
-                Renderer.Write(match.File.Filename, ConsoleColor.DarkGray);
+                Renderer.Write($"\"match.File.Filename\"", ConsoleColor.DarkGray);
                 Renderer.Write(" ");
-                Renderer.Write(Pluralize(match.Local.Scenes?.Count() ?? 0, "scene", "scenes"), ConsoleColor.DarkCyan);
+                Renderer.Write($"referenced by {Pluralize(match.Local.Scenes?.Count() ?? 0, "scene", "scenes")}", ConsoleColor.DarkCyan);
                 Renderer.Write(Environment.NewLine);
                 if (scenes) PrintScenes(match.Local.Scenes);
             }
@@ -63,7 +63,7 @@ namespace Party.CLI.Commands
                 {
                     Renderer.Write(script.Name, ConsoleColor.Red);
                     Renderer.Write(" ");
-                    Renderer.Write(Pluralize(script.Scenes?.Count() ?? 0, "scene", "scenes"), ConsoleColor.DarkCyan);
+                    Renderer.Write($"referenced by {Pluralize(script.Scenes?.Count() ?? 0, "scene", "scenes")}", ConsoleColor.DarkCyan);
                     Renderer.Write(Environment.NewLine);
                     if (scenes)
                         PrintScenes(script.Scenes);
