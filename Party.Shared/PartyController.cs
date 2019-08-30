@@ -18,6 +18,7 @@ namespace Party.Shared
         IEnumerable<SearchResult> Search(Registry registry, SavesMap saves, string query, bool showUsage);
         Task<InstalledPackageInfoResult> GetInstalledPackageInfoAsync(string name, RegistryScriptVersion version);
         Task<InstalledPackageInfoResult> InstallPackageAsync(InstalledPackageInfoResult info);
+        RegistrySavesMatch[] MatchSavesToRegistry(SavesMap saves, Registry registry);
         string GetRelativePath(string fullPath);
         string GetRelativePath(string fullPath, string parentPath);
         void SaveToFile(string data, string path);
@@ -66,6 +67,10 @@ namespace Party.Shared
         public Task<InstalledPackageInfoResult> InstallPackageAsync(InstalledPackageInfoResult info)
         {
             return new InstallPackageHandler(_fs, _http).InstallPackageAsync(info);
+        }
+        public RegistrySavesMatch[] MatchSavesToRegistry(SavesMap saves, Registry registry)
+        {
+            return new RegistrySavesMatchHandler().Match(saves, registry);
         }
 
         public string GetRelativePath(string fullPath)

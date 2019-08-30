@@ -1,9 +1,13 @@
-﻿using System.CommandLine;
+﻿using System;
+using System.Collections.Generic;
+using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
+using Party.Shared.Models;
+using Party.Shared.Resources;
 
 namespace Party.CLI.Commands
 {
@@ -13,11 +17,13 @@ namespace Party.CLI.Commands
         {
             var command = new Command("status", "Shows the state of the current scripts and scenes");
             AddCommonOptions(command);
-            command.AddOption(new Option("--scenes", "Show scenes information") { Argument = new Argument<string>() });
+            command.AddOption(new Option("--scenes", "Show scenes information"));
+            command.AddOption(new Option("--warnings", "Show warnings such as broken scenes or missing scripts"));
+            command.AddOption(new Option("--unregistered", "Show all scripts that were not registered"));
 
-            command.Handler = CommandHandler.Create(async (DirectoryInfo saves, bool scenes) =>
+            command.Handler = CommandHandler.Create(async (DirectoryInfo saves, bool scenes, bool warnings, bool unregistered) =>
             {
-                await new StatusCommand(renderer, config, saves, controller).ExecuteAsync(scenes);
+                await new StatusCommand(renderer, config, saves, controller).ExecuteAsync(scenes, warnings, unregistered);
             });
             return command;
         }
@@ -26,25 +32,64 @@ namespace Party.CLI.Commands
         {
         }
 
-        private async Task ExecuteAsync(bool scenes)
+        private async Task ExecuteAsync(bool scenes, bool warnings, bool unregistered)
         {
-            var saves = await Controller.GetSavesAsync();
+            Renderer.WriteLine("Analyzing the saves folder and downloading the scripts list from the registry...");
+            var (saves, registry) = await GetSavesAndRegistry();
 
-            PrintWarnings(saves.Errors);
+            var matches = Controller.MatchSavesToRegistry(saves, registry);
 
-            Renderer.WriteLine("Scripts:");
-            foreach (var script in saves.Scripts.OrderBy(sm => sm.FullPath))
+            if (warnings)
+                PrintWarnings(saves.Errors);
+            else
+                PrintWarningsCount(saves.Errors);
+
+            foreach (var match in matches)
             {
-                Renderer.WriteLine($"- {script.Name} (used in {Pluralize(script.Scenes?.Count() ?? 0, "scene", "scenes")})");
+                Renderer.Write(match.Script.Name, ConsoleColor.Green);
+                Renderer.Write(" ");
+                Renderer.Write(match.Version.Version, ConsoleColor.Gray);
+                Renderer.Write(" ");
+                Renderer.Write(match.File.Filename, ConsoleColor.DarkGray);
+                Renderer.Write(" ");
+                Renderer.Write(Pluralize(match.Local.Scenes?.Count() ?? 0, "scene", "scenes"), ConsoleColor.DarkCyan);
+                Renderer.Write(Environment.NewLine);
+                if (scenes) PrintScenes(match.Local.Scenes);
+            }
 
-                if (scenes && script.Scenes != null)
+            if (unregistered)
+            {
+                foreach (var script in saves.Scripts.Where(s => !matches.Any(m => m.Local == s)))
                 {
-                    foreach (var scene in script.Scenes)
-                    {
-                        Renderer.WriteLine($"  - {Controller.GetRelativePath(scene.FullPath)}");
-                    }
+                    Renderer.Write(script.Name, ConsoleColor.Red);
+                    Renderer.Write(" ");
+                    Renderer.Write(Pluralize(script.Scenes?.Count() ?? 0, "scene", "scenes"), ConsoleColor.DarkCyan);
+                    Renderer.Write(Environment.NewLine);
+                    if (scenes)
+                        PrintScenes(script.Scenes);
                 }
             }
+        }
+
+        private void PrintScenes(List<Scene> scenes)
+        {
+            if (scenes == null) return;
+            foreach (var scene in scenes)
+            {
+                Renderer.WriteLine($"- {Controller.GetRelativePath(scene.FullPath)}");
+            }
+        }
+
+        private async Task<(SavesMap, Registry)> GetSavesAndRegistry()
+        {
+            var registryTask = Controller.GetRegistryAsync();
+            var savesTask = Controller.GetSavesAsync();
+
+            await Task.WhenAll();
+
+            var registry = await registryTask;
+            var saves = await savesTask;
+            return (saves, registry);
         }
     }
 }

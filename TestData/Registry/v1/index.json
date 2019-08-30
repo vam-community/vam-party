@@ -95,6 +95,7 @@
     },
     {
       "name": "unused-script",
+      "description": "This plugin is not used in any scenes",
       "tags": ["unused", "test"],
       "author": {
         "name": "John Doe"

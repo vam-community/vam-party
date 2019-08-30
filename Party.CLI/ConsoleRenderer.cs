@@ -10,6 +10,8 @@ namespace Party.CLI
     public interface IRenderer : IConsole
     {
         IDisposable WithColor(ConsoleColor color);
+        void Write(string text);
+        void Write(string text, ConsoleColor color);
         void WriteLine(string text);
         Task<string> AskAsync(string prompt, bool mandatory = false, Regex regex = null, string sampleValue = null);
         Task WhenCompleteAsync();
@@ -52,6 +54,18 @@ namespace Party.CLI
         {
             _setColor(color);
             return new ColorContext(() => { _resetColor(); WhenCompleteAsync().ConfigureAwait(false).GetAwaiter().GetResult(); });
+        }
+
+        public void Write(string text)
+        {
+            _output.Write(text);
+        }
+
+        public void Write(string text, ConsoleColor color)
+        {
+            _setColor(color);
+            _output.Write(text);
+            _resetColor();
         }
 
         public void WriteLine(string text)

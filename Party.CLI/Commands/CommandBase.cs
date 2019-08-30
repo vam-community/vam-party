@@ -46,6 +46,16 @@ namespace Party.CLI.Commands
             }
         }
 
+        protected void PrintWarningsCount(string[] errors)
+        {
+            if (errors == null || errors.Length == 0) return;
+
+            using (Renderer.WithColor(ConsoleColor.Yellow))
+            {
+                Renderer.Error.WriteLine($"There were {errors.Length} errors in the saves folder. Run with --warnings to print them.");
+            }
+        }
+
         protected static string Pluralize(int count, string singular, string plural)
         {
             if (count == 1)
