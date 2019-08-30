@@ -54,6 +54,8 @@ namespace Party.CLI.Commands
 
             var (script, version) = await Controller.AddFilesToRegistryAsync(registry, name, Path.GetFullPath(input)).ConfigureAwait(false);
 
+            if (script == null || version == null || script.Versions == null) throw new NullReferenceException($"Error in {nameof(Controller.AddFilesToRegistryAsync)}: Null values were returned.");
+
             var isNew = script.Versions.Count == 1;
 
             // TODO: Validate all fields
@@ -61,13 +63,10 @@ namespace Party.CLI.Commands
             {
                 Renderer.WriteLine($"This package already exists (by {script.Author?.Name ?? "Anonymous User"}), a new version will be added to it.");
 
-                if (script.Versions != null)
+                Renderer.WriteLine("Existing versions:");
+                foreach (var existingVersion in script.Versions)
                 {
-                    Renderer.WriteLine("Existing versions:");
-                    foreach (var existingVersion in script.Versions)
-                    {
-                        Renderer.WriteLine($"- {existingVersion.Version}");
-                    }
+                    Renderer.WriteLine($"- {existingVersion.Version}");
                 }
             }
 

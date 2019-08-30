@@ -9,23 +9,25 @@ using System.Threading.Tasks;
 
 namespace Party.CLI
 {
-    public abstract class CommandTestsBase
+    public abstract class CommandTestsBase : IDisposable
     {
         protected Mock<IRenderer> _renderer;
         protected Mock<IPartyController> _controller;
         protected Program _program;
         protected StringBuilder _out;
+        private StringWriter _stringWriter;
 
         [SetUp]
         public void CreateDependencies()
         {
             _out = new StringBuilder();
-            var outWriter = StandardStreamWriter.Create(new StringWriter(_out));
+            _stringWriter = new StringWriter(_out);
+            var outWriter = StandardStreamWriter.Create(_stringWriter);
             _renderer = new Mock<IRenderer>(MockBehavior.Strict);
             _renderer.Setup(x => x.WriteLine()).Callback(() => _out.Append($"\n"));
             _renderer.Setup(x => x.WriteLine(It.IsAny<string>())).Callback((string line) => _out.Append($"{line}\n"));
             _renderer.Setup(x => x.WriteLine(It.IsAny<string>(), It.IsAny<ConsoleColor>())).Callback((string line, ConsoleColor color) => _out.Append($"[color:{color}]{line}[/color]\n"));
-            _renderer.Setup(x => x.Write(It.IsAny<string>())).Callback((string text) => _out.Append($"text));
+            _renderer.Setup(x => x.Write(It.IsAny<string>())).Callback((string text) => _out.Append(text));
             _renderer.Setup(x => x.Write(It.IsAny<string>(), It.IsAny<ConsoleColor>())).Callback((string text, ConsoleColor color) => _out.Append($"[color:{color}]{text}[/color]"));
             _renderer.Setup(x => x.WithColor(It.IsAny<ConsoleColor>())).Returns((ConsoleColor color) => new ColorStub(_out, color));
             _renderer.Setup(x => x.Out).Returns(outWriter);
@@ -54,6 +56,11 @@ namespace Party.CLI
             {
                 _out.Append("[/color]");
             }
+        }
+
+        public void Dispose()
+        {
+            _stringWriter?.Dispose();
         }
     }
 }

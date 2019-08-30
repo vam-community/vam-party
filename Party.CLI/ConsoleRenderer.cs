@@ -83,7 +83,7 @@ namespace Party.CLI
             _resetColor();
         }
 
-        public string Ask(string prompt, bool mandatory = true, Regex regex = null, string sampleValue = null)
+        public string Ask(string prompt, bool mandatory, Regex regex, string sampleValue)
         {
             string value;
             do

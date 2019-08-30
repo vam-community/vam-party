@@ -27,9 +27,8 @@ namespace Party.Shared.Handlers
         {
             var script1 = ResultFactory.RegScript("script1", ResultFactory.RegVer("1.0", ResultFactory.RegFile("My Script.cs", "12345", "https://example.org/scripts/MyScript.cs")));
             var registry = ResultFactory.Reg(script1);
-            var saves = ResultFactory.SavesMap().Build();
 
-            var result = _handler.Search(registry, saves, "", false);
+            var result = _handler.Search(registry, null, "");
 
             PartyAssertions.AreDeepEqual(new[]
             {
@@ -46,9 +45,8 @@ namespace Party.Shared.Handlers
         {
             var script1 = ResultFactory.RegScript("script1", ResultFactory.RegVer("1.0", ResultFactory.RegFile("My Script.cs", "12345", "https://example.com/scripts/MyScript.cs")));
             var registry = ResultFactory.Reg(script1);
-            var saves = ResultFactory.SavesMap().Build();
 
-            var result = _handler.Search(registry, saves, "", false);
+            var result = _handler.Search(registry, null, "");
 
             PartyAssertions.AreDeepEqual(new[]
             {
@@ -72,11 +70,10 @@ namespace Party.Shared.Handlers
             script2.Author = new RegistryScriptAuthor { Name = "John Doe" };
             script2.Description = "This is a script that makes stuff go boom!";
             var registry = ResultFactory.Reg(script1, script2);
-            var saves = ResultFactory.SavesMap().Build();
 
-            var result = _handler.Search(registry, saves, query, false);
+            var result = _handler.Search(registry, null, query);
 
-            PartyAssertions.AreDeepEqual(new SearchResult[]
+            PartyAssertions.AreDeepEqual(new[]
             {
                 new SearchResult
                 {
@@ -98,9 +95,9 @@ namespace Party.Shared.Handlers
                 .WithScene(new Scene(@"C:\VaM\Saves\My Scene 2.json"))
                 .Build();
 
-            var result = _handler.Search(registry, saves, "", true);
+            var result = _handler.Search(registry, saves, "");
 
-            PartyAssertions.AreDeepEqual(new SearchResult[]
+            PartyAssertions.AreDeepEqual(new[]
             {
                 new SearchResult
                 {
