@@ -6,10 +6,10 @@
             { 
                "id" : "PluginManager", 
                "plugins" : { 
-                  "plugin#0" : "Saves/Scripts/Simple Script 1.cs",
-                  "plugin#1" : "Saves/Scripts/Complex Plugin/Complex Plugin.cslist",
-                  "plugin#2" : "Saves/Scripts/Multi Plugin/Multi Script 1.cs",
-                  "plugin#3" : "Saves/Scripts/Multi Plugin/Multi Script 2.cs",
+                  "plugin#0" : "Saves/Scripts/Simple Script 1.cs", 
+                  "plugin#1" : "Saves/Scripts/Complex Plugin/Complex Plugin.cslist", 
+                  "plugin#2" : "Saves/Scripts/Multi Plugin/Multi Script 1.cs", 
+                  "plugin#3" : "Saves/Scripts/Multi Plugin/Multi Script 2.cs", 
                   "plugin#4" : "Saves/Scripts/Unregistered Script.cs"
                }
             }, 

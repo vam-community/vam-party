@@ -33,12 +33,7 @@ namespace Party.Shared.Serializers
                 var json = await LoadJson(fs, path).ConfigureAwait(false);
                 ProcessScripts(json, script => updates.Where(u => u.before == script).Select(u => u.after).FirstOrDefault());
                 using var file = fs.File.CreateText(@path);
-                using JsonTextWriter writer = new JsonTextWriter(file)
-                {
-                    Formatting = Formatting.Indented,
-                    Indentation = 3,
-                    // TODO: Formatting in VaM uses `"field" : "value"`, so we must figure out a way to add the space before the colon...
-                };
+                using var writer = new SceneJsonTextWriter(file);
                 json.WriteTo(writer);
             }
             catch (JsonReaderException exc)

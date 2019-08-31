@@ -6,12 +6,15 @@
             { 
                "id" : "PluginManager", 
                "plugins" : { 
-                  "plugin#0" : "Simple Script 1.cs"
+                  "plugin#0" : "Saves/Scripts/Simple Script 1.cs"
                }
             }, 
             { 
                "id" : "plugin#0_SimpleScript1", 
-               "Some Setting" : "0.1234567"
+               "Int" : 5, 
+               "Double" : 0.1234, 
+               "Special String" : "\"愛のパートナー", 
+               "\"Special name\"" : ""
             }
          ]
       }
