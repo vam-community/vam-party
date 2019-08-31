@@ -101,7 +101,7 @@ namespace Party.CLI
             {
                 if (mandatory)
                 {
-                    _output.WriteLine("Please enter a value.", ConsoleColor.Red);
+                    WriteLine("Please enter a value.", ConsoleColor.Red);
                     return false;
                 }
                 return true;
