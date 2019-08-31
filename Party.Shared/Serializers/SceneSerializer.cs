@@ -33,6 +33,7 @@ namespace Party.Shared.Serializers
                 var result = new List<(string before, string after)>();
                 var json = await LoadJson(fs, path).ConfigureAwait(false);
                 ProcessScripts(json, script => updates.Where(u => u.before == script).Select(u => { result.Add(u); return u.after; }).FirstOrDefault());
+                if (result.Count == 0) return result;
                 using var file = fs.File.CreateText(@path);
                 using var writer = new SceneJsonTextWriter(file);
                 json.WriteTo(writer);

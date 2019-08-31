@@ -50,7 +50,7 @@ namespace Party.CLI
                 GetCommand.CreateCommand(_renderer, _config, _controller),
                 ShowCommand.CreateCommand(_renderer, _config, _controller),
                 StatusCommand.CreateCommand(_renderer, _config, _controller),
-                FixCommand.CreateCommand(_renderer, _config, _controller),
+                UpgradeCommand.CreateCommand(_renderer, _config, _controller),
                 PublishCommand.CreateCommand(_renderer, _config, _controller),
             };
 

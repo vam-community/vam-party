@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -24,6 +25,7 @@ namespace Party.Shared
         string GetRelativePath(string fullPath);
         string GetRelativePath(string fullPath, string parentPath);
         void SaveToFile(string data, string path);
+        void Delete(string fullPath);
     }
 
     public class PartyController : IPartyController
@@ -97,7 +99,26 @@ namespace Party.Shared
 
         public void SaveToFile(string data, string path)
         {
+            if (!path.StartsWith(_config.VirtAMate.SavesDirectory)) throw new UnauthorizedAccessException($"Cannot save to file {path} because it is not in the Saves folder.");
             _fs.File.WriteAllText(path, data);
+        }
+
+        public void Delete(string path)
+        {
+            if (!path.StartsWith(_config.VirtAMate.SavesDirectory)) throw new UnauthorizedAccessException($"Cannot delete file {path} because it is not in the Saves folder.");
+            if (!File.Exists(path))
+                return;
+
+            _fs.File.Delete(path);
+
+            while (true)
+            {
+                path = _fs.Path.GetDirectoryName(path);
+                if (path == null) return;
+                if (!path.StartsWith(_config.VirtAMate.SavesDirectory)) return;
+                if (_fs.Directory.EnumerateFileSystemEntries(path).Any()) return;
+                _fs.Directory.Delete(path);
+            }
         }
     }
 }

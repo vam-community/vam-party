@@ -23,8 +23,9 @@ namespace Party.Shared.Handlers
         internal async Task<(string before, string after)[]> UpdateScripts(Scene scene, Script local, InstalledPackageInfoResult info)
         {
             var serializer = new SceneSerializer();
+            var changes = new List<(string before, string after)>();
 
-            var changes = new List<(string before, string after)>(GetTransform(local, info));
+            changes.AddRange(GetTransform(local, info));
 
             if (local is ScriptList scriptList)
             {

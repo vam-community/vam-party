@@ -47,19 +47,27 @@ You can also install a specific version:
 
     > party get some-package --version 1.0.0
 
-### `fix`
+### `upgrade`
 
 Scans for scenes referencing scripts that are available in the registry, and use them instead.
 
-    > party fix
+    > party upgrade
 
 Since this can affect lots of files, you might want to make a dry run first, see what the script will do:
 
-    > party get fix --noop
+    > party get upgrade --noop
 
-If you want the script to download matching packages, you can use `--get`:
+If you want the script to download all packages that were found in the registry for you, you can use `--get`:
 
-    > party get fix --get
+    > party get upgrade --get
+
+If you want the script to fix all scenes that are referencing a script outside of the Party folder, `--fix`:
+
+    > party get upgrade --fix
+
+To avoid clutter, you can delete unused scripts after upgrading using `--clean`. So for an aggressive update:
+
+    > party get upgrade --get --fix --clean
 
 ### `publish`
 
