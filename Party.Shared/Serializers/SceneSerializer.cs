@@ -26,15 +26,17 @@ namespace Party.Shared.Serializers
             }
         }
 
-        public async Task UpdateScriptAsync(IFileSystem fs, string path, List<(string before, string after)> updates)
+        public async Task<List<(string before, string after)>> UpdateScriptAsync(IFileSystem fs, string path, List<(string before, string after)> updates)
         {
             try
             {
+                var result = new List<(string before, string after)>();
                 var json = await LoadJson(fs, path).ConfigureAwait(false);
-                ProcessScripts(json, script => updates.Where(u => u.before == script).Select(u => u.after).FirstOrDefault());
+                ProcessScripts(json, script => updates.Where(u => u.before == script).Select(u => { result.Add(u); return u.after; }).FirstOrDefault());
                 using var file = fs.File.CreateText(@path);
                 using var writer = new SceneJsonTextWriter(file);
                 json.WriteTo(writer);
+                return result;
             }
             catch (JsonReaderException exc)
             {

@@ -19,21 +19,20 @@ namespace Party.CLI.Commands
             command.AddOption(new Option("--get", "Downloads registered scripts that were not already downloaded"));
             command.AddOption(new Option("--warnings", "Show warnings such as broken scenes or missing scripts"));
             command.AddOption(new Option("--noop", "Prints what the script will do, but won't actually do anything"));
+            command.AddOption(new Option("--verbose", "Prints every change that will be done on every scene"));
 
-            command.Handler = CommandHandler.Create(async (DirectoryInfo saves, bool get, bool warnings, bool noop) =>
+            command.Handler = CommandHandler.Create(async (DirectoryInfo saves, bool get, bool warnings, bool noop, bool verbose) =>
             {
-                await new FixCommand(renderer, config, saves, controller).ExecuteAsync(get, warnings, noop);
+                await new FixCommand(renderer, config, saves, controller).ExecuteAsync(get, warnings, noop, verbose);
             });
             return command;
         }
-
-        private SceneSerializer _serializer = new SceneSerializer();
 
         public FixCommand(IRenderer renderer, PartyConfiguration config, DirectoryInfo saves, IPartyController controller) : base(renderer, config, saves, controller)
         {
         }
 
-        private async Task ExecuteAsync(bool get, bool warnings, bool noop)
+        private async Task ExecuteAsync(bool get, bool warnings, bool noop, bool verbose)
         {
             Renderer.WriteLine("Analyzing the saves folder and downloading the scripts list from the registry...");
             var (saves, registry) = await GetSavesAndRegistryAsync();
@@ -42,16 +41,26 @@ namespace Party.CLI.Commands
 
             PrintWarnings(warnings, saves.Errors);
 
-            foreach (var match in matches.Where(m => m.Local.Scenes != null && m.Local.Scenes.Count > 0))
+            foreach (var match in matches)
             {
-                await HandleOne(match, get, noop);
+                await HandleOne(match, get, noop, verbose);
                 Renderer.WriteLine();
             }
         }
 
-        private async Task HandleOne(RegistrySavesMatch match, bool get, bool noop)
+        private async Task HandleOne(RegistrySavesMatch match, bool get, bool noop, bool verbose)
         {
-            Renderer.WriteLine($"Found script \"{Controller.GetRelativePath(match.Local.FullPath)}\" -> package {match.Script.Name} v{match.Version.Version}");
+            if (match.Local.Scenes == null || match.Local.Scenes.Count == 0)
+            {
+                if (verbose)
+                {
+                    PrintScriptToPackage(match);
+                    Renderer.WriteLine($"  Skipping because no scenes are using it", ConsoleColor.Yellow);
+                }
+                return;
+            }
+
+            PrintScriptToPackage(match);
 
             var info = await Controller.GetInstalledPackageInfoAsync(match.Script.Name, match.Version);
 
@@ -105,10 +114,36 @@ namespace Party.CLI.Commands
             {
                 // TODO: Fix scene
                 // TODO: Do not fix scene if the scene is already fine
-                Renderer.Write($"  Updating scene \"{Controller.GetRelativePath(scene.FullPath)}\"...");
-                await Controller.UpdateScriptInSceneAsync(scene, match.Local, info);
-                Renderer.WriteLine(" Done!", ConsoleColor.Green);
+                Renderer.Write($"  Updating scene \"");
+                Renderer.Write(Controller.GetRelativePath(scene.FullPath), ConsoleColor.Blue);
+                Renderer.Write($"...");
+
+                var changes = await Controller.UpdateScriptInSceneAsync(scene, match.Local, info);
+
+                if (changes.Length > 0)
+                    Renderer.WriteLine(" Done", ConsoleColor.Green);
+                else
+                    Renderer.WriteLine(" No changes", ConsoleColor.Red);
+
+                if (verbose)
+                {
+                    using (Renderer.WithColor(ConsoleColor.DarkGray))
+                    {
+                        foreach (var (before, after) in changes)
+                        {
+                            Renderer.WriteLine($"    {before} > {after}");
+                        }
+                    }
+                }
             }
+        }
+
+        private void PrintScriptToPackage(RegistrySavesMatch match)
+        {
+            Renderer.Write($"Script ");
+            Renderer.Write(Controller.GetRelativePath(match.Local.FullPath), ConsoleColor.Blue);
+            Renderer.Write($" > ");
+            Renderer.WriteLine($"{match.Script.Name} v{match.Version.Version}", ConsoleColor.Green);
         }
 
         private void PrintCorruptedInstallInfo(InstalledPackageInfoResult info)

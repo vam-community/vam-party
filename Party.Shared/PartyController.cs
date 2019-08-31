@@ -20,7 +20,7 @@ namespace Party.Shared
         Task<InstalledPackageInfoResult> GetInstalledPackageInfoAsync(string name, RegistryScriptVersion version);
         Task<InstalledPackageInfoResult> InstallPackageAsync(InstalledPackageInfoResult info);
         RegistrySavesMatch[] MatchSavesToRegistry(SavesMap saves, Registry registry);
-        Task UpdateScriptInSceneAsync(Scene scene, Script local, InstalledPackageInfoResult info);
+        Task<(string before, string after)[]> UpdateScriptInSceneAsync(Scene scene, Script local, InstalledPackageInfoResult info);
         string GetRelativePath(string fullPath);
         string GetRelativePath(string fullPath, string parentPath);
         void SaveToFile(string data, string path);
@@ -75,7 +75,7 @@ namespace Party.Shared
             return new RegistrySavesMatchHandler().Match(saves, registry);
         }
 
-        public Task UpdateScriptInSceneAsync(Scene scene, Script local, InstalledPackageInfoResult info)
+        public Task<(string before, string after)[]> UpdateScriptInSceneAsync(Scene scene, Script local, InstalledPackageInfoResult info)
         {
             return new SceneUpdateHandler(_fs, _config.VirtAMate.SavesDirectory).UpdateScripts(scene, local, info);
         }

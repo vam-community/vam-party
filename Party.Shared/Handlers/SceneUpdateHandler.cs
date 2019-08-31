@@ -20,38 +20,32 @@ namespace Party.Shared.Handlers
             _savesDirectory = savesDirectory ?? throw new ArgumentNullException(nameof(savesDirectory));
         }
 
-        internal async Task UpdateScripts(Scene scene, Script local, InstalledPackageInfoResult info)
+        internal async Task<(string before, string after)[]> UpdateScripts(Scene scene, Script local, InstalledPackageInfoResult info)
         {
             var serializer = new SceneSerializer();
 
-            var toUpdate = new List<(string before, string after)>
-            {
-                GetTransform(local, info)
-            };
+            var changes = new List<(string before, string after)>(GetTransform(local, info));
 
             if (local is ScriptList scriptList)
             {
-                foreach (var script in scriptList.Scripts)
-                {
-                    toUpdate.Add(GetTransform(script, info));
-                }
+                changes.AddRange(scriptList.Scripts.SelectMany(script => GetTransform(script, info)));
             }
 
-            await serializer.UpdateScriptAsync(_fs, scene.FullPath, toUpdate);
+            var result = await serializer.UpdateScriptAsync(_fs, scene.FullPath, changes);
+
+            return result.ToArray();
         }
 
-        private (string before, string after) GetTransform(Script local, InstalledPackageInfoResult info)
+        private IEnumerable<(string before, string after)> GetTransform(Script local, InstalledPackageInfoResult info)
         {
-            return
-            (
-                before: ToRelative(local.FullPath),
-                after: info.Files.First(f => f.RegistryFile.Hash.Value == local.Hash).Path
-            );
+            var after = ToRelative(info.Files.First(f => f.RegistryFile.Hash.Value == local.Hash).Path);
+            yield return (before: ToRelative(local.FullPath), after);
+            yield return (before: _fs.Path.GetFileName(local.FullPath), after);
         }
 
         private string ToRelative(string path)
         {
-            return path.Substring(_savesDirectory.Length).TrimStart(_fs.Path.DirectorySeparatorChar).Replace("\\", "/");
+            return "Saves/" + path.Substring(_savesDirectory.Length).TrimStart(_fs.Path.DirectorySeparatorChar).Replace("\\", "/");
         }
     }
 }
