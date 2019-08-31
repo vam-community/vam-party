@@ -63,8 +63,8 @@ namespace Party.CLI.Commands
             {
                 Renderer.WriteLine($"This package already exists (by {script.Author?.Name ?? "Anonymous User"}), a new version will be added to it.");
 
-                Renderer.WriteLine("Existing versions:");
-                foreach (var existingVersion in script.Versions)
+                Renderer.WriteLine($"Latest {Math.Min(5, script.Versions.Count)} versions:");
+                foreach (var existingVersion in script.SortedVersions().Take(5))
                 {
                     Renderer.WriteLine($"- {existingVersion.Version}");
                 }

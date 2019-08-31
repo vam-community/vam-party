@@ -44,7 +44,7 @@ namespace Party.CLI.Commands
                 var latestVersion = script.GetLatestVersion();
                 var trustNotice = result.Trusted ? "" : " [NOT TRUSTED]";
                 var scenes = noUsage ? "" : $" (used in {Pluralize(result.Scenes?.Length ?? 0, "scene", "scenes")})";
-                Renderer.WriteLine($"{script.Name} {latestVersion.Version ?? "-"} by {script.Author.Name}{trustNotice}{scenes}");
+                Renderer.WriteLine($"{script.Name} {latestVersion.Version} by {script.Author.Name}{trustNotice}{scenes}");
             }
         }
     }

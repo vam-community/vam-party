@@ -45,7 +45,7 @@ namespace Party.Shared.Handlers
                     {
                         foreach (var additionalVersion in additionalScript.Versions)
                         {
-                            if (!script.Versions.Any(v => v.Version == additionalVersion.Version))
+                            if (!script.Versions.Any(v => v.Version.Equals(additionalVersion.Version)))
                             {
                                 script.Versions.Add(additionalVersion);
                             }

@@ -40,7 +40,7 @@ namespace Party.CLI.Commands
                 throw new UserInputException($"Could not find package {package}");
             }
 
-            var registryVersion = registryPackage.Versions?.FirstOrDefault();
+            var registryVersion = registryPackage.GetLatestVersion();
 
             if (registryVersion?.Files == null)
             {
