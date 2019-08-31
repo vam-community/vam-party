@@ -48,9 +48,7 @@ namespace Party.Shared.Models
         public RegistryScriptVersion CreateVersion()
         {
             var version = new RegistryScriptVersion { Files = new List<RegistryFile>() };
-            Versions.Insert(0, version);
-            Versions.Sort();
-            Versions.Reverse();
+            Versions = Versions.Append(version).OrderByDescending(v => v.Version).ToList();
             return version;
         }
     }
@@ -83,7 +81,7 @@ namespace Party.Shared.Models
         public string Value { get; set; }
     }
 
-    public struct RegistryVersionString : IComparable<RegistryVersionString>
+    public struct RegistryVersionString : IComparable, IComparable<RegistryVersionString>
     {
         public RegistryVersionString(string version)
         {
@@ -139,6 +137,11 @@ namespace Party.Shared.Models
                     return -1;
 
             return Extra.CompareTo(other.Extra);
+        }
+
+        public int CompareTo(object other)
+        {
+            return CompareTo((RegistryVersionString)other);
         }
 
         public static implicit operator string(RegistryVersionString d) => d.ToString();

@@ -26,7 +26,8 @@ namespace Party.Shared.Serializers
                 NullValueHandling = NullValueHandling.Ignore,
                 ContractResolver = new CamelCasePropertyNamesContractResolver(),
                 Converters = {
-                    new StringArrayConverter()
+                    new StringArrayConverter(),
+                    new VersionConverter()
                 }
             };
 
@@ -48,6 +49,24 @@ namespace Party.Shared.Serializers
             public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
             {
                 writer.WriteRawValue(JsonConvert.SerializeObject(value, Formatting.None).Replace(",\"", ", \""));
+            }
+        }
+
+        class VersionConverter : JsonConverter
+        {
+            public override bool CanConvert(Type objectType)
+            {
+                return objectType == typeof(RegistryVersionString);
+            }
+
+            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+            {
+                writer.WriteRawValue(value.ToString());
             }
         }
     }
