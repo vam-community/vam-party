@@ -18,15 +18,15 @@ namespace Party.CLI.Commands
         {
             var command = new Command("publish", "Prepares files for publishing");
             AddCommonOptions(command);
-            command.AddArgument(new Argument<string>("package-path", null));
+            command.AddArgument(new Argument<string>("path-or-url", null));
             command.AddOption(new Option("--package-name", "The name of your package") { Argument = new Argument<string>() });
             command.AddOption(new Option("--package-version", "The version of your package") { Argument = new Argument<string>() });
             command.AddOption(new Option("--registry", "Path the the index.json file of your locally cloned registry") { Argument = new Argument<FileInfo>().ExistingOnly() });
             // TODO: Add the different fields too (author, name, etc.)
 
-            command.Handler = CommandHandler.Create(async (DirectoryInfo saves, string packagePath, string packageName, string packageVersion, FileInfo registry) =>
+            command.Handler = CommandHandler.Create(async (DirectoryInfo saves, string pathOrUrl, string packageName, string packageVersion, FileInfo registry) =>
             {
-                await new PublishCommand(renderer, config, saves, controller).ExecuteAsync(packagePath, packageName, packageVersion, registry);
+                await new PublishCommand(renderer, config, saves, controller).ExecuteAsync(pathOrUrl, packageName, packageVersion, registry);
             });
             return command;
         }
@@ -35,7 +35,7 @@ namespace Party.CLI.Commands
         {
         }
 
-        private async Task ExecuteAsync(string input, string packageName, string packageVersion, FileInfo registryJson)
+        private async Task ExecuteAsync(string pathOrUrl, string packageName, string packageVersion, FileInfo registryJson)
         {
             Registry registry;
             if (registryJson != null)
@@ -52,7 +52,12 @@ namespace Party.CLI.Commands
 
             var name = packageName ?? Renderer.Ask("Package Name: ", false, RegistryScript.ValidNameRegex, "my-package");
 
-            var (script, version) = await Controller.AddFilesToRegistryAsync(registry, name, Path.GetFullPath(input)).ConfigureAwait(false);
+            if (!Uri.IsWellFormedUriString(pathOrUrl, UriKind.Absolute) && !Path.IsPathRooted(pathOrUrl))
+                pathOrUrl = Path.GetFullPath(pathOrUrl);
+
+            var (script, version) = Uri.TryCreate(pathOrUrl, UriKind.Absolute, out var url)
+                ? await Controller.AddUrlToRegistryAsync(registry, name, url).ConfigureAwait(false)
+                : await Controller.AddFilesToRegistryAsync(registry, name, pathOrUrl).ConfigureAwait(false);
 
             if (script == null || version == null || script.Versions == null) throw new NullReferenceException($"Error in {nameof(Controller.AddFilesToRegistryAsync)}: Null values were returned.");
 
@@ -88,7 +93,7 @@ namespace Party.CLI.Commands
                 script.Author = author;
 
                 script.Description = Renderer.Ask("Description: ");
-                script.Tags = (Renderer.Ask("Tags (comma-separated list): ")).Split(',').Select(x => x.Trim()).Where(x => x != "").ToList();
+                script.Tags = (Renderer.Ask("Tags (comma-separated list): ") ?? "").Split(',').Select(x => x.Trim()).Where(x => x != "").ToList();
                 script.Homepage = Renderer.Ask("Package Homepage URL: ");
                 script.Repository = Renderer.Ask("Package Repository URL: ");
             }
@@ -96,10 +101,12 @@ namespace Party.CLI.Commands
             string baseUrl = null;
             foreach (var file in version.Files)
             {
+                if (!string.IsNullOrEmpty(file.Url)) continue;
+
                 if (baseUrl != null)
                 {
-                    var url = $"{baseUrl}{file.Filename.Replace(" ", "%20")}";
-                    file.Url = Renderer.Ask($"{file.Filename} URL ({url}): ") ?? url;
+                    var fileUrl = $"{baseUrl}{file.Filename.Replace(" ", "%20")}";
+                    file.Url = Renderer.Ask($"{file.Filename} URL ({fileUrl}): ") ?? fileUrl;
                 }
                 else
                 {
@@ -114,7 +121,7 @@ namespace Party.CLI.Commands
             var serializer = new RegistrySerializer();
             if (registryJson != null)
             {
-                Controller.SaveToFile(serializer.Serialize(registry), registryJson.FullName);
+                Controller.SaveToFile(serializer.Serialize(registry), registryJson.FullName, false);
                 Renderer.WriteLine($"JSON written to {registryJson.FullName}");
             }
             else

@@ -9,6 +9,16 @@ namespace Party.Shared.Models
     public class Registry
     {
         public List<RegistryScript> Scripts { get; set; }
+
+        public RegistryScript GetOrCreateScript(string name)
+        {
+            var script = Scripts.FirstOrDefault(s => s.Name == name);
+            if (script != null) return script;
+
+            script = new RegistryScript { Name = name, Versions = new List<RegistryScriptVersion>() };
+            Scripts.Add(script);
+            return script;
+        }
     }
 
     public class RegistryScript
@@ -33,6 +43,15 @@ namespace Party.Shared.Models
         public IEnumerable<RegistryScriptVersion> SortedVersions()
         {
             return Versions.OrderByDescending(v => v.Version);
+        }
+
+        public RegistryScriptVersion CreateVersion()
+        {
+            var version = new RegistryScriptVersion { Files = new List<RegistryFile>() };
+            Versions.Insert(0, version);
+            Versions.Sort();
+            Versions.Reverse();
+            return version;
         }
     }
 

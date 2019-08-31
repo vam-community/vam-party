@@ -13,12 +13,12 @@ namespace Party.Shared.Handlers
     public class InstallPackageHandler
     {
         private readonly IFileSystem _fs;
-        private readonly HttpClient _httpClient;
+        private readonly HttpClient _http;
 
-        public InstallPackageHandler(IFileSystem fs, HttpClient httpClient)
+        public InstallPackageHandler(IFileSystem fs, HttpClient http)
         {
             _fs = fs ?? throw new ArgumentNullException(nameof(fs));
-            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            _http = http ?? throw new ArgumentNullException(nameof(http));
         }
 
         public async Task<InstalledPackageInfoResult> InstallPackageAsync(InstalledPackageInfoResult info)
@@ -36,7 +36,7 @@ namespace Party.Shared.Handlers
                     Path = file.Path,
                     RegistryFile = file.RegistryFile
                 };
-                using var response = await _httpClient.GetAsync(file.RegistryFile.Url).ConfigureAwait(false);
+                using var response = await _http.GetAsync(file.RegistryFile.Url).ConfigureAwait(false);
                 response.EnsureSuccessStatusCode();
                 var content = await response.Content.ReadAsStringAsync();
                 var lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);

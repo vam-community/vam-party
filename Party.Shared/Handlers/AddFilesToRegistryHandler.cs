@@ -9,45 +9,36 @@ using Party.Shared.Utils;
 
 namespace Party.Shared.Handlers
 {
-    public class AddToRegistryHandler
+    public class AddFilesToRegistryHandler
     {
         private static readonly string[] _validFileExtensions = new[] { ".cs", ".cslist" };
         private readonly string _savesDirectory;
         private readonly IFileSystem _fs;
 
-        public AddToRegistryHandler(string savesDirectory, IFileSystem fs)
+        public AddFilesToRegistryHandler(string savesDirectory, IFileSystem fs)
         {
             _savesDirectory = savesDirectory ?? throw new ArgumentNullException(nameof(savesDirectory));
             _fs = fs ?? throw new ArgumentNullException(nameof(fs));
         }
 
-        public async Task<(RegistryScript script, RegistryScriptVersion version)> AddScriptVersionAsync(Registry registry, string name, string path)
+        public async Task<(RegistryScript script, RegistryScriptVersion version)> AddScriptVersionAsync(Registry registry, string name, string pathOrUrl)
         {
             if (registry is null) throw new ArgumentNullException(nameof(registry));
-            if (path is null) throw new ArgumentNullException(nameof(path));
+            if (pathOrUrl is null) throw new ArgumentNullException(nameof(pathOrUrl));
 
-            if (!_fs.Path.IsPathRooted(path)) throw new InvalidOperationException($"Path must be rooted prior to being sent to this handler: {path}");
-            if (!path.StartsWith(_savesDirectory)) throw new UserInputException($"Path must be inside the saves directory.\nPath: {path}\nSaves: {_savesDirectory}");
+            if (!_fs.Path.IsPathRooted(pathOrUrl)) throw new InvalidOperationException($"Path must be rooted prior to being sent to this handler: {pathOrUrl}");
+            if (!pathOrUrl.StartsWith(_savesDirectory)) throw new UserInputException($"Path must be inside the saves directory.\nPath: {pathOrUrl}\nSaves: {_savesDirectory}");
 
-            var files = GetFiles(path);
-            if (files.Length == 0) throw new UserInputException($"No files were found with either a .cs or a .cslist extension in {path}");
+            var files = GetFilesFromFileSystem(pathOrUrl);
+
+            if (files.Length == 0) throw new UserInputException($"No files were found with either a .cs or a .cslist extension in {pathOrUrl}");
 
             var registryFiles = await BuildRegistryFilesList(files);
             AssertNoDuplicates(registry, registryFiles);
 
-            var script = registry.Scripts.FirstOrDefault(s => s.Name == name);
-
-            if (script == null)
-            {
-                script = new RegistryScript { Name = name, Versions = new List<RegistryScriptVersion>() };
-                registry.Scripts.Add(script);
-            }
-
-            var version = new RegistryScriptVersion
-            {
-                Files = registryFiles
-            };
-            script.Versions.Insert(0, version);
+            var script = registry.GetOrCreateScript(name);
+            var version = script.CreateVersion();
+            version.Files.AddRange(registryFiles);
 
             return (script, version);
         }
@@ -74,7 +65,7 @@ namespace Party.Shared.Handlers
                     Url = "",
                     Hash = new RegistryFileHash
                     {
-                        Type = "sha256",
+                        Type = Hashing.Type,
                         Value = await Hashing.GetHashAsync(_fs, file).ConfigureAwait(false)
                     }
                 });
@@ -83,7 +74,7 @@ namespace Party.Shared.Handlers
             return registryFiles;
         }
 
-        private string[] GetFiles(string path)
+        private string[] GetFilesFromFileSystem(string path)
         {
             if (_fs.Directory.Exists(path))
                 return _fs.Directory.GetFiles(path).Where(f => _validFileExtensions.Contains(_fs.Path.GetExtension(f))).ToArray();

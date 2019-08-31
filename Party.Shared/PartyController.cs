@@ -17,6 +17,7 @@ namespace Party.Shared
         Task<Registry> GetRegistryAsync(params string[] registries);
         Task<SavesMap> GetSavesAsync();
         Task<(RegistryScript script, RegistryScriptVersion version)> AddFilesToRegistryAsync(Registry registry, string name, string path);
+        Task<(RegistryScript script, RegistryScriptVersion version)> AddUrlToRegistryAsync(Registry registry, string name, Uri url);
         IEnumerable<SearchResult> Search(Registry registry, SavesMap saves, string query);
         Task<InstalledPackageInfoResult> GetInstalledPackageInfoAsync(string name, RegistryScriptVersion version);
         Task<InstalledPackageInfoResult> InstallPackageAsync(InstalledPackageInfoResult info);
@@ -24,7 +25,7 @@ namespace Party.Shared
         Task<(string before, string after)[]> UpdateScriptInSceneAsync(Scene scene, Script local, InstalledPackageInfoResult info);
         string GetRelativePath(string fullPath);
         string GetRelativePath(string fullPath, string parentPath);
-        void SaveToFile(string data, string path);
+        void SaveToFile(string data, string path, bool restrict = true);
         void Delete(string fullPath);
     }
 
@@ -55,7 +56,12 @@ namespace Party.Shared
 
         public Task<(RegistryScript script, RegistryScriptVersion version)> AddFilesToRegistryAsync(Registry registry, string name, string path)
         {
-            return new AddToRegistryHandler(_config.VirtAMate.SavesDirectory, _fs).AddScriptVersionAsync(registry, name, path);
+            return new AddFilesToRegistryHandler(_config.VirtAMate.SavesDirectory, _fs).AddScriptVersionAsync(registry, name, path);
+        }
+
+        public Task<(RegistryScript script, RegistryScriptVersion version)> AddUrlToRegistryAsync(Registry registry, string name, Uri url)
+        {
+            return new AddUrlsToRegistryHandler(_http).AddScriptVersionAsync(registry, name, url);
         }
 
         public IEnumerable<SearchResult> Search(Registry registry, SavesMap saves, string query)
@@ -97,9 +103,9 @@ namespace Party.Shared
             return fullPath.Substring(parentPath.Length).TrimStart(Path.DirectorySeparatorChar);
         }
 
-        public void SaveToFile(string data, string path)
+        public void SaveToFile(string data, string path, bool restrict)
         {
-            if (!path.StartsWith(_config.VirtAMate.SavesDirectory)) throw new UnauthorizedAccessException($"Cannot save to file {path} because it is not in the Saves folder.");
+            if (restrict && !path.StartsWith(_config.VirtAMate.SavesDirectory)) throw new UnauthorizedAccessException($"Cannot save to file {path} because it is not in the Saves folder.");
             _fs.File.WriteAllText(path, data);
         }
 
