@@ -55,6 +55,7 @@ namespace Party.CLI.Commands
             if (!Uri.IsWellFormedUriString(pathOrUrl, UriKind.Absolute) && !Path.IsPathRooted(pathOrUrl))
                 pathOrUrl = Path.GetFullPath(pathOrUrl);
 
+            // TODO: Instead create version here and foreach passed files/urls
             var (script, version) = Uri.TryCreate(pathOrUrl, UriKind.Absolute, out var url)
                 ? await Controller.AddUrlToRegistryAsync(registry, name, url).ConfigureAwait(false)
                 : await Controller.AddFilesToRegistryAsync(registry, name, pathOrUrl).ConfigureAwait(false);
