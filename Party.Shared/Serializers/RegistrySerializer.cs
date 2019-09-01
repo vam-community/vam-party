@@ -26,6 +26,7 @@ namespace Party.Shared.Serializers
                 NullValueHandling = NullValueHandling.Ignore,
                 DateParseHandling = DateParseHandling.DateTimeOffset,
                 DateFormatHandling = DateFormatHandling.IsoDateFormat,
+                DateFormatString = "yyyy-MM-dd",
                 DateTimeZoneHandling = DateTimeZoneHandling.Utc,
                 ContractResolver = new CamelCasePropertyNamesContractResolver(),
                 Converters = {
@@ -69,7 +70,7 @@ namespace Party.Shared.Serializers
 
             public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
             {
-                writer.WriteRawValue(value.ToString());
+                writer.WriteRawValue($"\"{value.ToString()}\"");
             }
         }
     }

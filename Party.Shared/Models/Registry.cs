@@ -74,9 +74,9 @@ namespace Party.Shared.Models
     {
         public static readonly Regex ValidVersionNameRegex = new Regex(@"^(?<Major>0|[1-9][0-9]{0,3})\.(?<Minor>0|[1-9][0-9]{0,3})\.(?<Revision>0|[1-9][0-9]{0,3})(-(?<Extra>[a-z0-9]{1,32}))?$", RegexOptions.Compiled);
 
+        public RegistryVersionString Version { get; set; }
         public DateTimeOffset Created { get; set; }
         public string Notes { get; set; }
-        public RegistryVersionString Version { get; set; }
         public List<RegistryFile> Files { get; set; }
     }
 

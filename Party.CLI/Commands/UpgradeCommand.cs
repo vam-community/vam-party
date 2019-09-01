@@ -174,7 +174,7 @@ namespace Party.CLI.Commands
             {
                 Renderer.Write($"new version available: v{updateToVersion.Version}", ConsoleColor.Magenta);
                 Renderer.WriteLine();
-                Renderer.WriteLine($"  Version release {updateToVersion.Created.ToLocalTime()}: {updateToVersion.Notes ?? "No release notes"}");
+                Renderer.WriteLine($"  Version release {updateToVersion.Created.ToLocalTime().ToString("D")}: {updateToVersion.Notes ?? "No release notes"}");
             }
         }
 
