@@ -32,7 +32,8 @@ namespace Party.CLI
                                 {
                                     new RegistryFile
                                     {
-                                        Filename = "File 1.cs"
+                                        Filename = "File 1.cs",
+                                        Url = "https://example.org/File%201.cs"
                                     }
                                 }
                             }
@@ -40,15 +41,16 @@ namespace Party.CLI
                     }
                 })
             });
-            _controller.Setup(x => x.GetSavesAsync()).ReturnsAsync(new SavesMap());
+            _controller.Setup(x => x.GetSavesAsync(null)).ReturnsAsync(new SavesMap());
 
             var result = await _program.Execute(new[] { "show", "cool-thing" });
 
             Assert.That(GetOutput(), Is.EqualTo(new[]{
-                "Package cool-thing, by some dude",
+                "Package cool-thing",
                 $"Last version v1.2.3, published {created.ToLocalTime().ToString("D")}",
+                "Author: some dude",
                 "Files:",
-                "- File 1.cs"
+                "- File 1.cs: https://example.org/File%201.cs"
             }));
             Assert.That(result, Is.EqualTo(0));
         }

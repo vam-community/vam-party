@@ -32,7 +32,7 @@ Download a package:
 
 Upgrade your scenes with updated versions of your scripts:
 
-    > party ugrade
+    > party upgrade
 
 Publish your own scripts:
 

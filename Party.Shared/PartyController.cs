@@ -15,7 +15,7 @@ namespace Party.Shared
     public interface IPartyController
     {
         Task<Registry> GetRegistryAsync(params string[] registries);
-        Task<SavesMap> GetSavesAsync();
+        Task<SavesMap> GetSavesAsync(string[] items = null);
         Task<List<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string name, string path);
         Task<List<RegistryFile>> BuildRegistryFilesFromUrlAsync(Registry registry, string name, Uri url);
         IEnumerable<SearchResult> Search(Registry registry, SavesMap saves, string query);
@@ -49,9 +49,9 @@ namespace Party.Shared
             return new RegistryHandler(_http, _config.Registry.Urls).AcquireAsync(registries);
         }
 
-        public Task<SavesMap> GetSavesAsync()
+        public Task<SavesMap> GetSavesAsync(string[] filters)
         {
-            return new SavesResolverHandler(_fs, _config.VirtAMate.SavesDirectory, _config.Scanning.Ignore).AnalyzeSaves();
+            return new SavesResolverHandler(_fs, _config.VirtAMate.SavesDirectory, _config.Scanning.Ignore).AnalyzeSaves(filters ?? new string[0]);
         }
 
         public Task<List<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string name, string path)

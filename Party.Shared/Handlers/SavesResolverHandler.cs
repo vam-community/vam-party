@@ -8,6 +8,7 @@ using Party.Shared.Models;
 using Party.Shared.Serializers;
 using Party.Shared.Utils;
 using Party.Shared.Exceptions;
+using System;
 
 namespace Party.Shared.Handlers
 {
@@ -24,8 +25,20 @@ namespace Party.Shared.Handlers
             _ignoredPaths = ignoredPaths?.Select(path => Path.GetFullPath(path, savesDirectory)).ToArray() ?? new string[0];
         }
 
-        public async Task<SavesMap> AnalyzeSaves()
+        public async Task<SavesMap> AnalyzeSaves(string[] filters)
         {
+            if (filters is null) throw new ArgumentNullException(nameof(filters));
+            if (filters.Any(p => !_fs.Path.IsPathRooted(p))) throw new ArgumentException("All filter paths must be rooted", nameof(filters));
+            if (filters.Any(p => !_fs.File.Exists(p))) throw new ArgumentException("All files must exist", nameof(filters));
+
+            var canonicalPaths = filters.Select(p => _fs.Directory.GetFiles(_fs.Path.GetDirectoryName(p), _fs.Path.GetFileName(p), SearchOption.TopDirectoryOnly).First());
+            var filterPaths = (await Task.WhenAll(canonicalPaths.Select(f => _fs.Path.GetExtension(f) == ".cslist" ? ExpandCsList(f) : Task.FromResult(new[] { f }))).ConfigureAwait(false)).SelectMany(x => x).ToArray();
+            var filterExtensions = canonicalPaths.Select(f => _fs.Path.GetExtension(f)).ToArray();
+            bool filtering = filterExtensions.Any();
+            bool filterScenes = filtering && filterExtensions.All(f => f == ".json");
+            bool filterScripts = filtering && filterExtensions.All(f => f == ".cs");
+            bool filterScriptLists = filtering && filterScripts;
+
             var scriptTasks = new List<Task<Script>>();
             var sceneFiles = new List<string>();
             var scriptListFiles = new List<string>();
@@ -34,6 +47,10 @@ namespace Party.Shared.Handlers
             var scriptListSerializer = new ScriptListSerializer();
             var sceneSerializer = new SceneSerializer();
 
+            // TODO: If the item is a script, check all scenes
+            // TODO: If the item is a script list, get scripts and all scenes
+            // TODO: If the item is a scene, load the scripts/script lists from the scene
+
             foreach (var file in _fs.Directory.EnumerateFiles(_savesDirectory, "*.*", SearchOption.AllDirectories))
             {
                 if (_ignoredPaths.Any(ignoredPath => file.StartsWith(ignoredPath))) continue;
@@ -41,15 +58,18 @@ namespace Party.Shared.Handlers
                 switch (Path.GetExtension(file))
                 {
                     case ".json":
+                        if (filterScenes && !filterPaths.Contains(file)) continue;
                         sceneFiles.Add(file);
                         break;
                     case ".cs":
+                        if (filterScripts && !filterPaths.Contains(file)) continue;
                         scriptTasks.Add(Task.Run(async () =>
                         {
                             return new Script(file, await Hashing.GetHashAsync(_fs, file).ConfigureAwait(false));
                         }));
                         break;
                     case ".cslist":
+                        if (filterScripts && !filterPaths.Contains(file)) continue;
                         scriptListFiles.Add(file);
                         break;
                     default:
@@ -68,7 +88,7 @@ namespace Party.Shared.Handlers
                 var scriptRefPaths = await scriptListSerializer.GetScriptsAsync(_fs, scriptListFile);
                 foreach (var scriptRefRelativePath in scriptRefPaths)
                 {
-                    var fullPath = Path.GetFullPath(scriptRefRelativePath, Path.GetDirectoryName(scriptListFile));
+                    string fullPath = GetScriptListReferenceFullPath(scriptListFile, scriptRefRelativePath);
                     if (scriptsByFilename.TryGetValue(fullPath, out var scriptRef))
                     {
                         scriptsByFilename.Remove(fullPath);
@@ -125,6 +145,17 @@ namespace Party.Shared.Handlers
                 // TODO: This is never actually used, for now
                 Scenes = scenes.ToArray()
             };
+        }
+
+        private static string GetScriptListReferenceFullPath(string scriptListFile, string scriptRefRelativePath)
+        {
+            return Path.GetFullPath(scriptRefRelativePath, Path.GetDirectoryName(scriptListFile));
+        }
+
+        private async Task<string[]> ExpandCsList(string path)
+        {
+            var references = await new ScriptListSerializer().GetScriptsAsync(_fs, path);
+            return references.Select(p => GetScriptListReferenceFullPath(path, p)).ToArray();
         }
     }
 }

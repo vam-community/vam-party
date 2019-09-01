@@ -21,6 +21,16 @@ namespace Party.CLI.Commands
             Controller = controller;
         }
 
+        protected static void AddCommonOptions(Command command)
+        {
+            command.AddOption(new Option("--saves", "Specify the Saves folder to use") { Argument = new Argument<DirectoryInfo>().ExistingOnly() });
+        }
+
+        public class CommonArguments
+        {
+            public DirectoryInfo Saves;
+        }
+
         private static PartyConfiguration GetConfig(PartyConfiguration config, DirectoryInfo saves)
         {
             if (saves != null)
@@ -30,15 +40,10 @@ namespace Party.CLI.Commands
             return config;
         }
 
-        protected static void AddCommonOptions(Command command)
-        {
-            command.AddOption(new Option("--saves", "Specify the Saves folder to use") { Argument = new Argument<DirectoryInfo>().ExistingOnly() });
-        }
-
-        protected async Task<(SavesMap, Registry)> GetSavesAndRegistryAsync()
+        protected async Task<(SavesMap, Registry)> GetSavesAndRegistryAsync(string[] filters = null)
         {
             var registryTask = Controller.GetRegistryAsync();
-            var savesTask = Controller.GetSavesAsync();
+            var savesTask = Controller.GetSavesAsync(filters);
 
             await Task.WhenAll();
 
