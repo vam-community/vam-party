@@ -1,37 +1,21 @@
 {
   "authors": [
     {
-      "name": "John Doe"
+      "name": "gfds",
+      "reddit": "dfgdgf",
+      "github": "sgdf"
     },
     {
       "name": "Jane Smith"
+    },
+    {
+      "name": "John Doe"
     },
     {
       "name": "William Brown"
     }
   ],
   "scripts": [
-    {
-      "name": "simple-script-1",
-      "description": "This is a simple package",
-      "tags": ["simple", "test"],
-      "author": "John Doe",
-      "versions": [
-        {
-          "version": "1.0.0",
-          "files": [
-            {
-              "filename": "Simple Script 1.cs",
-              "url": "https://github.com/vam-community/vam-party/raw/3640bf85a6bb76b6cac6454501525b9bb5505ee2/TestData/Saves/Scripts/Simple%20Script%201.cs",
-              "hash": {
-                "type": "sha256",
-                "value": "B249529FEFB64007FA361EA2374248A83CA275AB01AB19B03C34A45219FB2A20"
-              }
-            }
-          ]
-        }
-      ]
-    },
     {
       "name": "complex-plugin",
       "description": "A plugin with a cslist and two files",
@@ -40,6 +24,7 @@
       "versions": [
         {
           "version": "0.0.1-alpha",
+          "created": "0001-01-01",
           "files": [
             {
               "filename": "Complex Plugin.cslist",
@@ -70,6 +55,28 @@
       ]
     },
     {
+      "name": "improved-po-2v",
+      "tags": [],
+      "author": "gfds",
+      "versions": [
+        {
+          "version": "2.0.0",
+          "created": "2019-09-01",
+          "notes": "dsfds",
+          "files": [
+            {
+              "filename": "ImprovedPoV.cs",
+              "url": "https://github.com/acidbubbles/vam-improved-pov/releases/download/v2.0.0/ImprovedPoV.cs",
+              "hash": {
+                "type": "sha256",
+                "value": "8380EA8BDA45B3DA28476A5EFAD90804A0C6B7840C8F8FE4D3FE1719A681A936"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "multi-plugin",
       "description": "This plugin contains two independent scripts",
       "tags": ["multi", "test"],
@@ -77,6 +84,7 @@
       "versions": [
         {
           "version": "12.5.412",
+          "created": "0001-01-01",
           "files": [
             {
               "filename": "Multi Script 1.cs",
@@ -99,6 +107,28 @@
       ]
     },
     {
+      "name": "simple-script-1",
+      "description": "This is a simple package",
+      "tags": ["simple", "test"],
+      "author": "John Doe",
+      "versions": [
+        {
+          "version": "1.0.0",
+          "created": "0001-01-01",
+          "files": [
+            {
+              "filename": "Simple Script 1.cs",
+              "url": "https://github.com/vam-community/vam-party/raw/3640bf85a6bb76b6cac6454501525b9bb5505ee2/TestData/Saves/Scripts/Simple%20Script%201.cs",
+              "hash": {
+                "type": "sha256",
+                "value": "B249529FEFB64007FA361EA2374248A83CA275AB01AB19B03C34A45219FB2A20"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "unused-script",
       "description": "This plugin is not used in any scenes",
       "tags": ["unused", "test"],
@@ -106,6 +136,7 @@
       "versions": [
         {
           "version": "1.0.0",
+          "created": "0001-01-01",
           "files": [
             {
               "filename": "Unused Script 1.cs",

@@ -51,7 +51,7 @@ namespace Party.CLI.Commands
             var registryPackageVersion = registryPackage.GetLatestVersion();
             if (!string.IsNullOrEmpty(version))
             {
-                registryPackageVersion = registryPackage.Versions.FirstOrDefault(p => p.Version.Equals(version));
+                registryPackageVersion = registryPackage.Versions.FirstOrDefault(p => p.Version.ToString().Equals(version));
                 if (registryPackageVersion == null)
                 {
                     throw new RegistryException($"Package version not found: '{package}' version '{version}'");

@@ -14,7 +14,7 @@ namespace Party.Shared
                 },
                 Scanning = new PartyConfigurationScanning
                 {
-                    Ignore = new[] { Path.Combine("scene", "MeshedVR"), "Person", "Downloads" },
+                    Ignore = new[] { Path.Combine("scene", "MeshedVR"), "Person", "Downloads", "Dev" },
                     PackagesFolder = "party"
                 },
                 Registry = new PartyConfigurationRegistry

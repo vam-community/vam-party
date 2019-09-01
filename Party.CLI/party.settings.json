@@ -3,7 +3,7 @@
     "SavesDirectory": "../../../../TestData/Saves"
   },
   "Scanning": {
-    "Ignore": ["scene\\MeshedVR", "Person", "Downloads"]
+    "Ignore": ["scene\\MeshedVR", "Person", "Downloads", "Dev"]
   },
   "Registry": {
     "TrustedDomains": [

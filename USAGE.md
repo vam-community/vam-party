@@ -81,6 +81,8 @@ You can also generate the JSON for your package directly in the console by omitt
 
 If you do not provide a version and package name, party will ask for one. If it's a new package, it will ask you for information such as tags, repository link, etc.
 
+For more details and a walkthrough, see the [instructions on vam-registry](https://github.com/vam-community/vam-registry/blob/master/INSTRUCTIONS.md).
+
 ### `status`
 
 Prints the list of all installed scripts, identify the ones that are out of date, and flag scenes that reference scripts from a folder other than the party installation folder.
