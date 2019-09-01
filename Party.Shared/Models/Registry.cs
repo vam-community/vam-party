@@ -8,11 +8,11 @@ namespace Party.Shared.Models
 {
     public class Registry
     {
-        private SortedSet<RegistryAuthor> _authors;
         private SortedSet<RegistryScript> _scripts;
+        private SortedSet<RegistryAuthor> _authors;
 
-        public SortedSet<RegistryScript> Scripts { get => _scripts ?? (_scripts = new SortedSet<RegistryScript>()); set => _scripts = value; }
         public SortedSet<RegistryAuthor> Authors { get => _authors ?? (_authors = new SortedSet<RegistryAuthor>()); set => _authors = value; }
+        public SortedSet<RegistryScript> Scripts { get => _scripts ?? (_scripts = new SortedSet<RegistryScript>()); set => _scripts = value; }
 
         public RegistryScript GetOrCreateScript(string name)
         {
