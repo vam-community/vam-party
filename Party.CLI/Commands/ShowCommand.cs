@@ -50,6 +50,7 @@ namespace Party.CLI.Commands
             PrintWarnings(warnings, saves.Errors);
 
             Renderer.WriteLine($"Package {registryPackage.Name}, by {registryPackage.Author?.Name ?? "Anonymous"}");
+            Renderer.WriteLine($"Last version v{registryVersion.Version}, published {registryVersion.Created.ToLocalTime()}")
             if (registryPackage.Description != null)
             {
                 Renderer.WriteLine($"Description: {registryPackage.Description}");

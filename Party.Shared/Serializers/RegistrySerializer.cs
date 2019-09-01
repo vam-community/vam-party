@@ -24,6 +24,9 @@ namespace Party.Shared.Serializers
             {
                 Formatting = Formatting.Indented,
                 NullValueHandling = NullValueHandling.Ignore,
+                DateParseHandling = DateParseHandling.DateTimeOffset,
+                DateFormatHandling = DateFormatHandling.IsoDateFormat,
+                DateTimeZoneHandling = DateTimeZoneHandling.Utc,
                 ContractResolver = new CamelCasePropertyNamesContractResolver(),
                 Converters = {
                     new StringArrayConverter(),

@@ -166,10 +166,16 @@ namespace Party.CLI.Commands
             Renderer.Write($"{match.Script.Name} v{match.Version.Version}", ConsoleColor.Cyan);
             Renderer.Write($" > ");
             if (updateToVersion == null)
+            {
                 Renderer.Write($"already up to date", ConsoleColor.DarkGray);
+                Renderer.WriteLine();
+            }
             else
+            {
                 Renderer.Write($"new version available: v{updateToVersion.Version}", ConsoleColor.Magenta);
-            Renderer.WriteLine();
+                Renderer.WriteLine();
+                Renderer.WriteLine($"  Version release {updateToVersion.Created.ToLocalTime()}: {updateToVersion.Notes ?? "No release notes"}");
+            }
         }
 
         private void PrintCorruptedInstallInfo(InstalledPackageInfoResult info)

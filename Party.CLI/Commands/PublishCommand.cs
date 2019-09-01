@@ -82,7 +82,9 @@ namespace Party.CLI.Commands
                 }
             }
 
+            version.Created = DateTimeOffset.Now;
             version.Version = packageVersion ?? Renderer.Ask("Package Version: ", true, RegistryScriptVersion.ValidVersionNameRegex, "1.0.0");
+            version.Notes = Renderer.Ask("Release notes: ");
 
             if (isNew)
             {
