@@ -18,13 +18,13 @@ namespace Party.CLI.Commands
         {
             var command = new Command("publish", "Prepares files for publishing");
             AddCommonOptions(command);
-            command.AddArgument(new Argument<string>("path-or-url", null));
+            command.AddArgument(new Argument<string>("path-or-url", null) { Arity = ArgumentArity.OneOrMore });
             command.AddOption(new Option("--package-name", "The name of your package") { Argument = new Argument<string>() });
             command.AddOption(new Option("--package-version", "The version of your package") { Argument = new Argument<string>() });
             command.AddOption(new Option("--registry", "Path the the index.json file of your locally cloned registry") { Argument = new Argument<FileInfo>().ExistingOnly() });
             // TODO: Add the different fields too (author, name, etc.)
 
-            command.Handler = CommandHandler.Create(async (DirectoryInfo saves, string pathOrUrl, string packageName, string packageVersion, FileInfo registry) =>
+            command.Handler = CommandHandler.Create(async (DirectoryInfo saves, string[] pathOrUrl, string packageName, string packageVersion, FileInfo registry) =>
             {
                 await new PublishCommand(renderer, config, saves, controller).ExecuteAsync(pathOrUrl, packageName, packageVersion, registry);
             });
@@ -35,7 +35,7 @@ namespace Party.CLI.Commands
         {
         }
 
-        private async Task ExecuteAsync(string pathOrUrl, string packageName, string packageVersion, FileInfo registryJson)
+        private async Task ExecuteAsync(string[] pathOrUrls, string packageName, string packageVersion, FileInfo registryJson)
         {
             Registry registry;
             if (registryJson != null)
@@ -52,15 +52,21 @@ namespace Party.CLI.Commands
 
             var name = packageName ?? Renderer.Ask("Package Name: ", false, RegistryScript.ValidNameRegex, "my-package");
 
-            if (!Uri.IsWellFormedUriString(pathOrUrl, UriKind.Absolute) && !Path.IsPathRooted(pathOrUrl))
-                pathOrUrl = Path.GetFullPath(pathOrUrl);
+            var script = registry.GetOrCreateScript(name);
+            var version = script.CreateVersion();
 
-            // TODO: Instead create version here and foreach passed files/urls
-            var (script, version) = Uri.TryCreate(pathOrUrl, UriKind.Absolute, out var url)
-                ? await Controller.AddUrlToRegistryAsync(registry, name, url).ConfigureAwait(false)
-                : await Controller.AddFilesToRegistryAsync(registry, name, pathOrUrl).ConfigureAwait(false);
+            foreach (var pathOrUrl in pathOrUrls)
+            {
+                version.Files.AddRange(Uri.TryCreate(pathOrUrl, UriKind.Absolute, out var url)
+                     ? await Controller.BuildRegistryFilesFromUrlAsync(registry, name, url).ConfigureAwait(false)
+                     : await Controller.BuildRegistryFilesFromPathAsync(registry, name, Path.GetFullPath(pathOrUrl)).ConfigureAwait(false)
+                );
+            }
 
-            if (script == null || version == null || script.Versions == null) throw new NullReferenceException($"Error in {nameof(Controller.AddFilesToRegistryAsync)}: Null values were returned.");
+            registry.AssertNoDuplicates(version);
+
+
+            if (script == null || version == null || script.Versions == null) throw new NullReferenceException($"Error in {nameof(Controller.BuildRegistryFilesFromPathAsync)}: Null values were returned.");
 
             var isNew = script.Versions.Count == 1;
 

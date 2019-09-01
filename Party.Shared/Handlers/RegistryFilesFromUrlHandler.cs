@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -9,25 +10,21 @@ using Party.Shared.Utils;
 
 namespace Party.Shared.Handlers
 {
-    public class AddUrlsToRegistryHandler
+    public class RegistryFilesFromUrlHandler
     {
         private readonly HttpClient _http;
 
-        public AddUrlsToRegistryHandler(HttpClient _http)
+        public RegistryFilesFromUrlHandler(HttpClient _http)
         {
             this._http = _http ?? throw new ArgumentNullException(nameof(_http));
         }
 
-        public async Task<(RegistryScript script, RegistryScriptVersion version)> AddScriptVersionAsync(Registry registry, string name, Uri url)
+        public async Task<List<RegistryFile>> BuildFiles(Registry registry, string name, Uri url)
         {
             if (registry is null) throw new ArgumentNullException(nameof(registry));
             if (url is null) throw new ArgumentNullException(nameof(url));
 
-            var script = registry.GetOrCreateScript(name);
-            var version = script.CreateVersion();
-            version.Files.Add(await GetFileFromUrl(url));
-
-            return (script, version);
+            return new List<RegistryFile> { await GetFileFromUrl(url) };
         }
 
         private async Task<RegistryFile> GetFileFromUrl(Uri url)

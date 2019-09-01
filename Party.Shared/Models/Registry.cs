@@ -19,6 +19,17 @@ namespace Party.Shared.Models
             Scripts.Add(script);
             return script;
         }
+
+        public void AssertNoDuplicates(RegistryScriptVersion version)
+        {
+            var versionFileHashes = version.Files.Select(f => f.Hash.Value).ToArray();
+            var versionWithSameHashes = Scripts
+                .SelectMany(s => s.Versions.Where(v => v != version).Select(v => (s, v)))
+                .FirstOrDefault(x => x.v.Files.Count == versionFileHashes.Length && x.v.Files.All(f => versionFileHashes.Contains(f.Hash.Value)));
+
+            if (versionWithSameHashes.v != null)
+                throw new UserInputException($"This version contains exactly the same file count and file hashes as {versionWithSameHashes.s.Name} v{versionWithSameHashes.v.Version}.");
+        }
     }
 
     public class RegistryScript

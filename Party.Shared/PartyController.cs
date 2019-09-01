@@ -16,8 +16,8 @@ namespace Party.Shared
     {
         Task<Registry> GetRegistryAsync(params string[] registries);
         Task<SavesMap> GetSavesAsync();
-        Task<(RegistryScript script, RegistryScriptVersion version)> AddFilesToRegistryAsync(Registry registry, string name, string path);
-        Task<(RegistryScript script, RegistryScriptVersion version)> AddUrlToRegistryAsync(Registry registry, string name, Uri url);
+        Task<List<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string name, string path);
+        Task<List<RegistryFile>> BuildRegistryFilesFromUrlAsync(Registry registry, string name, Uri url);
         IEnumerable<SearchResult> Search(Registry registry, SavesMap saves, string query);
         Task<InstalledPackageInfoResult> GetInstalledPackageInfoAsync(string name, RegistryScriptVersion version);
         Task<InstalledPackageInfoResult> InstallPackageAsync(InstalledPackageInfoResult info);
@@ -54,14 +54,14 @@ namespace Party.Shared
             return new SavesResolverHandler(_fs, _config.VirtAMate.SavesDirectory, _config.Scanning.Ignore).AnalyzeSaves();
         }
 
-        public Task<(RegistryScript script, RegistryScriptVersion version)> AddFilesToRegistryAsync(Registry registry, string name, string path)
+        public Task<List<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string name, string path)
         {
-            return new AddFilesToRegistryHandler(_config.VirtAMate.SavesDirectory, _fs).AddScriptVersionAsync(registry, name, path);
+            return new RegistryFilesFromPathHandler(_config.VirtAMate.SavesDirectory, _fs).BuildFiles(registry, name, path);
         }
 
-        public Task<(RegistryScript script, RegistryScriptVersion version)> AddUrlToRegistryAsync(Registry registry, string name, Uri url)
+        public Task<List<RegistryFile>> BuildRegistryFilesFromUrlAsync(Registry registry, string name, Uri url)
         {
-            return new AddUrlsToRegistryHandler(_http).AddScriptVersionAsync(registry, name, url);
+            return new RegistryFilesFromUrlHandler(_http).BuildFiles(registry, name, url);
         }
 
         public IEnumerable<SearchResult> Search(Registry registry, SavesMap saves, string query)
