@@ -41,9 +41,17 @@ You can also install a specific version:
 
 ### `upgrade`
 
-Scans for scenes referencing scripts that are available in the registry, and use them instead.
+Scans for scenes referencing scripts that are available in the registry, and use them instead:
 
     > party upgrade
+
+Update a specific scene (and all scripts it uses) or script (and all scenes referencing it):
+
+    > party upgrade Saves\Scripts\Some Script.cs
+
+Update a specific package (and all scenes referencing it):
+
+    > party upgrade my-package
 
 Since this can affect lots of files, you might want to make a dry run first, see what the script will do:
 
@@ -65,7 +73,9 @@ To avoid clutter, you can delete unused scripts after upgrading using `--clean`.
 
 Helps publishing a new scene to the registry. First, clone [vam-registry](https://github.com/vam-community/vam-registry), and then you can run:
 
-    > party publish "C:\...\My Script.cs" --package-name my-package --package-version 1.0.0 --registry "C:\...\vam-registry\v1\index.json"
+    > party publish "C:\...\My Script.cs" "C:\...\Some Other Script.cs" --package-name my-package --package-version 1.0.0 --registry "C:\...\vam-registry\v1\index.json"
+
+Note that you can also specify file URLs directly instead if they are already uploaded, as long as the end of the URL ends with the file name (e.g. `https://example.org/.../My%20Script.cs`)
 
 You can also generate the JSON for your package directly in the console by omitting the `--registry` option. In this case, it will load registry information from GitHub directly.
 
@@ -82,6 +92,8 @@ Prints the list of all installed scripts, identify the ones that are out of date
     - scene\Some Scene.json
     - scene\Some Other Scene.json
     other-script 3.0.4 "My Script.cslist" (referenced by 0 scenes)
+
+You can also specify a script, a scene or a package name to show if you don't want to list everything in your Saves folder.
 
 ### `show`
 
