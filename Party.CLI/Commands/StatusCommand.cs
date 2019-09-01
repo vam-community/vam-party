@@ -16,29 +16,38 @@ namespace Party.CLI.Commands
         {
             var command = new Command("status", "Shows the state of the current scripts and scenes");
             AddCommonOptions(command);
+            command.AddArgument(new Argument<string>("filters") { Arity = ArgumentArity.ZeroOrMore });
             command.AddOption(new Option("--scenes", "Show scenes information"));
             command.AddOption(new Option("--warnings", "Show warnings such as broken scenes or missing scripts"));
             command.AddOption(new Option("--unregistered", "Show all scripts that were not registered"));
 
-            command.Handler = CommandHandler.Create(async (DirectoryInfo saves, bool scenes, bool warnings, bool unregistered) =>
+            command.Handler = CommandHandler.Create<StatusArguments>(async args =>
             {
-                await new StatusCommand(renderer, config, saves, controller).ExecuteAsync(scenes, warnings, unregistered);
+                await new StatusCommand(renderer, config, args.Saves, controller).ExecuteAsync(args);
             });
             return command;
+        }
+
+        public class StatusArguments : CommonArguments
+        {
+            public string[] Filters { get; set; }
+            public bool Scenes { get; set; }
+            public bool Warnings { get; set; }
+            public bool Unregistered { get; set; }
         }
 
         public StatusCommand(IRenderer renderer, PartyConfiguration config, DirectoryInfo saves, IPartyController controller) : base(renderer, config, saves, controller)
         {
         }
 
-        private async Task ExecuteAsync(bool scenes, bool warnings, bool unregistered)
+        private async Task ExecuteAsync(StatusArguments args)
         {
             Renderer.WriteLine("Analyzing the saves folder and downloading the scripts list from the registry...");
-            var (saves, registry) = await GetSavesAndRegistryAsync();
+            var (saves, registry) = await GetSavesAndRegistryAsync(args.Filters);
 
             var matches = Controller.MatchSavesToRegistry(saves, registry);
 
-            PrintWarnings(warnings, saves.Errors);
+            PrintWarnings(args.Warnings, saves.Errors);
 
             foreach (var match in matches)
             {
@@ -50,10 +59,15 @@ namespace Party.CLI.Commands
                 Renderer.Write(" ");
                 Renderer.Write($"referenced by {Pluralize(match.Local.Scenes?.Count() ?? 0, "scene", "scenes")}", ConsoleColor.DarkCyan);
                 Renderer.Write(Environment.NewLine);
-                if (scenes) PrintScenes(match.Local.Scenes);
+                if (match.Version != match.Script.GetLatestVersion())
+                {
+                    Renderer.Write("  Update available: ");
+                    Renderer.WriteLine($"v{match.Script.GetLatestVersion().Version}");
+                }
+                if (args.Scenes) PrintScenes(match.Local.Scenes);
             }
 
-            if (unregistered)
+            if (args.Unregistered)
             {
                 foreach (var script in saves.Scripts.Where(s => !matches.Any(m => m.Local == s)))
                 {
@@ -61,7 +75,7 @@ namespace Party.CLI.Commands
                     Renderer.Write(" ");
                     Renderer.Write($"referenced by {Pluralize(script.Scenes?.Count() ?? 0, "scene", "scenes")}", ConsoleColor.DarkCyan);
                     Renderer.Write(Environment.NewLine);
-                    if (scenes)
+                    if (args.Scenes)
                         PrintScenes(script.Scenes);
                 }
             }

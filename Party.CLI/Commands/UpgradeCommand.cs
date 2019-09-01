@@ -32,6 +32,7 @@ namespace Party.CLI.Commands
             });
             return command;
         }
+
         public class UpgradeArguments : CommonArguments
         {
             public string[] Filters { get; set; }
@@ -57,7 +58,7 @@ namespace Party.CLI.Commands
 
             // TODO: If the item is a package (no extension), resolve it to a path (if the plugin was not downloaded, throw)
             Renderer.WriteLine("Analyzing the saves folder and downloading the scripts list from the registry...");
-            var (saves, registry) = await GetSavesAndRegistryAsync(args.Filters?.Select(Path.GetFullPath).ToArray());
+            var (saves, registry) = await GetSavesAndRegistryAsync(args.Filters);
 
             var matches = Controller.MatchSavesToRegistry(saves, registry);
 

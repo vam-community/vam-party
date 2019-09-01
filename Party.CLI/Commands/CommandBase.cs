@@ -2,8 +2,10 @@
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
+using Party.Shared.Exceptions;
 using Party.Shared.Models;
 
 namespace Party.CLI.Commands
@@ -43,7 +45,8 @@ namespace Party.CLI.Commands
         protected async Task<(SavesMap, Registry)> GetSavesAndRegistryAsync(string[] filters = null)
         {
             var registryTask = Controller.GetRegistryAsync();
-            var savesTask = Controller.GetSavesAsync(filters);
+            // TODO: If the item is a package (no extension), resolve it to a path (if the plugin was not downloaded, throw)
+            var savesTask = Controller.GetSavesAsync(filters?.Select(Path.GetFullPath).ToArray());
 
             await Task.WhenAll();
 

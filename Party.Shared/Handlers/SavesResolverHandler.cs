@@ -37,7 +37,6 @@ namespace Party.Shared.Handlers
             bool filtering = filterExtensions.Any();
             bool filterScenes = filtering && filterExtensions.All(f => f == ".json");
             bool filterScripts = filtering && filterExtensions.All(f => f == ".cs");
-            bool filterScriptLists = filtering && filterScripts;
 
             var scriptTasks = new List<Task<Script>>();
             var sceneFiles = new List<string>();
@@ -124,7 +123,7 @@ namespace Party.Shared.Handlers
                             scene.References(scriptRef);
                             scriptRef.ReferencedBy(scene);
                         }
-                        else
+                        else if (!filterScripts)
                         {
                             errors.Add($"Scene '{sceneFile}' references a script that does not exist: '{fullPath}'");
                         }
