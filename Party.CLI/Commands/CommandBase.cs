@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.IO;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 using Party.Shared;
 using Party.Shared.Exceptions;
 using Party.Shared.Models;
+using Party.Shared.Resources;
 
 namespace Party.CLI.Commands
 {
@@ -44,14 +46,32 @@ namespace Party.CLI.Commands
 
         protected async Task<(SavesMap, Registry)> GetSavesAndRegistryAsync(string[] filters = null)
         {
+            var filterPackages = filters?.Where(f => f.IndexOf(".") == -1).ToArray();
+            var filterPaths = filters?.Where(f => !filterPackages.Contains(f)).ToArray();
+
             var registryTask = Controller.GetRegistryAsync();
             // TODO: If the item is a package (no extension), resolve it to a path (if the plugin was not downloaded, throw)
-            var savesTask = Controller.GetSavesAsync(filters?.Select(Path.GetFullPath).ToArray());
+            var savesTask = Controller.GetSavesAsync(filterPaths?.Select(Path.GetFullPath).ToArray());
 
             await Task.WhenAll();
 
             var registry = await registryTask;
             var saves = await savesTask;
+
+            if (filterPackages != null && filterPackages.Length > 0)
+            {
+                Console.WriteLine(string.Join(", ", saves.ScriptsByFilename.Select(s => s.Value.Name)));
+                Console.WriteLine(string.Join(", ", filterPackages.Select(s => s)));
+                var packageHashes = new HashSet<string>(registry.Scripts.Where(s => filterPackages.Contains(s.Name)).SelectMany(s => s.Versions).SelectMany(v => v.Files).Select(f => f.Hash.Value).Distinct());
+                saves.ScriptsByFilename = saves.ScriptsByFilename.Where(s =>
+                {
+                    if (s.Value is ScriptList scriptList)
+                        return new[] { scriptList.Hash }.Concat(scriptList.Scripts.Select(c => c.Hash)).All(h => packageHashes.Contains(h));
+                    else
+                        return packageHashes.Contains(s.Value.Hash);
+                }).ToDictionary(s => s.Key, s => s.Value);
+            }
+
             return (saves, registry);
         }
 
