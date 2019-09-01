@@ -63,7 +63,7 @@ namespace Party.Shared.Models
 
         int IComparable<RegistryScript>.CompareTo(RegistryScript other)
         {
-            return Name.CompareTo(other.Name);
+            return Name?.CompareTo(other.Name) ?? 0;
         }
 
         int IComparable.CompareTo(object other)
@@ -183,7 +183,7 @@ namespace Party.Shared.Models
 
         int IComparable<RegistryAuthor>.CompareTo(RegistryAuthor other)
         {
-            return Name.CompareTo(other.Name);
+            return Name?.CompareTo(other.Name) ?? 0;
         }
 
         int IComparable.CompareTo(object other)

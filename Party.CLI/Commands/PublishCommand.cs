@@ -66,18 +66,17 @@ namespace Party.CLI.Commands
 
             registry.AssertNoDuplicates(version);
 
-
             if (script == null || version == null || script.Versions == null) throw new NullReferenceException($"Error in {nameof(Controller.BuildRegistryFilesFromPathAsync)}: Null values were returned.");
 
             var isNew = script.Versions.Count == 1;
 
             // TODO: Validate all fields
-            if (!isNew)
+            if (!isNew && string.IsNullOrEmpty(packageVersion))
             {
                 Renderer.WriteLine($"This package already exists (by {script.Author ?? "Unknown User"}), a new version will be added to it.");
 
-                Renderer.WriteLine($"Latest {Math.Min(5, script.Versions.Count)} versions:");
-                foreach (var existingVersion in script.Versions.Take(5))
+                Renderer.WriteLine($"Latest {Math.Min(5, script.Versions.Count - 1)} versions:");
+                foreach (var existingVersion in script.Versions.Where(v => !ReferenceEquals(v, version)).Take(5))
                 {
                     Renderer.WriteLine($"- {existingVersion.Version}");
                 }
@@ -92,10 +91,11 @@ namespace Party.CLI.Commands
                 Renderer.WriteLine("Looks like a new package in the registry! Please provide some information about this new package, or press CTRL+C if you want to abort.");
 
                 var author = Renderer.Ask("Author Name: ", true);
-                if (registry.Authors.Any(a => a.Name.Equals(author, StringComparison.InvariantCultureIgnoreCase)))
+                if (!registry.Authors.Any(a => a.Name.Equals(author, StringComparison.InvariantCultureIgnoreCase)))
                 {
                     registry.Authors.Add(new RegistryAuthor
                     {
+                        Name = author,
                         Github = Renderer.Ask($"GitHub Profile URL: "),
                         Reddit = Renderer.Ask($"Reddit Profile URL: ")
                     });
