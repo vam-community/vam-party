@@ -66,7 +66,7 @@ namespace Party.CLI.Commands
 
             if (noop)
             {
-                Renderer.WriteLine($"Package {registryPackage.Name} v{registryPackageVersion.Version} by {registryPackage.Author.Name ?? "Anonymous"}");
+                Renderer.WriteLine($"Package {registryPackage.Name} v{registryPackageVersion.Version} by {registryPackage.Author ?? "?"}");
                 Renderer.WriteLine($"Files will be downloaded in {filesStatuses.InstallFolder}:");
                 foreach (var file in filesStatuses.Files)
                 {
@@ -79,7 +79,7 @@ namespace Party.CLI.Commands
 
             var installResult = await Controller.InstallPackageAsync(filesStatuses);
 
-            Renderer.WriteLine($"Installed package {registryPackage.Name} v{registryPackageVersion.Version} by {registryPackage.Author.Name ?? "Anonymous"}");
+            Renderer.WriteLine($"Installed package {registryPackage.Name} v{registryPackageVersion.Version} by {registryPackage.Author ?? "?"}");
             Renderer.WriteLine($"Files downloaded in {filesStatuses.InstallFolder}:");
             foreach (var file in installResult.Files)
             {

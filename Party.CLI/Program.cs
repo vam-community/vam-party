@@ -105,10 +105,19 @@ namespace Party.CLI
                     _renderer.Error.WriteLine(unauthorizedExc.Message);
                     return 2;
                 }
-            }
 
-            ExceptionDispatchInfo.Capture(exc).Throw();
-            return 1;
+                _renderer.Error.WriteLine(
+                    string.Join(
+                        '\n',
+                        exc.ToString()
+                            .Split(new[] { '\r', '\n' })
+                            .Where(line => !string.IsNullOrWhiteSpace(line))
+                            .Where(line => line != "--- End of stack trace from previous location where exception was thrown ---")
+                            .Where(line => !line.StartsWith("   at System.CommandLine."))
+                    )
+                );
+                return 1;
+            }
         }
     }
 }

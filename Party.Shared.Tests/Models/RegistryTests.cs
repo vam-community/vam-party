@@ -21,33 +21,33 @@ namespace Party.Shared
         [Test]
         public void CanGetLatestVersion()
         {
-            var file = new RegistryScript
+            var script = new RegistryScript
             {
-                Versions = new[]
+                Versions = new SortedSet<RegistryScriptVersion>(new[]
                 {
                     new RegistryScriptVersion{ Version = "1.0.0" },
                     new RegistryScriptVersion{ Version = "2.0.5" },
                     new RegistryScriptVersion{ Version = "2.0.4" },
-                }.ToList()
+                })
             };
-                        
-            Assert.That(file.GetLatestVersion().Version.ToString(), Is.EqualTo("2.0.5"));
+
+            Assert.That(script.GetLatestVersion().Version.ToString(), Is.EqualTo("2.0.5"));
         }
 
         [Test]
         public void CanSort()
         {
-            var file = new RegistryScript
+            var script = new RegistryScript
             {
-                Versions = new[]
+                Versions = new SortedSet<RegistryScriptVersion>(new[]
                 {
                     new RegistryScriptVersion{ Version = "1.0.0" },
                     new RegistryScriptVersion{ Version = "2.0.5" },
                     new RegistryScriptVersion{ Version = "2.0.4" },
-                }.ToList()
+                })
             };
-            
-            Assert.That(file.SortedVersions().Select(v => v.Version.ToString()).ToArray(), Is.EqualTo(new[] { "2.0.5", "2.0.4", "1.0.0" }));
+
+            Assert.That(script.Versions.Select(v => v.Version.ToString()).ToArray(), Is.EqualTo(new[] { "2.0.5", "2.0.4", "1.0.0" }));
         }
     }
 

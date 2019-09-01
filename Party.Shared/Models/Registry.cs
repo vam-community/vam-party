@@ -8,14 +8,18 @@ namespace Party.Shared.Models
 {
     public class Registry
     {
-        public List<RegistryScript> Scripts { get; set; }
+        private SortedSet<RegistryAuthor> _authors;
+        private SortedSet<RegistryScript> _scripts;
+
+        public SortedSet<RegistryScript> Scripts { get => _scripts ?? (_scripts = new SortedSet<RegistryScript>()); set => _scripts = value; }
+        public SortedSet<RegistryAuthor> Authors { get => _authors ?? (_authors = new SortedSet<RegistryAuthor>()); set => _authors = value; }
 
         public RegistryScript GetOrCreateScript(string name)
         {
             var script = Scripts.FirstOrDefault(s => s.Name == name);
             if (script != null) return script;
 
-            script = new RegistryScript { Name = name, Versions = new List<RegistryScriptVersion>() };
+            script = new RegistryScript { Name = name, Versions = new SortedSet<RegistryScriptVersion>() };
             Scripts.Add(script);
             return script;
         }
@@ -32,52 +36,62 @@ namespace Party.Shared.Models
         }
     }
 
-    public class RegistryScript
+    public class RegistryScript : IComparable<RegistryScript>, IComparable
     {
         public static readonly Regex ValidNameRegex = new Regex(@"^[a-z][a-z0-9\-_]{2,127}$");
 
         public string Name { get; set; }
         public string Description { get; set; }
         public List<string> Tags { get; set; }
-        public RegistryScriptAuthor Author { get; set; }
+        public string Author { get; set; }
         // TODO: Ensure this only contains valid characters
         public string Homepage { get; set; }
         public string Repository { get; set; }
-        public List<RegistryScriptVersion> Versions { get; set; }
+        public SortedSet<RegistryScriptVersion> Versions { get; set; }
 
         public RegistryScriptVersion GetLatestVersion()
         {
-            // TODO: String sorting will not cut it
-            return SortedVersions().FirstOrDefault();
-        }
-
-        public IEnumerable<RegistryScriptVersion> SortedVersions()
-        {
-            return Versions.OrderByDescending(v => v.Version);
+            return Versions.FirstOrDefault();
         }
 
         public RegistryScriptVersion CreateVersion()
         {
-            var version = new RegistryScriptVersion { Files = new List<RegistryFile>() };
-            Versions = Versions.Append(version).OrderByDescending(v => v.Version).ToList();
+            var version = new RegistryScriptVersion();
+            if (!Versions.Add(version)) throw new InvalidOperationException("Could not create a new version");
             return version;
+        }
+
+        int IComparable<RegistryScript>.CompareTo(RegistryScript other)
+        {
+            return Name.CompareTo(other.Name);
+        }
+
+        int IComparable.CompareTo(object other)
+        {
+            return (this as IComparable<RegistryScript>).CompareTo(other as RegistryScript);
         }
     }
 
-    public class RegistryScriptAuthor
-    {
-        public string Name { get; set; }
-        public string Profile { get; set; }
-    }
-
-    public class RegistryScriptVersion
+    public class RegistryScriptVersion : IComparable<RegistryScriptVersion>, IComparable
     {
         public static readonly Regex ValidVersionNameRegex = new Regex(@"^(?<Major>0|[1-9][0-9]{0,3})\.(?<Minor>0|[1-9][0-9]{0,3})\.(?<Revision>0|[1-9][0-9]{0,3})(-(?<Extra>[a-z0-9]{1,32}))?$", RegexOptions.Compiled);
+
+        private List<RegistryFile> _files;
 
         public RegistryVersionString Version { get; set; }
         public DateTimeOffset Created { get; set; }
         public string Notes { get; set; }
-        public List<RegistryFile> Files { get; set; }
+        public List<RegistryFile> Files { get => _files ?? (_files = new List<RegistryFile>()); set => _files = value; }
+
+        int IComparable<RegistryScriptVersion>.CompareTo(RegistryScriptVersion other)
+        {
+            return (Version as IComparable<RegistryVersionString>).CompareTo(other.Version);
+        }
+
+        int IComparable.CompareTo(object other)
+        {
+            return (this as IComparable<RegistryScriptVersion>).CompareTo(other as RegistryScriptVersion);
+        }
     }
 
     public class RegistryFile
@@ -133,31 +147,48 @@ namespace Party.Shared.Models
         {
             if (Major != other.Major)
                 if (Major > other.Major)
-                    return 1;
-                else
                     return -1;
+                else
+                    return 1;
 
             if (Minor != other.Minor)
                 if (Minor > other.Minor)
-                    return 1;
-                else
                     return -1;
+                else
+                    return 1;
 
             if (Revision != other.Revision)
                 if (Revision > other.Revision)
-                    return 1;
-                else
                     return -1;
+                else
+                    return 1;
 
-            return Extra.CompareTo(other.Extra);
+            return other.Extra.CompareTo(Extra);
         }
 
-        public int CompareTo(object other)
+        int IComparable.CompareTo(object other)
         {
-            return CompareTo((RegistryVersionString)other);
+            return (this as IComparable<RegistryVersionString>).CompareTo((RegistryVersionString)other);
         }
 
         public static implicit operator string(RegistryVersionString d) => d.ToString();
         public static implicit operator RegistryVersionString(string b) => new RegistryVersionString(b);
+    }
+
+    public class RegistryAuthor : IComparable<RegistryAuthor>, IComparable
+    {
+        public string Name { get; set; }
+        public string Reddit { get; set; }
+        public string Github { get; set; }
+
+        int IComparable<RegistryAuthor>.CompareTo(RegistryAuthor other)
+        {
+            return Name.CompareTo(other.Name);
+        }
+
+        int IComparable.CompareTo(object other)
+        {
+            return (this as IComparable<RegistryAuthor>).CompareTo(other as RegistryAuthor);
+        }
     }
 }

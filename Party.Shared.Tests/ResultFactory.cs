@@ -12,7 +12,7 @@ namespace Party.Shared
         {
             return new Registry
             {
-                Scripts = scripts.ToList()
+                Scripts = new SortedSet<RegistryScript>(scripts)
             };
         }
 
@@ -21,7 +21,7 @@ namespace Party.Shared
             return new RegistryScript
             {
                 Name = name,
-                Versions = versions.ToList()
+                Versions = new SortedSet<RegistryScriptVersion>(versions)
             };
         }
 

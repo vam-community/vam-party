@@ -63,22 +63,28 @@ namespace Party.Shared.Handlers
                 using var response = await _http.GetAsync(url).ConfigureAwait(false);
                 response.EnsureSuccessStatusCode();
                 using var streamReader = new StreamReader(await response.Content.ReadAsStreamAsync().ConfigureAwait(false));
-                return Deserialize(streamReader);
+                return Deserialize(url, streamReader);
             }
             else
             {
                 using var fileStream = File.OpenRead(Path.Combine(AppContext.BaseDirectory, url));
                 using var streamReader = new StreamReader(fileStream);
-                return Deserialize(streamReader);
+                return Deserialize(url, streamReader);
             }
         }
 
-        private static Registry Deserialize(StreamReader streamReader)
+        private static Registry Deserialize(string url, StreamReader streamReader)
         {
             using var jsonTestReader = new JsonTextReader(streamReader);
             var jsonSerializer = new JsonSerializer();
-            var registry = jsonSerializer.Deserialize<Registry>(jsonTestReader);
-            return registry;
+            try
+            {
+                return jsonSerializer.Deserialize<Registry>(jsonTestReader);
+            }
+            catch (Exception exc)
+            {
+                throw new RegistryException($"Could not deserialize the registry {url}: {exc.Message}", exc);
+            }
         }
     }
 }

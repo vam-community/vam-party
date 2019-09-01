@@ -28,7 +28,7 @@
 		{
 			"id": "commandName",
             "type": "pickString",
-            "options": ["search", "get", "publish", "status"],
+            "options": ["search", "get", "publish", "status", "show", "upgrade"],
 			"default": "search",
 			"description": "The command name to debug"
 		}

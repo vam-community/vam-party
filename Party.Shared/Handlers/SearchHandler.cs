@@ -55,7 +55,7 @@ namespace Party.Shared.Handlers
             {
                 return true;
             }
-            if (package.Author?.Name?.Contains(query, StringComparison.InvariantCultureIgnoreCase) ?? false)
+            if (package.Author?.Contains(query, StringComparison.InvariantCultureIgnoreCase) ?? false)
             {
                 return true;
             }

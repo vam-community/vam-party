@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Invocation;
@@ -73,10 +74,10 @@ namespace Party.CLI.Commands
             // TODO: Validate all fields
             if (!isNew)
             {
-                Renderer.WriteLine($"This package already exists (by {script.Author?.Name ?? "Anonymous User"}), a new version will be added to it.");
+                Renderer.WriteLine($"This package already exists (by {script.Author ?? "Unknown User"}), a new version will be added to it.");
 
                 Renderer.WriteLine($"Latest {Math.Min(5, script.Versions.Count)} versions:");
-                foreach (var existingVersion in script.SortedVersions().Take(5))
+                foreach (var existingVersion in script.Versions.Take(5))
                 {
                     Renderer.WriteLine($"- {existingVersion.Version}");
                 }
@@ -90,17 +91,17 @@ namespace Party.CLI.Commands
             {
                 Renderer.WriteLine("Looks like a new package in the registry! Please provide some information about this new package, or press CTRL+C if you want to abort.");
 
-                var author = new RegistryScriptAuthor
+                var author = Renderer.Ask("Author Name: ", true);
+                if (registry.Authors.Any(a => a.Name.Equals(author, StringComparison.InvariantCultureIgnoreCase)))
                 {
-                    Name = Renderer.Ask("Author Name: ", true)
-                };
-                var existingAuthor = registry.Scripts.Where(s => s.Author != null).Select(s => s.Author).FirstOrDefault(a => a.Name.Equals(author.Name, StringComparison.InvariantCultureIgnoreCase));
-                if (!string.IsNullOrEmpty(existingAuthor?.Profile))
-                    author.Profile = Renderer.Ask($"Author Profile URL ({existingAuthor.Profile}): ") ?? existingAuthor.Profile;
-                else
-                    author.Profile = Renderer.Ask("Author Profile URL ");
-                script.Author = author;
+                    registry.Authors.Add(new RegistryAuthor
+                    {
+                        Github = Renderer.Ask($"GitHub Profile URL: "),
+                        Reddit = Renderer.Ask($"Reddit Profile URL: ")
+                    });
+                }
 
+                script.Author = author;
                 script.Description = Renderer.Ask("Description: ");
                 script.Tags = (Renderer.Ask("Tags (comma-separated list): ") ?? "").Split(',').Select(x => x.Trim()).Where(x => x != "").ToList();
                 script.Homepage = Renderer.Ask("Package Homepage URL: ");

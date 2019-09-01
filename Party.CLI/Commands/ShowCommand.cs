@@ -49,28 +49,33 @@ namespace Party.CLI.Commands
 
             PrintWarnings(warnings, saves.Errors);
 
-            Renderer.WriteLine($"Package {registryPackage.Name}, by {registryPackage.Author?.Name ?? "Anonymous"}");
+            Renderer.WriteLine($"Package {registryPackage.Name}");
+
             Renderer.WriteLine($"Last version v{registryVersion.Version}, published {registryVersion.Created.ToLocalTime().ToString("D")}");
+
             if (registryPackage.Description != null)
-            {
                 Renderer.WriteLine($"Description: {registryPackage.Description}");
-            }
             if (registryPackage.Tags != null)
-            {
                 Renderer.WriteLine($"Tags: {string.Join(", ", registryPackage.Tags)}");
-            }
             if (registryPackage.Repository != null)
-            {
                 Renderer.WriteLine($"Repository: {registryPackage.Repository}");
-            }
             if (registryPackage.Homepage != null)
-            {
                 Renderer.WriteLine($"Homepage: {registryPackage.Homepage}");
+
+            Renderer.WriteLine($"Author: {registryPackage.Author}");
+            var registryAuthor = registry.Authors?.FirstOrDefault(a => a.Name == registryPackage.Author);
+            if (registryAuthor != null)
+            {
+                if (registryAuthor.Github != null)
+                    Renderer.WriteLine($"- Github: {registryAuthor.Github}");
+                if (registryAuthor.Reddit != null)
+                    Renderer.WriteLine($"- Reddit: {registryAuthor.Reddit}");
             }
+
             Renderer.WriteLine("Files:");
             foreach (var file in registryVersion.Files)
             {
-                Renderer.WriteLine($"- {file.Filename}");
+                Renderer.WriteLine($"- {file.Filename}: {file.Url}");
             }
         }
     }

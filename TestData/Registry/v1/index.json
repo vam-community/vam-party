@@ -1,12 +1,21 @@
 {
+  "authors": [
+    {
+      "name": "John Doe"
+    },
+    {
+      "name": "Jane Smith"
+    },
+    {
+      "name": "William Brown"
+    }
+  ],
   "scripts": [
     {
       "name": "simple-script-1",
       "description": "This is a simple package",
       "tags": ["simple", "test"],
-      "author": {
-        "name": "John Doe"
-      },
+      "author": "John Doe",
       "versions": [
         {
           "version": "1.0.0",
@@ -27,9 +36,7 @@
       "name": "complex-plugin",
       "description": "A plugin with a cslist and two files",
       "tags": ["complex", "test"],
-      "author": {
-        "name": "Jane Smith"
-      },
+      "author": "Jane Smith",
       "versions": [
         {
           "version": "0.0.1-alpha",
@@ -66,9 +73,7 @@
       "name": "multi-plugin",
       "description": "This plugin contains two independent scripts",
       "tags": ["multi", "test"],
-      "author": {
-        "name": "William Brown"
-      },
+      "author": "William Brown",
       "versions": [
         {
           "version": "12.5.412",
@@ -97,9 +102,7 @@
       "name": "unused-script",
       "description": "This plugin is not used in any scenes",
       "tags": ["unused", "test"],
-      "author": {
-        "name": "John Doe"
-      },
+      "author": "John Doe",
       "versions": [
         {
           "version": "1.0.0",
