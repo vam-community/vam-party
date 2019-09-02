@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.IO;
@@ -13,7 +12,7 @@ namespace Party.CLI.Commands
 {
     public class GetCommand : CommandBase
     {
-        public static Command CreateCommand(IRenderer renderer, PartyConfiguration config, IPartyController controller)
+        public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller)
         {
             var command = new Command("get", "Downloads a package (script) into the saves folder");
             AddCommonOptions(command);
@@ -28,7 +27,8 @@ namespace Party.CLI.Commands
             return command;
         }
 
-        public GetCommand(IRenderer renderer, PartyConfiguration config, DirectoryInfo saves, IPartyController controller) : base(renderer, config, saves, controller)
+        public GetCommand(IConsoleRenderer renderer, PartyConfiguration config, DirectoryInfo saves, IPartyController controller)
+            : base(renderer, config, saves, controller)
         {
         }
 
@@ -83,12 +83,11 @@ namespace Party.CLI.Commands
             Renderer.WriteLine($"Files downloaded in {filesStatuses.InstallFolder}:");
             foreach (var file in installResult.Files)
             {
-
                 Renderer.WriteLine($"- {Controller.GetRelativePath(file.Path, filesStatuses.InstallFolder)}");
             }
         }
 
-        private static void ValidateStatuses(InstalledPackageInfoResult.FileStatus[] distinctStatuses)
+        private void ValidateStatuses(InstalledPackageInfoResult.FileStatus[] distinctStatuses)
         {
             if (distinctStatuses.Length > 1)
             {

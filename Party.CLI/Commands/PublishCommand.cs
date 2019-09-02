@@ -15,7 +15,7 @@ namespace Party.CLI.Commands
 {
     public class PublishCommand : CommandBase
     {
-        public static Command CreateCommand(IRenderer renderer, PartyConfiguration config, IPartyController controller)
+        public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller)
         {
             var command = new Command("publish", "Prepares files for publishing");
             AddCommonOptions(command);
@@ -32,7 +32,8 @@ namespace Party.CLI.Commands
             return command;
         }
 
-        public PublishCommand(IRenderer renderer, PartyConfiguration config, DirectoryInfo saves, IPartyController controller) : base(renderer, config, saves, controller)
+        public PublishCommand(IConsoleRenderer renderer, PartyConfiguration config, DirectoryInfo saves, IPartyController controller)
+            : base(renderer, config, saves, controller)
         {
         }
 
@@ -60,8 +61,7 @@ namespace Party.CLI.Commands
             {
                 version.Files.AddRange(Uri.TryCreate(pathOrUrl, UriKind.Absolute, out var url)
                      ? await Controller.BuildRegistryFilesFromUrlAsync(registry, name, url).ConfigureAwait(false)
-                     : await Controller.BuildRegistryFilesFromPathAsync(registry, name, Path.GetFullPath(pathOrUrl)).ConfigureAwait(false)
-                );
+                     : await Controller.BuildRegistryFilesFromPathAsync(registry, name, Path.GetFullPath(pathOrUrl)).ConfigureAwait(false));
             }
 
             registry.AssertNoDuplicates(version);

@@ -5,18 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace Party.CLI
 {
-    public interface IRenderer : IConsole
-    {
-        IDisposable WithColor(ConsoleColor color);
-        void Write(string text);
-        void Write(string text, ConsoleColor color);
-        void WriteLine();
-        void WriteLine(string text);
-        void WriteLine(string text, ConsoleColor color);
-        string Ask(string prompt, bool mandatory = false, Regex regex = null, string sampleValue = null);
-    }
-
-    public class ConsoleRenderer : IRenderer
+    public class ConsoleRenderer : IConsoleRenderer
     {
         private readonly TextWriter _output;
         private readonly TextReader _input;
@@ -91,7 +80,8 @@ namespace Party.CLI
                 _output.Write(prompt);
                 value = _input.ReadLine();
                 value = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
-            } while (!IsValueValid(value, mandatory, regex, sampleValue));
+            }
+            while (!IsValueValid(value, mandatory, regex, sampleValue));
             return value;
         }
 
@@ -105,7 +95,6 @@ namespace Party.CLI
                     return false;
                 }
                 return true;
-
             }
 
             if (regex == null)
@@ -139,5 +128,16 @@ namespace Party.CLI
                 _resetColor();
             }
         }
+    }
+
+    public interface IConsoleRenderer : IConsole
+    {
+        IDisposable WithColor(ConsoleColor color);
+        void Write(string text);
+        void Write(string text, ConsoleColor color);
+        void WriteLine();
+        void WriteLine(string text);
+        void WriteLine(string text, ConsoleColor color);
+        string Ask(string prompt, bool mandatory = false, Regex regex = null, string sampleValue = null);
     }
 }

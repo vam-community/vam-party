@@ -31,11 +31,11 @@ namespace Party.CLI
             return await new Program(renderer, config, controller).Execute(args).ConfigureAwait(false);
         }
 
-        private readonly IRenderer _renderer;
+        private readonly IConsoleRenderer _renderer;
         private readonly PartyConfiguration _config;
         private readonly IPartyController _controller;
 
-        public Program(IRenderer renderer, PartyConfiguration config, IPartyController controller)
+        public Program(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller)
         {
             _renderer = renderer;
             _config = config;
@@ -44,8 +44,8 @@ namespace Party.CLI
 
         public async Task<int> Execute(string[] args)
         {
-
-            var rootCommand = new RootCommand("Party: A Virt-A-Mate package manager") {
+            var rootCommand = new RootCommand("Party: A Virt-A-Mate package manager")
+            {
                 SearchCommand.CreateCommand(_renderer, _config, _controller),
                 GetCommand.CreateCommand(_renderer, _config, _controller),
                 ShowCommand.CreateCommand(_renderer, _config, _controller),
@@ -61,12 +61,12 @@ namespace Party.CLI
             var parser = new CommandLineBuilder(rootCommand)
                 .UseVersionOption()
                 .UseHelp()
-#if (DEBUG)
+#if DEBUG
                 .UseParseDirective()
                 .UseDebugDirective()
 #endif
                     .UseSuggestDirective()
-                //.RegisterWithDotnetSuggest()
+                // .RegisterWithDotnetSuggest()
                 .UseTypoCorrections()
                 .UseParseErrorReporting()
                 .UseExceptionHandler((e, ctx) => exc = e)
@@ -113,9 +113,7 @@ namespace Party.CLI
                             .Split(new[] { '\r', '\n' })
                             .Where(line => !string.IsNullOrWhiteSpace(line))
                             .Where(line => line != "--- End of stack trace from previous location where exception was thrown ---")
-                            .Where(line => !line.StartsWith("   at System.CommandLine."))
-                    )
-                );
+                            .Where(line => !line.StartsWith("   at System.CommandLine."))));
                 return 1;
             }
         }

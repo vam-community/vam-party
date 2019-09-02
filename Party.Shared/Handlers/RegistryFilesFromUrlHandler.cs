@@ -14,9 +14,9 @@ namespace Party.Shared.Handlers
     {
         private readonly HttpClient _http;
 
-        public RegistryFilesFromUrlHandler(HttpClient _http)
+        public RegistryFilesFromUrlHandler(HttpClient http)
         {
-            this._http = _http ?? throw new ArgumentNullException(nameof(_http));
+            _http = http ?? throw new ArgumentNullException(nameof(http));
         }
 
         public async Task<List<RegistryFile>> BuildFiles(Registry registry, string name, Uri url)

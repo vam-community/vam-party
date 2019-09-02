@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
-using Party.Shared.Exceptions;
 using Party.Shared.Models;
 using Party.Shared.Resources;
 
@@ -14,11 +13,20 @@ namespace Party.CLI.Commands
 {
     public abstract class CommandBase
     {
-        protected readonly IRenderer Renderer;
-        protected readonly PartyConfiguration Config;
-        protected readonly IPartyController Controller;
+        private static PartyConfiguration GetConfig(PartyConfiguration config, DirectoryInfo saves)
+        {
+            if (saves != null)
+            {
+                config.VirtAMate.SavesDirectory = Path.GetFullPath(saves.FullName, Environment.CurrentDirectory);
+            }
+            return config;
+        }
 
-        protected CommandBase(IRenderer renderer, PartyConfiguration config, DirectoryInfo saves, IPartyController controller)
+        protected IConsoleRenderer Renderer { get; }
+        protected PartyConfiguration Config { get; }
+        protected IPartyController Controller { get; }
+
+        protected CommandBase(IConsoleRenderer renderer, PartyConfiguration config, DirectoryInfo saves, IPartyController controller)
         {
             Renderer = renderer;
             Config = GetConfig(config, saves);
@@ -30,18 +38,9 @@ namespace Party.CLI.Commands
             command.AddOption(new Option("--saves", "Specify the Saves folder to use") { Argument = new Argument<DirectoryInfo>().ExistingOnly() });
         }
 
-        public class CommonArguments
+        public abstract class CommonArguments
         {
-            public DirectoryInfo Saves;
-        }
-
-        private static PartyConfiguration GetConfig(PartyConfiguration config, DirectoryInfo saves)
-        {
-            if (saves != null)
-            {
-                config.VirtAMate.SavesDirectory = Path.GetFullPath(saves.FullName, Environment.CurrentDirectory);
-            }
-            return config;
+            public DirectoryInfo Saves { get; set; }
         }
 
         protected async Task<(SavesMap, Registry)> GetSavesAndRegistryAsync(string[] filters = null)
@@ -101,7 +100,7 @@ namespace Party.CLI.Commands
             }
         }
 
-        protected static string Pluralize(int count, string singular, string plural)
+        protected string Pluralize(int count, string singular, string plural)
         {
             if (count == 1)
             {

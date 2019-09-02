@@ -4,7 +4,8 @@ namespace Party.Shared.Exceptions
     {
         public override int Code => 100;
 
-        public UserInputException(string message) : base(message)
+        public UserInputException(string message)
+            : base(message)
         {
         }
     }

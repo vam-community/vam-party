@@ -6,7 +6,8 @@ namespace Party.Shared.Resources
     {
         public List<Script> Scripts { get; } = new List<Script>();
 
-        public Scene(string fullPath) : base(fullPath, null)
+        public Scene(string fullPath)
+            : base(fullPath, null)
         {
         }
 

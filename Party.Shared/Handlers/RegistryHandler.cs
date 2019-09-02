@@ -73,7 +73,7 @@ namespace Party.Shared.Handlers
             }
         }
 
-        private static Registry Deserialize(string url, StreamReader streamReader)
+        private Registry Deserialize(string url, StreamReader streamReader)
         {
             using var jsonTestReader = new JsonTextReader(streamReader);
             var jsonSerializer = new JsonSerializer();

@@ -37,7 +37,7 @@ namespace Party.Shared.Utils
             var bytes = Encoding.UTF8.GetBytes(content);
             using var sha256Hash = SHA256.Create();
             byte[] checksum = sha256Hash.ComputeHash(bytes);
-            return BitConverter.ToString(checksum).Replace("-", String.Empty);
+            return BitConverter.ToString(checksum).Replace("-", string.Empty);
         }
     }
 }

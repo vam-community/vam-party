@@ -146,22 +146,28 @@ namespace Party.Shared.Models
         int IComparable<RegistryVersionString>.CompareTo(RegistryVersionString other)
         {
             if (Major != other.Major)
+            {
                 if (Major > other.Major)
                     return -1;
                 else
                     return 1;
+            }
 
             if (Minor != other.Minor)
+            {
                 if (Minor > other.Minor)
                     return -1;
                 else
                     return 1;
+            }
 
             if (Revision != other.Revision)
+            {
                 if (Revision > other.Revision)
                     return -1;
                 else
                     return 1;
+            }
 
             return other.Extra.CompareTo(Extra);
         }

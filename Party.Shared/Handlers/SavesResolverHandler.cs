@@ -1,14 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Threading.Tasks;
-using Party.Shared.Resources;
+using Party.Shared.Exceptions;
 using Party.Shared.Models;
+using Party.Shared.Resources;
 using Party.Shared.Serializers;
 using Party.Shared.Utils;
-using Party.Shared.Exceptions;
-using System;
 
 namespace Party.Shared.Handlers
 {
@@ -134,7 +134,6 @@ namespace Party.Shared.Handlers
                     errors.Add(exc.Message);
                 }
             }
-
 
             return new SavesMap
             {

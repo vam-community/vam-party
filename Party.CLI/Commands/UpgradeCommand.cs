@@ -12,7 +12,7 @@ namespace Party.CLI.Commands
 {
     public class UpgradeCommand : CommandBase
     {
-        public static Command CreateCommand(IRenderer renderer, PartyConfiguration config, IPartyController controller)
+        public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller)
         {
             var command = new Command("upgrade", "Updates scenes to reference scripts from the Party folder. You can specify a package, scene or script to upgrade. If you don't specify anything, all scenes and scripts will be upgraded.");
             AddCommonOptions(command);
@@ -45,7 +45,8 @@ namespace Party.CLI.Commands
             public bool Verbose { get; set; }
         }
 
-        public UpgradeCommand(IRenderer renderer, PartyConfiguration config, DirectoryInfo saves, IPartyController controller) : base(renderer, config, saves, controller)
+        public UpgradeCommand(IConsoleRenderer renderer, PartyConfiguration config, DirectoryInfo saves, IPartyController controller)
+            : base(renderer, config, saves, controller)
         {
         }
 
@@ -75,7 +76,7 @@ namespace Party.CLI.Commands
             var latestVersion = match.Script.GetLatestVersion();
             var updateToVersion = latestVersion.Version.Equals(match.Version.Version) ? null : latestVersion;
 
-            if (match.Local.Scenes == null || match.Local.Scenes.Count == 0 && updateToVersion == null)
+            if (match.Local.Scenes == null || (match.Local.Scenes.Count == 0 && updateToVersion == null))
             {
                 if (args.Verbose)
                 {

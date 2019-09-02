@@ -4,7 +4,8 @@ namespace Party.Shared.Exceptions
     {
         public override int Code => 200;
 
-        public ConfigurationException(string message) : base(message)
+        public ConfigurationException(string message)
+            : base(message)
         {
         }
     }

@@ -29,7 +29,8 @@ namespace Party.Shared.Serializers
                 DateFormatString = "yyyy-MM-dd",
                 DateTimeZoneHandling = DateTimeZoneHandling.Utc,
                 ContractResolver = new CamelCasePropertyNamesContractResolver(),
-                Converters = {
+                Converters =
+                {
                     new StringArrayConverter(),
                     new VersionConverter()
                 }
@@ -38,7 +39,7 @@ namespace Party.Shared.Serializers
             return JsonConvert.SerializeObject(value, serializerSettings);
         }
 
-        class StringArrayConverter : JsonConverter
+        public class StringArrayConverter : JsonConverter
         {
             public override bool CanConvert(Type objectType)
             {
@@ -56,7 +57,7 @@ namespace Party.Shared.Serializers
             }
         }
 
-        class VersionConverter : JsonConverter
+        public class VersionConverter : JsonConverter
         {
             public override bool CanConvert(Type objectType)
             {

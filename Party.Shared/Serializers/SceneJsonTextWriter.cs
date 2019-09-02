@@ -58,7 +58,6 @@ namespace Party.Shared.Serializers
             _writer.Write(value);
         }
 
-
         public override void WriteValue(float value)
         {
             base.WriteValue(value);
@@ -95,15 +94,15 @@ namespace Party.Shared.Serializers
             _writer.Write('}');
         }
 
+        public override void Flush()
+        {
+            _writer.Flush();
+        }
+
         protected override void WriteValueDelimiter()
         {
             base.WriteValueDelimiter();
             _writer.Write(", ");
-        }
-
-        public override void Flush()
-        {
-            _writer.Flush();
         }
 
         protected override void WriteIndent()
@@ -112,7 +111,7 @@ namespace Party.Shared.Serializers
 
             int currentIndentCount = Top * 3;
 
-            if(currentIndentCount == 0) return;
+            if (currentIndentCount == 0) return;
 
             while (currentIndentCount > 0)
             {

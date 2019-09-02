@@ -12,7 +12,7 @@ namespace Party.CLI.Commands
 {
     public class StatusCommand : CommandBase
     {
-        public static Command CreateCommand(IRenderer renderer, PartyConfiguration config, IPartyController controller)
+        public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller)
         {
             var command = new Command("status", "Shows the state of the current scripts and scenes");
             AddCommonOptions(command);
@@ -36,7 +36,8 @@ namespace Party.CLI.Commands
             public bool Unregistered { get; set; }
         }
 
-        public StatusCommand(IRenderer renderer, PartyConfiguration config, DirectoryInfo saves, IPartyController controller) : base(renderer, config, saves, controller)
+        public StatusCommand(IConsoleRenderer renderer, PartyConfiguration config, DirectoryInfo saves, IPartyController controller)
+            : base(renderer, config, saves, controller)
         {
         }
 
