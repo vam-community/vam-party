@@ -12,23 +12,6 @@ using Party.Shared.Resources;
 
 namespace Party.Shared
 {
-    public interface IPartyController
-    {
-        Task<Registry> GetRegistryAsync(params string[] registries);
-        Task<SavesMap> GetSavesAsync(string[] items = null);
-        Task<List<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string name, string path);
-        Task<List<RegistryFile>> BuildRegistryFilesFromUrlAsync(Registry registry, string name, Uri url);
-        IEnumerable<SearchResult> Search(Registry registry, SavesMap saves, string query);
-        Task<InstalledPackageInfoResult> GetInstalledPackageInfoAsync(string name, RegistryScriptVersion version);
-        Task<InstalledPackageInfoResult> InstallPackageAsync(InstalledPackageInfoResult info);
-        RegistrySavesMatch[] MatchSavesToRegistry(SavesMap saves, Registry registry);
-        Task<(string before, string after)[]> UpdateScriptInSceneAsync(Scene scene, Script local, InstalledPackageInfoResult info);
-        string GetRelativePath(string fullPath);
-        string GetRelativePath(string fullPath, string parentPath);
-        void SaveToFile(string data, string path, bool restrict = true);
-        void Delete(string fullPath);
-    }
-
     public class PartyController : IPartyController
     {
         private static string Version { get; } = typeof(PartyController).Assembly.GetName().Version.ToString();
@@ -126,5 +109,22 @@ namespace Party.Shared
                 _fs.Directory.Delete(path);
             }
         }
+    }
+
+    public interface IPartyController
+    {
+        Task<Registry> GetRegistryAsync(params string[] registries);
+        Task<SavesMap> GetSavesAsync(string[] items = null);
+        Task<List<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string name, string path);
+        Task<List<RegistryFile>> BuildRegistryFilesFromUrlAsync(Registry registry, string name, Uri url);
+        IEnumerable<SearchResult> Search(Registry registry, SavesMap saves, string query);
+        Task<InstalledPackageInfoResult> GetInstalledPackageInfoAsync(string name, RegistryScriptVersion version);
+        Task<InstalledPackageInfoResult> InstallPackageAsync(InstalledPackageInfoResult info);
+        RegistrySavesMatch[] MatchSavesToRegistry(SavesMap saves, Registry registry);
+        Task<(string before, string after)[]> UpdateScriptInSceneAsync(Scene scene, Script local, InstalledPackageInfoResult info);
+        string GetRelativePath(string fullPath);
+        string GetRelativePath(string fullPath, string parentPath);
+        void SaveToFile(string data, string path, bool restrict = true);
+        void Delete(string fullPath);
     }
 }
