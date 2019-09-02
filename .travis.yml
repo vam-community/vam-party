@@ -1,13 +1,15 @@
 os: windows
 language: csharp
 mono: none
+env:
+  - VERSION_PREFIX="1.0.0" VERSION_SUFFIX="alpha1"
 script:
   - choco install dotnetcore-sdk --pre -y
   - choco install opencover.portable codecov -y
   - dotnet restore
   - OpenCover.Console.exe -register -target:"C:/Program Files/dotnet/dotnet.exe" -targetargs:"test --logger:trx;LogFileName=results.trx /p:DebugType=full ./Party.Shared.Tests/Party.Shared.Tests.csproj" -filter:"+[Party*]* -[Party.Shared.Tests*]*" -output:"coverage.xml" -skipautoprops -returntargetcode
   - powershell "codecov -f coverage.xml -t $env:CODECOV_TOKEN"
-  - dotnet publish Party.CLI -c Release -r win-x64
+  - powershell "dotnet publish Party.CLI -c Release -r win-x64 /p:VersionPrefix=$VERSION_PREFIX.$TRAVIS_BUILD_NUMBER /p:VersionSuffix=$VERSION_SUFFIX"
 deploy:
   provider: releases
   skip_cleanup: true
