@@ -59,8 +59,6 @@ namespace Party.CLI.Commands
 
             if (filterPackages != null && filterPackages.Length > 0)
             {
-                Console.WriteLine(string.Join(", ", saves.ScriptsByFilename.Select(s => s.Value.Name)));
-                Console.WriteLine(string.Join(", ", filterPackages.Select(s => s)));
                 var packageHashes = new HashSet<string>(registry.Scripts.Where(s => filterPackages.Contains(s.Name)).SelectMany(s => s.Versions).SelectMany(v => v.Files).Select(f => f.Hash.Value).Distinct());
                 saves.ScriptsByFilename = saves.ScriptsByFilename.Where(s =>
                 {
