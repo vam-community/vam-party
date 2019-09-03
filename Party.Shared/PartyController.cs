@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Party.Shared.Handlers;
 using Party.Shared.Models;
 using Party.Shared.Resources;
+using Party.Shared.Serializers;
 
 namespace Party.Shared
 {
@@ -29,46 +30,60 @@ namespace Party.Shared
 
         public Task<Registry> GetRegistryAsync(params string[] registries)
         {
-            return new RegistryHandler(_http, _config.Registry.Urls).AcquireAsync(registries);
+            return new RegistryHandler(_http, _config.Registry.Urls)
+                .AcquireAsync(registries);
         }
 
         public Task<SavesMap> GetSavesAsync(string[] filters)
         {
-            return new SavesResolverHandler(_fs, _config.VirtAMate.SavesDirectory, _config.Scanning.Ignore).AnalyzeSaves(filters ?? new string[0]);
+            return new SavesResolverHandler(
+                _fs,
+                new SceneSerializer(_fs),
+                new ScriptListSerializer(_fs),
+                _config.VirtAMate.SavesDirectory,
+                _config.Scanning.Ignore
+                ).AnalyzeSaves(filters ?? new string[0]);
         }
 
         public Task<List<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string name, string path)
         {
-            return new RegistryFilesFromPathHandler(_config.VirtAMate.SavesDirectory, _fs).BuildFiles(registry, name, path);
+            return new RegistryFilesFromPathHandler(_config.VirtAMate.SavesDirectory, _fs)
+                .BuildFiles(registry, name, path);
         }
 
         public Task<List<RegistryFile>> BuildRegistryFilesFromUrlAsync(Registry registry, string name, Uri url)
         {
-            return new RegistryFilesFromUrlHandler(_http).BuildFiles(registry, name, url);
+            return new RegistryFilesFromUrlHandler(_http)
+                .BuildFiles(registry, name, url);
         }
 
         public IEnumerable<SearchResult> Search(Registry registry, SavesMap saves, string query)
         {
-            return new SearchHandler(_config).Search(registry, saves, query);
+            return new SearchHandler(_config)
+                .Search(registry, saves, query);
         }
 
         public Task<InstalledPackageInfoResult> GetInstalledPackageInfoAsync(string name, RegistryScriptVersion version)
         {
-            return new PackageStatusHandler(_config, _fs).GetInstalledPackageInfoAsync(name, version);
+            return new PackageStatusHandler(_config, _fs)
+                .GetInstalledPackageInfoAsync(name, version);
         }
 
         public Task<InstalledPackageInfoResult> InstallPackageAsync(InstalledPackageInfoResult info)
         {
-            return new InstallPackageHandler(_fs, _http).InstallPackageAsync(info);
+            return new InstallPackageHandler(_fs, _http)
+                .InstallPackageAsync(info);
         }
         public RegistrySavesMatch[] MatchSavesToRegistry(SavesMap saves, Registry registry)
         {
-            return new RegistrySavesMatchHandler().Match(saves, registry);
+            return new RegistrySavesMatchHandler()
+                .Match(saves, registry);
         }
 
         public Task<(string before, string after)[]> UpdateScriptInSceneAsync(Scene scene, Script local, InstalledPackageInfoResult info)
         {
-            return new SceneUpdateHandler(_fs, _config.VirtAMate.SavesDirectory).UpdateScripts(scene, local, info);
+            return new SceneUpdateHandler(new SceneSerializer(_fs), _config.VirtAMate.SavesDirectory)
+                .UpdateScripts(scene, local, info);
         }
 
         public string GetRelativePath(string fullPath)

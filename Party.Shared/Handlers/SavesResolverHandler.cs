@@ -15,13 +15,17 @@ namespace Party.Shared.Handlers
     public class SavesResolverHandler
     {
         private readonly IFileSystem _fs;
+        private readonly ISceneSerializer _sceneSerializer;
+        private readonly IScriptListSerializer _scriptListSerializer;
         private readonly string _savesDirectory;
         private readonly string[] _ignoredPaths;
 
-        public SavesResolverHandler(IFileSystem fs, string savesDirectory, string[] ignoredPaths)
+        public SavesResolverHandler(IFileSystem fs, ISceneSerializer sceneSerializer, IScriptListSerializer scriptListSerializer, string savesDirectory, string[] ignoredPaths)
         {
-            _fs = fs ?? throw new System.ArgumentNullException(nameof(fs));
-            _savesDirectory = savesDirectory ?? throw new System.ArgumentNullException(nameof(savesDirectory));
+            _fs = fs ?? throw new ArgumentNullException(nameof(fs));
+            _sceneSerializer = sceneSerializer ?? throw new ArgumentNullException(nameof(sceneSerializer));
+            _scriptListSerializer = scriptListSerializer ?? throw new ArgumentNullException(nameof(scriptListSerializer));
+            _savesDirectory = savesDirectory ?? throw new ArgumentNullException(nameof(savesDirectory));
             _ignoredPaths = ignoredPaths?.Select(path => Path.GetFullPath(path, savesDirectory)).ToArray() ?? new string[0];
         }
 
@@ -42,9 +46,6 @@ namespace Party.Shared.Handlers
             var sceneFiles = new List<string>();
             var scriptListFiles = new List<string>();
             var vamDirectory = _fs.DirectoryInfo.FromDirectoryName(_savesDirectory).Parent.FullName;
-
-            var scriptListSerializer = new ScriptListSerializer();
-            var sceneSerializer = new SceneSerializer();
 
             // TODO: If the item is a script, check all scenes
             // TODO: If the item is a script list, get scripts and all scenes
@@ -84,7 +85,7 @@ namespace Party.Shared.Handlers
             foreach (var scriptListFile in scriptListFiles)
             {
                 var scriptRefs = new List<Script>();
-                var scriptRefPaths = await scriptListSerializer.GetScriptsAsync(_fs, scriptListFile);
+                var scriptRefPaths = await _scriptListSerializer.GetScriptsAsync(scriptListFile);
                 foreach (var scriptRefRelativePath in scriptRefPaths)
                 {
                     string fullPath = GetScriptListReferenceFullPath(scriptListFile, scriptRefRelativePath);
@@ -113,7 +114,7 @@ namespace Party.Shared.Handlers
                 scenes.Add(scene);
                 try
                 {
-                    foreach (var scriptRefRelativePath in await sceneSerializer.GetScriptsAsync(_fs, sceneFile).ConfigureAwait(false))
+                    foreach (var scriptRefRelativePath in await _sceneSerializer.GetScriptsAsync(sceneFile).ConfigureAwait(false))
                     {
                         var fullPath = scriptRefRelativePath.Contains('/')
                             ? Path.GetFullPath(scriptRefRelativePath, vamDirectory)
@@ -152,7 +153,7 @@ namespace Party.Shared.Handlers
 
         private async Task<string[]> ExpandCsList(string path)
         {
-            var references = await new ScriptListSerializer().GetScriptsAsync(_fs, path);
+            var references = await _scriptListSerializer.GetScriptsAsync(path);
             return references.Select(p => GetScriptListReferenceFullPath(path, p)).ToArray();
         }
     }

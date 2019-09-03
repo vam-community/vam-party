@@ -1,16 +1,17 @@
 using System.Collections.Generic;
+using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Party.Shared.Handlers;
 using Party.Shared.Resources;
+using Party.Shared.Serializers;
 
 namespace Party.Shared
 {
     public class SavesResolverHandlerTests
     {
-
         [Test]
         public async Task CanIgnoreByExtension()
         {
@@ -18,7 +19,7 @@ namespace Party.Shared
             {
                 { @"C:\VaM\Saves\Scene 1.exe", new MockFileData("I'm bad") },
             });
-            var handler = new SavesResolverHandler(fileSystem, @"C:\VaM\Saves", new string[0]);
+            var handler = Create(fileSystem);
 
             var result = await handler.AnalyzeSaves(new string[0]);
 
@@ -35,7 +36,7 @@ namespace Party.Shared
             {
                 { @"C:\VaM\Saves\Ignored\Scene 1.json", new MockFileData("I don't count") },
             });
-            var handler = new SavesResolverHandler(fileSystem, @"C:\VaM\Saves", new[] { @"C:\VaM\Saves\Ignored" });
+            var handler = Create(fileSystem, new[] { @"C:\VaM\Saves\Ignored" });
 
             var result = await handler.AnalyzeSaves(new string[0]);
 
@@ -52,7 +53,7 @@ namespace Party.Shared
             {
                 { @"C:\VaM\Saves\Scene 1.json", new MockFileData("{}") },
             });
-            var handler = new SavesResolverHandler(fileSystem, @"C:\VaM\Saves", new string[0]);
+            var handler = Create(fileSystem);
 
             var result = await handler.AnalyzeSaves(new string[0]);
 
@@ -71,7 +72,7 @@ namespace Party.Shared
             {
                 { @"C:\VaM\Saves\Script 1.cs", new MockFileData("using Unity;\npublic class MyScript {}") },
             });
-            var handler = new SavesResolverHandler(fileSystem, @"C:\VaM\Saves", new string[0]);
+            var handler = Create(fileSystem);
 
             var result = await handler.AnalyzeSaves(new string[0]);
 
@@ -91,7 +92,7 @@ namespace Party.Shared
                 { @"C:\VaM\Saves\Scene 1.json", new MockFileData("{\"atoms\": [ { \"storables\": [ { \"id\": \"PluginManager\", \"plugins\": { \"plugin#0\": \"Saves/Script 1.cs\" } } ] } ] }") },
                 { @"C:\VaM\Saves\Script 1.cs", new MockFileData("using Unity;\npublic class MyScript {}") }
             });
-            var handler = new SavesResolverHandler(fileSystem, @"C:\VaM\Saves", new string[0]);
+            var handler = Create(fileSystem);
 
             var result = await handler.AnalyzeSaves(new string[0]);
 
@@ -110,7 +111,7 @@ namespace Party.Shared
                 { @"C:\VaM\Saves\Downloads\Scene 1\Scene 1.json", new MockFileData("{\"atoms\": [ { \"storables\": [ { \"id\": \"PluginManager\", \"plugins\": { \"plugin#0\": \"Script 1.cs\" } } ] } ] }") },
                 { @"C:\VaM\Saves\Downloads\Scene 1\Script 1.cs", new MockFileData("using Unity;\npublic class MyScript {}") }
             });
-            var handler = new SavesResolverHandler(fileSystem, @"C:\VaM\Saves", new string[0]);
+            var handler = Create(fileSystem);
 
             var result = await handler.AnalyzeSaves(new string[0]);
 
@@ -129,7 +130,7 @@ namespace Party.Shared
                 { @"C:\VaM\Saves\My Script\Script 1.cs", new MockFileData("using Unity;\npublic class MyScript {}") },
                 { @"C:\VaM\Saves\My Script\Add Me.cslist", new MockFileData("Script 1.cs") },
             });
-            var handler = new SavesResolverHandler(fileSystem, @"C:\VaM\Saves", new string[0]);
+            var handler = Create(fileSystem);
 
             var result = await handler.AnalyzeSaves(new string[0]);
 
@@ -152,7 +153,7 @@ namespace Party.Shared
                 { @"C:\VaM\Saves\Downloads\Scene 1\Script 1.cs", new MockFileData("using Unity;\npublic class MyScript {}") },
                 { @"C:\VaM\Saves\Downloads\Scene 1\Add Me.cslist", new MockFileData("Script 1.cs") },
             });
-            var handler = new SavesResolverHandler(fileSystem, @"C:\VaM\Saves", new string[0]);
+            var handler = Create(fileSystem);
 
             var result = await handler.AnalyzeSaves(new string[0]);
 
@@ -161,6 +162,16 @@ namespace Party.Shared
             Assert.That(result.Scenes.Select(s => s.FullPath), Is.EquivalentTo(new[] { @"C:\VaM\Saves\Downloads\Scene 1\Scene 1.json" }));
             Assert.That(result.Scripts.First().Scenes.Select(s => s.FullPath), Is.EquivalentTo(new[] { @"C:\VaM\Saves\Downloads\Scene 1\Scene 1.json" }));
             Assert.That(result.Scenes.First().Scripts.Select(s => s.FullPath), Is.EquivalentTo(new[] { @"C:\VaM\Saves\Downloads\Scene 1\Add Me.cslist" }));
+        }
+
+        private SavesResolverHandler Create(IFileSystem fileSystem, string[] ignoredPaths = null)
+        {
+            return new SavesResolverHandler(
+                fileSystem,
+                new SceneSerializer(fileSystem),
+                new ScriptListSerializer(fileSystem),
+                @"C:\VaM\Saves",
+                ignoredPaths ?? new string[0]);
         }
     }
 }

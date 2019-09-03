@@ -36,7 +36,7 @@ namespace Party.Shared
                 ))},
             });
 
-            var scripts = await new SceneSerializer().GetScriptsAsync(fileSystem, @"C:\VaM\Saves\Scene 1.json");
+            var scripts = await new SceneSerializer(fileSystem).GetScriptsAsync(@"C:\VaM\Saves\Scene 1.json");
 
             Assert.That(scripts, Is.EqualTo(new[] { "Saves/Script 1.cs" }));
         }

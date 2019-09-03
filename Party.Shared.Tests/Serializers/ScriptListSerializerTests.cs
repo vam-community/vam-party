@@ -24,7 +24,7 @@ namespace Party.Shared
                 ))},
             });
 
-            var result = await new ScriptListSerializer().GetScriptsAsync(fileSystem, @"C:\VaM\Saves\ADD_ME.cslist");
+            var result = await new ScriptListSerializer(fileSystem).GetScriptsAsync(@"C:\VaM\Saves\ADD_ME.cslist");
 
             Assert.That(result, Is.EqualTo(new[] { "Script 1.cs", "Script 2.cs" }));
         }

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.IO.Abstractions;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared.Models;
@@ -11,18 +11,17 @@ namespace Party.Shared.Handlers
 {
     public class SceneUpdateHandler
     {
-        private readonly IFileSystem _fs;
+        private readonly ISceneSerializer _serializer;
         private readonly string _savesDirectory;
 
-        public SceneUpdateHandler(IFileSystem fs, string savesDirectory)
+        public SceneUpdateHandler(ISceneSerializer serializer, string savesDirectory)
         {
-            _fs = fs ?? throw new ArgumentNullException(nameof(fs));
             _savesDirectory = savesDirectory ?? throw new ArgumentNullException(nameof(savesDirectory));
+            _serializer = serializer;
         }
 
-        internal async Task<(string before, string after)[]> UpdateScripts(Scene scene, Script local, InstalledPackageInfoResult info)
+        public async Task<(string before, string after)[]> UpdateScripts(Scene scene, Script local, InstalledPackageInfoResult info)
         {
-            var serializer = new SceneSerializer();
             var changes = new List<(string before, string after)>();
 
             changes.AddRange(GetTransform(local, info));
@@ -32,7 +31,7 @@ namespace Party.Shared.Handlers
                 changes.AddRange(scriptList.Scripts.SelectMany(script => GetTransform(script, info)));
             }
 
-            var result = await serializer.UpdateScriptAsync(_fs, scene.FullPath, changes);
+            var result = await _serializer.UpdateScriptAsync(scene.FullPath, changes);
 
             return result.ToArray();
         }
@@ -41,12 +40,12 @@ namespace Party.Shared.Handlers
         {
             var after = ToRelative(info.Files.First(f => f.RegistryFile.Hash.Value == local.Hash).Path);
             yield return (before: ToRelative(local.FullPath), after);
-            yield return (before: _fs.Path.GetFileName(local.FullPath), after);
+            yield return (before: Path.GetFileName(local.FullPath), after);
         }
 
         private string ToRelative(string path)
         {
-            return "Saves/" + path.Substring(_savesDirectory.Length).TrimStart(_fs.Path.DirectorySeparatorChar).Replace("\\", "/");
+            return "Saves/" + path.Substring(_savesDirectory.Length).TrimStart(Path.DirectorySeparatorChar).Replace("\\", "/");
         }
     }
 }

@@ -4,13 +4,25 @@ using System.Threading.Tasks;
 
 namespace Party.Shared.Serializers
 {
-    public class ScriptListSerializer
+    public class ScriptListSerializer : IScriptListSerializer
     {
-        public Task<string[]> GetScriptsAsync(IFileSystem fs, string fullPath)
+        private readonly IFileSystem _fs;
+
+        public ScriptListSerializer(IFileSystem fs)
         {
-            var lines = fs.File.ReadAllLines(fullPath);
+            _fs = fs ?? throw new System.ArgumentNullException(nameof(fs));
+        }
+
+        public Task<string[]> GetScriptsAsync(string fullPath)
+        {
+            var lines = _fs.File.ReadAllLines(fullPath);
             var paths = lines.Where(line => !string.IsNullOrWhiteSpace(line)).ToArray();
             return Task.FromResult(paths);
         }
+    }
+
+    public interface IScriptListSerializer
+    {
+        Task<string[]> GetScriptsAsync(string fullPath);
     }
 }

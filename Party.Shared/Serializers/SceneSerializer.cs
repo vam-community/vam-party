@@ -9,13 +9,20 @@ using Party.Shared.Exceptions;
 
 namespace Party.Shared.Serializers
 {
-    public class SceneSerializer
+    public class SceneSerializer : ISceneSerializer
     {
-        public async Task<string[]> GetScriptsAsync(IFileSystem fs, string path)
+        private readonly IFileSystem _fs;
+
+        public SceneSerializer(IFileSystem fs)
+        {
+            _fs = fs ?? throw new ArgumentNullException(nameof(fs));
+        }
+
+        public async Task<string[]> GetScriptsAsync(string path)
         {
             try
             {
-                var json = await LoadJson(fs, path).ConfigureAwait(false);
+                var json = await LoadJson(path).ConfigureAwait(false);
                 var scripts = new List<string>();
                 ProcessScripts(json, script =>
                 {
@@ -30,12 +37,12 @@ namespace Party.Shared.Serializers
             }
         }
 
-        public async Task<List<(string before, string after)>> UpdateScriptAsync(IFileSystem fs, string path, List<(string before, string after)> updates)
+        public async Task<List<(string before, string after)>> UpdateScriptAsync(string path, List<(string before, string after)> updates)
         {
             try
             {
                 var result = new List<(string before, string after)>();
-                var json = await LoadJson(fs, path).ConfigureAwait(false);
+                var json = await LoadJson(path).ConfigureAwait(false);
                 ProcessScripts(json, script => updates
                     .Where(u => u.before == script)
                     .Select(u =>
@@ -45,7 +52,7 @@ namespace Party.Shared.Serializers
                     })
                     .FirstOrDefault());
                 if (result.Count == 0) return result;
-                using var file = fs.File.CreateText(@path);
+                using var file = _fs.File.CreateText(@path);
                 using var writer = new SceneJsonTextWriter(file);
                 json.WriteTo(writer);
                 return result;
@@ -84,11 +91,17 @@ namespace Party.Shared.Serializers
             }
         }
 
-        private async Task<JObject> LoadJson(IFileSystem fs, string path)
+        private async Task<JObject> LoadJson(string path)
         {
-            using var file = fs.File.OpenText(path);
+            using var file = _fs.File.OpenText(path);
             using var reader = new JsonTextReader(file);
             return (JObject)await JToken.ReadFromAsync(reader).ConfigureAwait(false);
         }
+    }
+
+    public interface ISceneSerializer
+    {
+        Task<string[]> GetScriptsAsync(string path);
+        Task<List<(string before, string after)>> UpdateScriptAsync(string path, List<(string before, string after)> updates);
     }
 }
