@@ -58,15 +58,20 @@ namespace Party.CLI.Commands
                 if (!match.Local.FullPath.StartsWith(Config.Scanning.PackagesFolder))
                 {
                     Renderer.Write(" ");
-                    Renderer.Write($"\"{Controller.GetRelativePath(match.Local.FullPath)}\"", ConsoleColor.DarkGray);
+                    Renderer.Write($"\"{Controller.GetDisplayPath(match.Local.FullPath)}\"", ConsoleColor.DarkGray);
                 }
                 Renderer.Write(" ");
                 Renderer.Write($"referenced by {Pluralize(match.Local.Scenes?.Count() ?? 0, "scene", "scenes")}", ConsoleColor.DarkCyan);
                 Renderer.Write(Environment.NewLine);
-                if (match.Version != match.Script.GetLatestVersion())
+                var latestVersion = match.Script.GetLatestVersion();
+                if (match.Version != latestVersion)
                 {
                     Renderer.Write("  Update available: ");
-                    Renderer.WriteLine($"v{match.Script.GetLatestVersion().Version}");
+                    Renderer.WriteLine($"v{latestVersion.Version}", ConsoleColor.Blue);
+                    if (latestVersion.Files.Where(f => f.Url == null && f.LocalPath != null).Any(f => !Controller.Exists(f.LocalPath)))
+                        Renderer.WriteLine($"  Note: This script has files that cannot be downloaded by party, check the homepage to download it instead: {match.Script.Homepage ?? match.Script.Repository ?? "(no link provided)"}");
+                    if (latestVersion.Version.Major != match.Version.Version.Major)
+                        Renderer.WriteLine($"  Note: The major version changed, which usually means there are breaking changes. Make sure to check the release notes.");
                 }
                 if (args.Scenes) PrintScenes(match.Local.Scenes);
             }
@@ -90,7 +95,7 @@ namespace Party.CLI.Commands
             if (scenes == null) return;
             foreach (var scene in scenes)
             {
-                Renderer.WriteLine($"- {Controller.GetRelativePath(scene.FullPath)}");
+                Renderer.WriteLine($"- {Controller.GetDisplayPath(scene.FullPath)}");
             }
         }
     }

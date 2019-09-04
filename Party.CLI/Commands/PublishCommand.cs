@@ -24,7 +24,6 @@ namespace Party.CLI.Commands
             command.AddOption(new Option("--package-version", "The version of your package") { Argument = new Argument<string>() });
             command.AddOption(new Option("--package-author", "The author name of your package") { Argument = new Argument<string>() });
             command.AddOption(new Option("--registry", "Path the the index.json file of your locally cloned registry") { Argument = new Argument<FileInfo>().ExistingOnly() });
-            // TODO: Add the different fields too (author, name, etc.)
 
             command.Handler = CommandHandler.Create<PublishArguments>(async args =>
             {

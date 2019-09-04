@@ -10,19 +10,21 @@ namespace Party.Shared.Handlers
 {
     public class PackageStatusHandler
     {
-        private readonly PartyConfiguration _config;
         private readonly IFileSystem _fs;
+        private readonly string _savesDirectory;
+        private readonly string _packagesFolder;
 
-        public PackageStatusHandler(PartyConfiguration config, IFileSystem fs)
+        public PackageStatusHandler(IFileSystem fs, string savesDirectory, string packagesFolder)
         {
-            _config = config ?? throw new ArgumentNullException(nameof(config));
             _fs = fs ?? throw new ArgumentNullException(nameof(fs));
+            _savesDirectory = savesDirectory ?? throw new ArgumentNullException(nameof(savesDirectory));
+            _packagesFolder = packagesFolder ?? throw new ArgumentNullException(nameof(packagesFolder));
         }
 
         public async Task<InstalledPackageInfoResult> GetInstalledPackageInfoAsync(string name, RegistryScriptVersion version)
         {
-            var basePath = Path.GetFullPath(_config.Scanning.PackagesFolder, _config.VirtAMate.SavesDirectory);
-            if (!basePath.StartsWith(_config.VirtAMate.SavesDirectory))
+            var basePath = Path.GetFullPath(_packagesFolder, _savesDirectory);
+            if (!basePath.StartsWith(_savesDirectory))
             {
                 throw new UnauthorizedAccessException($"The packages folder must be within the saves directory: '{basePath}'");
             }

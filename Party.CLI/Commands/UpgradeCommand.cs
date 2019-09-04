@@ -114,11 +114,16 @@ namespace Party.CLI.Commands
                     {
                         Renderer.WriteLine("  Skipping install because the --noop option was specified", ConsoleColor.Yellow);
                     }
+                    else if (latestVersion.Files.Where(f => f.Url == null && f.LocalPath != null).Any(f => !Controller.Exists(f.LocalPath)))
+                    {
+                        Renderer.WriteLine($"  Cannot upgrade automatically because some companion files must be downloaded. Get them from: {match.Script.Homepage ?? match.Script.Repository ?? "(no link provided)"}", ConsoleColor.Yellow);
+                        return;
+                    }
                     else
                     {
                         Renderer.Write($"  Installing...");
                         info = await Controller.InstallPackageAsync(info);
-                        Renderer.WriteLine($"  downloaded in {info.InstallFolder}:", ConsoleColor.Green);
+                        Renderer.WriteLine($"  Downloaded in {info.InstallFolder}:", ConsoleColor.Green);
                         foreach (var file in info.Files)
                         {
                             Renderer.WriteLine($"  - {Controller.GetRelativePath(file.Path, info.InstallFolder)}");
@@ -135,11 +140,12 @@ namespace Party.CLI.Commands
                 throw new NotImplementedException($"Status {status} is not implemented");
             }
 
-            if (updateToVersion == null && !(args.Fix && !match.Local.FullPath.StartsWith(info.InstallFolder))) return;
+            if (updateToVersion == null && !(args.Fix && !match.Local.FullPath.StartsWith(info.InstallFolder)))
+                return;
 
             foreach (var scene in match.Local.Scenes)
             {
-                string scenePath = Controller.GetRelativePath(scene.FullPath);
+                string scenePath = Controller.GetDisplayPath(scene.FullPath);
                 if (args.Noop)
                 {
                     Renderer.WriteLine($"  Skipping scene {scenePath} because --noop option was specified", ConsoleColor.Yellow);
@@ -184,7 +190,7 @@ namespace Party.CLI.Commands
         private void PrintScriptToPackage(RegistrySavesMatch match, RegistryScriptVersion updateToVersion)
         {
             Renderer.Write($"Script ");
-            Renderer.Write(Controller.GetRelativePath(match.Local.FullPath), ConsoleColor.Blue);
+            Renderer.Write(Controller.GetDisplayPath(match.Local.FullPath), ConsoleColor.Blue);
             Renderer.Write($" is ");
             Renderer.Write($"{match.Script.Name} v{match.Version.Version}", ConsoleColor.Cyan);
             Renderer.Write($" > ");
@@ -208,7 +214,7 @@ namespace Party.CLI.Commands
                 Renderer.WriteLine($"  Installed version in {info.InstallFolder} is corrupted.");
                 foreach (var file in info.Files)
                 {
-                    Renderer.WriteLine($"  - {Controller.GetRelativePath(file.Path)} is {file.Status}");
+                    Renderer.WriteLine($"  - {Controller.GetDisplayPath(file.Path)} is {file.Status}");
                 }
             }
         }

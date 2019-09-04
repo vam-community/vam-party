@@ -58,6 +58,22 @@ namespace Party.CLI.Commands
                 }
             }
 
+            var notBundled = registryPackageVersion.Files.Where(f => f.Url == null && f.LocalPath != null).Select(f => (file: f, exists: Controller.Exists(f.LocalPath))).ToArray();
+            if (notBundled.Any(file => !file.exists))
+            {
+                Renderer.WriteLine($"Some files are not available for download and must be downloaded at {registryPackage.Homepage ?? registryPackage.Repository ?? "(no link provided)"}");
+                foreach (var file in notBundled)
+                {
+                    Renderer.Write($"  - {file.file}");
+                    if (file.exists)
+                        Renderer.Write($" [exists]", ConsoleColor.Green);
+                    else
+                        Renderer.Write($" [missing]", ConsoleColor.Red);
+                    Renderer.WriteLine();
+                }
+                return;
+            }
+
             var filesStatuses = await Controller.GetInstalledPackageInfoAsync(registryPackage.Name, registryPackageVersion);
 
             var distinctStatuses = filesStatuses.DistinctStatuses();

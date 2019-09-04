@@ -12,17 +12,20 @@ namespace Party.Shared
     public class PartyConfigurationVirtAMate
     {
         private readonly string _baseDirectory;
-        private string _savesDirectory;
+        private string _virtAMateInstallFolder;
 
         public PartyConfigurationVirtAMate(string baseDirectory)
         {
             _baseDirectory = baseDirectory;
         }
-        public string SavesDirectory
+
+        public string VirtAMateInstallFolder
         {
-            get => _savesDirectory;
-            set => _savesDirectory = Path.GetFullPath(value, _baseDirectory);
+            get => _virtAMateInstallFolder;
+            set => _virtAMateInstallFolder = Path.GetFullPath(value, _baseDirectory);
         }
+
+        public string[] VirtAMateAllowedSubfolders { get; set; }
     }
 
     public class PartyConfigurationScanning

@@ -17,7 +17,7 @@ namespace Party.CLI.Commands
         {
             if (saves != null)
             {
-                config.VirtAMate.SavesDirectory = Path.GetFullPath(saves.FullName, Environment.CurrentDirectory);
+                config.VirtAMate.VirtAMateInstallFolder = Path.GetFullPath(saves.FullName, Environment.CurrentDirectory);
             }
             return config;
         }
@@ -35,7 +35,7 @@ namespace Party.CLI.Commands
 
         protected static void AddCommonOptions(Command command)
         {
-            command.AddOption(new Option("--saves", "Specify the Saves folder to use") { Argument = new Argument<DirectoryInfo>().ExistingOnly() });
+            command.AddOption(new Option("--vam", "Specify the Virt-A-Mate install folder") { Argument = new Argument<DirectoryInfo>().ExistingOnly() });
         }
 
         public abstract class CommonArguments

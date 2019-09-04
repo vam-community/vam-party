@@ -10,7 +10,8 @@ namespace Party.Shared
             {
                 VirtAMate = new PartyConfigurationVirtAMate(baseDirectory)
                 {
-                    SavesDirectory = "Saves"
+                    VirtAMateInstallFolder = "./",
+                    VirtAMateAllowedSubfolders = new[] { "Assets", "Import", "Saves", "Textures" }
                 },
                 Scanning = new PartyConfigurationScanning
                 {

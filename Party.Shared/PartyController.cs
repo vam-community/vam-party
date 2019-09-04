@@ -20,6 +20,8 @@ namespace Party.Shared
         private readonly HttpClient _http;
         private readonly IFileSystem _fs;
 
+        private string SavesDirectory => Path.Combine(_config.VirtAMate.VirtAMateInstallFolder, "Saves");
+
         public PartyController(PartyConfiguration config)
         {
             _config = config;
@@ -40,14 +42,14 @@ namespace Party.Shared
                 _fs,
                 new SceneSerializer(_fs),
                 new ScriptListSerializer(_fs),
-                _config.VirtAMate.SavesDirectory,
+                SavesDirectory,
                 _config.Scanning.Ignore)
                     .AnalyzeSaves(filters ?? new string[0]);
         }
 
         public Task<List<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string name, string path)
         {
-            return new RegistryFilesFromPathHandler(_config.VirtAMate.SavesDirectory, _fs)
+            return new RegistryFilesFromPathHandler(SavesDirectory, _fs)
                 .BuildFiles(registry, name, path);
         }
 
@@ -65,7 +67,7 @@ namespace Party.Shared
 
         public Task<InstalledPackageInfoResult> GetInstalledPackageInfoAsync(string name, RegistryScriptVersion version)
         {
-            return new PackageStatusHandler(_config, _fs)
+            return new PackageStatusHandler(_fs, SavesDirectory, _config.Scanning.PackagesFolder)
                 .GetInstalledPackageInfoAsync(name, version);
         }
 
@@ -82,35 +84,36 @@ namespace Party.Shared
 
         public Task<(string before, string after)[]> UpdateScriptInSceneAsync(Scene scene, Script local, InstalledPackageInfoResult info)
         {
-            return new SceneUpdateHandler(new SceneSerializer(_fs), _config.VirtAMate.SavesDirectory)
+            return new SceneUpdateHandler(new SceneSerializer(_fs), SavesDirectory)
                 .UpdateScripts(scene, local, info);
         }
 
-        public string GetRelativePath(string fullPath)
+        public string GetDisplayPath(string path)
         {
-            return GetRelativePath(fullPath, _config.VirtAMate.SavesDirectory);
+            return GetRelativePath(path, SavesDirectory);
         }
 
-        public string GetRelativePath(string fullPath, string parentPath)
+        public string GetRelativePath(string path, string parentPath)
         {
-            if (!fullPath.StartsWith(parentPath))
-            {
-                throw new UnauthorizedAccessException($"Only paths within the saves directory are allowed: '{fullPath}'");
-            }
+            path = SanitizePath(path);
+            if (!path.StartsWith(parentPath))
+                throw new UnauthorizedAccessException($"Only paths under '{parentPath}' are allowed: '{path}'");
 
-            return fullPath.Substring(parentPath.Length).TrimStart(Path.DirectorySeparatorChar);
+            return path.Substring(parentPath.Length).TrimStart(Path.DirectorySeparatorChar);
         }
 
         public void SaveToFile(string data, string path, bool restrict)
         {
-            if (restrict && !path.StartsWith(_config.VirtAMate.SavesDirectory)) throw new UnauthorizedAccessException($"Cannot save to file {path} because it is not in the Saves folder.");
+            if (restrict)
+                path = SanitizePath(path);
+
             _fs.File.WriteAllText(path, data);
         }
 
         public void Delete(string path)
         {
-            if (!path.StartsWith(_config.VirtAMate.SavesDirectory)) throw new UnauthorizedAccessException($"Cannot delete file {path} because it is not in the Saves folder.");
-            if (!File.Exists(path))
+            path = SanitizePath(path);
+            if (!_fs.File.Exists(path))
                 return;
 
             _fs.File.Delete(path);
@@ -119,10 +122,27 @@ namespace Party.Shared
             {
                 path = _fs.Path.GetDirectoryName(path);
                 if (path == null) return;
-                if (!path.StartsWith(_config.VirtAMate.SavesDirectory)) return;
+                if (!path.StartsWith(SavesDirectory)) return;
                 if (_fs.Directory.EnumerateFileSystemEntries(path).Any()) return;
                 _fs.Directory.Delete(path);
             }
+        }
+
+        public bool Exists(string path)
+        {
+            return _fs.File.Exists(SanitizePath(path));
+        }
+
+        private string SanitizePath(string path)
+        {
+            path = Path.GetFullPath(path, _config.VirtAMate.VirtAMateInstallFolder);
+            if (!path.StartsWith(_config.VirtAMate.VirtAMateInstallFolder)) throw new UnauthorizedAccessException($"Cannot delete file {path} because it is not in the Virt-A-Mate installation folder.");
+            var localPath = path.Substring(0, _config.VirtAMate.VirtAMateInstallFolder.Length).TrimStart(new[] { '/', '\\' });
+            var directorySeparatorIndex = localPath.IndexOf('\\');
+            if (directorySeparatorIndex == -1) throw new UnauthorizedAccessException($"Cannot access files directly at Virt-A-Mate's root");
+            var subFolder = localPath.Substring(0, directorySeparatorIndex);
+            if (!_config.VirtAMate.VirtAMateAllowedSubfolders.Contains(subFolder)) throw new UnauthorizedAccessException($"Virt-A-Mate subfolder {subFolder} is not allowed");
+            return path;
         }
     }
 
@@ -137,9 +157,10 @@ namespace Party.Shared
         Task<InstalledPackageInfoResult> InstallPackageAsync(InstalledPackageInfoResult info);
         RegistrySavesMatch[] MatchSavesToRegistry(SavesMap saves, Registry registry);
         Task<(string before, string after)[]> UpdateScriptInSceneAsync(Scene scene, Script local, InstalledPackageInfoResult info);
-        string GetRelativePath(string fullPath);
+        string GetDisplayPath(string fullPath);
         string GetRelativePath(string fullPath, string parentPath);
         void SaveToFile(string data, string path, bool restrict = true);
         void Delete(string fullPath);
+        bool Exists(string localPath);
     }
 }

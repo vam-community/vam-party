@@ -98,6 +98,7 @@ namespace Party.Shared.Models
     {
         // TODO: Ensure this only contains valid characters
         public string Filename { get; set; }
+        public string LocalPath { get; set; }
         public string Url { get; set; }
         public RegistryFileHash Hash { get; set; }
     }
