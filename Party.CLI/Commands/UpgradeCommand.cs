@@ -28,7 +28,7 @@ namespace Party.CLI.Commands
 
             command.Handler = CommandHandler.Create<UpgradeArguments>(async args =>
             {
-                await new UpgradeCommand(renderer, config, args.Saves, controller).ExecuteAsync(args);
+                await new UpgradeCommand(renderer, config, args.VaM, controller).ExecuteAsync(args);
             });
             return command;
         }

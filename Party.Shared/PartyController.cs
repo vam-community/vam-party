@@ -137,7 +137,7 @@ namespace Party.Shared
         {
             path = Path.GetFullPath(path, _config.VirtAMate.VirtAMateInstallFolder);
             if (!path.StartsWith(_config.VirtAMate.VirtAMateInstallFolder)) throw new UnauthorizedAccessException($"Cannot delete file {path} because it is not in the Virt-A-Mate installation folder.");
-            var localPath = path.Substring(0, _config.VirtAMate.VirtAMateInstallFolder.Length).TrimStart(new[] { '/', '\\' });
+            var localPath = path.Substring(_config.VirtAMate.VirtAMateInstallFolder.Length).TrimStart(new[] { '/', '\\' });
             var directorySeparatorIndex = localPath.IndexOf('\\');
             if (directorySeparatorIndex == -1) throw new UnauthorizedAccessException($"Cannot access files directly at Virt-A-Mate's root");
             var subFolder = localPath.Substring(0, directorySeparatorIndex);

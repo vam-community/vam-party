@@ -23,7 +23,7 @@ namespace Party.CLI.Commands
 
             command.Handler = CommandHandler.Create<StatusArguments>(async args =>
             {
-                await new StatusCommand(renderer, config, args.Saves, controller).ExecuteAsync(args);
+                await new StatusCommand(renderer, config, args.VaM, controller).ExecuteAsync(args);
             });
             return command;
         }
@@ -50,7 +50,7 @@ namespace Party.CLI.Commands
 
             PrintWarnings(args.Warnings, saves.Errors);
 
-            foreach (var match in matches)
+            foreach (var match in matches.OrderBy(m => m.Script.Name))
             {
                 Renderer.Write(match.Script.Name, ConsoleColor.Green);
                 Renderer.Write(" ");
@@ -78,7 +78,7 @@ namespace Party.CLI.Commands
 
             if (args.Unregistered)
             {
-                foreach (var script in saves.Scripts.Where(s => !matches.Any(m => m.Local == s)))
+                foreach (var script in saves.Scripts.Where(s => !matches.Any(m => m.Local == s)).OrderBy(s => s.Name))
                 {
                     Renderer.Write(script.Name, ConsoleColor.Red);
                     Renderer.Write(" ");

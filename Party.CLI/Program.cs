@@ -4,7 +4,6 @@ using System.CommandLine.Builder;
 using System.CommandLine.Invocation;
 using System.IO;
 using System.Linq;
-using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Party.CLI.Commands;

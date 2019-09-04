@@ -27,7 +27,7 @@ namespace Party.CLI.Commands
 
             command.Handler = CommandHandler.Create<PublishArguments>(async args =>
             {
-                await new PublishCommand(renderer, config, args.Saves, controller).ExecuteAsync(args);
+                await new PublishCommand(renderer, config, args.VaM, controller).ExecuteAsync(args);
             });
             return command;
         }

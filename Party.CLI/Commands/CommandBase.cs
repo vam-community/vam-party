@@ -40,7 +40,7 @@ namespace Party.CLI.Commands
 
         public abstract class CommonArguments
         {
-            public DirectoryInfo Saves { get; set; }
+            public DirectoryInfo VaM { get; set; }
         }
 
         protected async Task<(SavesMap, Registry)> GetSavesAndRegistryAsync(string[] filters = null)

@@ -11,7 +11,7 @@ namespace Party.Shared.Handlers
         {
             var registryVersionsByHash = registry.Scripts
                 .SelectMany(s => s.Versions.Select(v => (s, v)))
-                .SelectMany(sv => sv.v.Files.Select(f => (script: sv.s, version: sv.v, file: f)))
+                .SelectMany(sv => sv.v.Files.Where(f => f.Hash?.Value != null).Select(f => (script: sv.s, version: sv.v, file: f)))
                 .GroupBy(svf => svf.file.Hash.Value)
                 .ToDictionary(svf => svf.Key, svf => svf.First());
 
