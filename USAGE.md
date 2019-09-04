@@ -8,6 +8,10 @@ Download `party.exe` from the [latest release](https://github.com/vam-community/
 
 Commands can be invoked using `party command-name (arguments...)`. See below for examples; not every option is documented here.
 
+Common options:
+
+- `--vam [vam install folder]` to specify where Virt-A-Mate is installed. You can use this if you download `party.exe` in another folder.
+
 ### `help`
 
 You can show commands using `party -h`, or help on a specific command using `party command-name -h`.
@@ -27,7 +31,12 @@ If you want the command to run faster, you can opt-out of the saves folder analy
 
     > party search some-keyword --no-usage
 
-If a script contains files that are hosted on an untrusted server (i.e. a server that can track you), if will be flagged as `[untrusted]`.
+If a script contains files that are hosted on an untrusted server (i.e. a server that can track you), if will be flagged as `[untrusted]`. This works by using a whitelist (currently only github).
+
+Options:
+
+- `--no-usage` skips scanning the saves folder, outputs faster but won't tell you if you already have it
+- `--warnings` prints warnings found while scanning your saves folder
 
 ### `get`
 
@@ -38,6 +47,11 @@ Downloads a script locally. This will also validate hashes to make sure there wa
 You can also install a specific version:
 
     > party get some-package --version 1.0.0
+
+Options:
+
+- `--version` choose a specific version to install (defaults to the latest version)
+- `--noop` do not install, just print what will happen when you do
 
 ### `upgrade`
 
@@ -69,19 +83,15 @@ To avoid clutter, you can delete unused scripts after upgrading using `--clean`.
 
     > party get upgrade --get --fix --clean
 
-### `publish`
+Options:
 
-Helps publishing a new scene to the registry. First, clone [vam-registry](https://github.com/vam-community/vam-registry), and then you can run:
-
-    > party publish "C:\...\My Script.cs" "C:\...\Some Other Script.cs" --package-name my-package --package-version 1.0.0 --registry "C:\...\vam-registry\v1\index.json"
-
-Note that you can also specify file URLs directly instead if they are already uploaded, as long as the end of the URL ends with the file name (e.g. `https://example.org/.../My%20Script.cs`)
-
-You can also generate the JSON for your package directly in the console by omitting the `--registry` option. In this case, it will load registry information from GitHub directly.
-
-If you do not provide a version and package name, party will ask for one. If it's a new package, it will ask you for information such as tags, repository link, etc.
-
-For more details and a walkthrough, see the [instructions on vam-registry](https://github.com/vam-community/vam-registry/blob/master/INSTRUCTIONS.md).
+- `--all` upgrade everything
+- `--get` downloads registered scripts that were not already downloaded
+- `--fix` updates scenes referencing scripts that are not yet in the party folder
+- `--clean` deletes the source script after scenes have been updated
+- `--warnings` show warnings such as broken scenes or missing scripts
+- `--noop` prints what the script will do, but won't actually do anything
+- `--verbose` prints every change that will be done on every scene
 
 ### `status`
 
@@ -97,6 +107,18 @@ Prints the list of all installed scripts, identify the ones that are out of date
 
 You can also specify a script, a scene or a package name to show if you don't want to list everything in your Saves folder.
 
+    > party status some-package
+    > party status "Saves\Scripts\Some Script.cs"
+    > party status "Saves\scenes\Some Scene.json"
+
+Options:
+
+- `--scenes` shows every scene actually referencing the script
+- `--warnings` prints warnings found while scanning your saves folder
+- `--unregistered` prints every script that was found but did not match a package
+
+If you also want to list unregistered scripts (scripts that did not match)
+
 ### `show`
 
 Shows more information about a specific package:
@@ -109,6 +131,35 @@ Shows more information about a specific package:
     Homepage: https://www.reddit.com/r/VAMscenes/...
     Files:
     - My Script.cs
+
+Options:
+
+- `--warnings` prints warnings found while scanning your saves folder
+
+### `publish`
+
+Helps publishing a new scene to the registry. First, clone [vam-registry](https://github.com/vam-community/vam-registry), and then you can run:
+
+    > party publish "C:\...\My Script.cs" "C:\...\Some Other Script.cs" --registry "C:\...\vam-registry\v1\index.json"
+
+Note that you can also specify file URLs directly instead if they are already uploaded, as long as the end of the URL ends with the file name (e.g. `https://example.org/.../My%20Script.cs`), this is usually easier. Here is an example with all arguments and a url:
+
+    > party publish "https://github.com/.../My%20Script.cs"--package-name my-package --package-version 1.0.0 --package-author "John Doe" --registry "C:\...\vam-registry\v1\index.json"
+
+You can also generate the JSON for your package directly in the console by omitting the `--registry` option. In this case, it will load registry information from GitHub directly.
+
+If you do not provide a version and package name, party will ask for one. If it's a new package, it will ask you for information such as tags, repository link, etc. Same thing for the list of files, you can let the publish command guide you completely:
+
+    > party publish --registry "C:\...\vam-registry\v1\index.json"
+
+For more details and a walkthrough, see the [instructions on vam-registry](https://github.com/vam-community/vam-registry/blob/master/INSTRUCTIONS.md).
+
+Options:
+
+- `--registry` to specify a cloned registry json to read and write to
+- `--package-name` the name of the package (lowercase, underscore, hyphen and numbers only)
+- `--package-author` the author name (allows spaces)
+- `--package-version` the version of the package to publish, either in the format `0.0.0` or `0.0.0-suffix`.
 
 ## Configuration
 
