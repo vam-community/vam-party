@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Invocation;
@@ -17,19 +16,29 @@ namespace Party.CLI.Commands
     {
         public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller)
         {
-            var command = new Command("publish", "Prepares files for publishing");
+            var command = new Command("publish", "Prepares files for publishing (using a folder, a list of files or a list of urls)");
             AddCommonOptions(command);
-            command.AddArgument(new Argument<string>("path-or-url", null) { Arity = ArgumentArity.OneOrMore });
+            command.AddArgument(new Argument<string>("input", null) { Arity = ArgumentArity.OneOrMore });
             command.AddOption(new Option("--package-name", "The name of your package") { Argument = new Argument<string>() });
             command.AddOption(new Option("--package-version", "The version of your package") { Argument = new Argument<string>() });
+            command.AddOption(new Option("--package-author", "The author name of your package") { Argument = new Argument<string>() });
             command.AddOption(new Option("--registry", "Path the the index.json file of your locally cloned registry") { Argument = new Argument<FileInfo>().ExistingOnly() });
             // TODO: Add the different fields too (author, name, etc.)
 
-            command.Handler = CommandHandler.Create(async (DirectoryInfo saves, string[] pathOrUrl, string packageName, string packageVersion, FileInfo registry) =>
+            command.Handler = CommandHandler.Create<PublishArguments>(async args =>
             {
-                await new PublishCommand(renderer, config, saves, controller).ExecuteAsync(pathOrUrl, packageName, packageVersion, registry);
+                await new PublishCommand(renderer, config, args.Saves, controller).ExecuteAsync(args);
             });
             return command;
+        }
+
+        public class PublishArguments : CommonArguments
+        {
+            public string[] Input { get; set; }
+            public string PackageName { get; set; }
+            public string PackageVersion { get; set; }
+            public string PackageAuthor { get; set; }
+            public FileInfo Registry { get; set; }
         }
 
         public PublishCommand(IConsoleRenderer renderer, PartyConfiguration config, DirectoryInfo saves, IPartyController controller)
@@ -37,27 +46,27 @@ namespace Party.CLI.Commands
         {
         }
 
-        private async Task ExecuteAsync(string[] pathOrUrls, string packageName, string packageVersion, FileInfo registryJson)
+        private async Task ExecuteAsync(PublishArguments args)
         {
             Registry registry;
-            if (registryJson != null)
+            if (args.Registry != null)
             {
-                if (registryJson.Name != "index.json")
+                if (args.Registry.Name != "index.json")
                     throw new UserInputException("Please specify the path to your locally cloned index.json file");
 
-                registry = await Controller.GetRegistryAsync(registryJson.FullName);
+                registry = await Controller.GetRegistryAsync(args.Registry.FullName);
             }
             else
             {
                 registry = await Controller.GetRegistryAsync();
             }
 
-            var name = packageName ?? Renderer.Ask("Package Name: ", false, RegistryScript.ValidNameRegex, "my-package");
+            var name = args.PackageName ?? Renderer.Ask("Package Name: ", false, RegistryScript.ValidNameRegex, "my-package");
 
             var script = registry.GetOrCreateScript(name);
             var version = script.CreateVersion();
 
-            foreach (var pathOrUrl in pathOrUrls)
+            foreach (var pathOrUrl in args.Input)
             {
                 version.Files.AddRange(Uri.TryCreate(pathOrUrl, UriKind.Absolute, out var url)
                      ? await Controller.BuildRegistryFilesFromUrlAsync(registry, name, url).ConfigureAwait(false)
@@ -71,7 +80,7 @@ namespace Party.CLI.Commands
             var isNew = script.Versions.Count == 1;
 
             // TODO: Validate all fields
-            if (!isNew && string.IsNullOrEmpty(packageVersion))
+            if (!isNew && string.IsNullOrEmpty(args.PackageVersion))
             {
                 Renderer.WriteLine($"This package already exists (by {script.Author ?? "Unknown User"}), a new version will be added to it.");
 
@@ -83,12 +92,16 @@ namespace Party.CLI.Commands
             }
 
             version.Created = DateTimeOffset.Now;
-            version.Version = packageVersion ?? Renderer.Ask("Package Version: ", true, RegistryScriptVersion.ValidVersionNameRegex, "1.0.0");
-            version.Notes = Renderer.Ask("Release notes: ");
+            version.Version = args.PackageVersion ?? Renderer.Ask("Package Version: ", true, RegistryScriptVersion.ValidVersionNameRegex, "1.0.0");
+
+            if (!isNew)
+            {
+                version.Notes = Renderer.Ask("Release notes: ");
+            }
 
             if (isNew)
             {
-                Renderer.WriteLine("Looks like a new package in the registry! Please provide some information about this new package, or press CTRL+C if you want to abort.");
+                Renderer.WriteLine("Looks like a new package in the registry! If this was not what you expected, you might have mistyped the package name; press CTRL+C if you want to abort.");
 
                 var author = Renderer.Ask("Author Name: ", true);
                 if (!registry.Authors.Any(a => a.Name.Equals(author, StringComparison.InvariantCultureIgnoreCase)))
@@ -129,10 +142,10 @@ namespace Party.CLI.Commands
             }
 
             var serializer = new RegistrySerializer();
-            if (registryJson != null)
+            if (args.Registry != null)
             {
-                Controller.SaveToFile(serializer.Serialize(registry), registryJson.FullName, false);
-                Renderer.WriteLine($"JSON written to {registryJson.FullName}");
+                Controller.SaveToFile(serializer.Serialize(registry), args.Registry.FullName, false);
+                Renderer.WriteLine($"JSON written to {args.Registry.FullName}");
             }
             else
             {
