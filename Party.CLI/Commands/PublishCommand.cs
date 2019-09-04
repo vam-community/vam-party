@@ -86,9 +86,9 @@ namespace Party.CLI.Commands
 
             foreach (var pathOrUrl in pathOrUrls)
             {
-                version.Files.AddRange(Uri.TryCreate(pathOrUrl, UriKind.Absolute, out var url)
-                     ? await Controller.BuildRegistryFilesFromUrlAsync(registry, name, url).ConfigureAwait(false)
-                     : await Controller.BuildRegistryFilesFromPathAsync(registry, name, Path.GetFullPath(pathOrUrl)).ConfigureAwait(false));
+                version.Files.AddRange(pathOrUrl.StartsWith("http") && Uri.TryCreate(pathOrUrl, UriKind.Absolute, out var url)
+                     ? await Controller.BuildRegistryFilesFromUrlAsync(registry, url).ConfigureAwait(false)
+                     : await Controller.BuildRegistryFilesFromPathAsync(registry, Path.GetFullPath(pathOrUrl)).ConfigureAwait(false));
             }
 
             registry.AssertNoDuplicates(version);

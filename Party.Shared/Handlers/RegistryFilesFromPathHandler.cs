@@ -21,7 +21,7 @@ namespace Party.Shared.Handlers
             _fs = fs ?? throw new ArgumentNullException(nameof(fs));
         }
 
-        public async Task<List<RegistryFile>> BuildFiles(Registry registry, string name, string path)
+        public async Task<List<RegistryFile>> BuildFiles(Registry registry, string path)
         {
             if (registry is null) throw new ArgumentNullException(nameof(registry));
             if (path is null) throw new ArgumentNullException(nameof(path));

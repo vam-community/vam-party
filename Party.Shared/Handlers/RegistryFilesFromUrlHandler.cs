@@ -19,7 +19,7 @@ namespace Party.Shared.Handlers
             _http = http ?? throw new ArgumentNullException(nameof(http));
         }
 
-        public async Task<List<RegistryFile>> BuildFiles(Registry registry, string name, Uri url)
+        public async Task<List<RegistryFile>> BuildFiles(Registry registry, Uri url)
         {
             if (registry is null) throw new ArgumentNullException(nameof(registry));
             if (url is null) throw new ArgumentNullException(nameof(url));
