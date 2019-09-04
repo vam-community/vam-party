@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Invocation;
@@ -66,7 +67,25 @@ namespace Party.CLI.Commands
             var script = registry.GetOrCreateScript(name);
             var version = script.CreateVersion();
 
-            foreach (var pathOrUrl in args.Input)
+            var pathOrUrls = args.Input;
+            if (pathOrUrls == null || pathOrUrls.Length == 0)
+            {
+                Renderer.WriteLine("No files were provided; please enter each file, folder or url. When done, enter an empty line.");
+                var fileInputs = new List<string>();
+                var empty = false;
+                var counter = 1;
+                do
+                {
+                    var line = Renderer.Ask($"File/Folder/Url {counter++}: ");
+                    empty = string.IsNullOrWhiteSpace(line);
+                    if (!empty)
+                        fileInputs.Add(line.Trim());
+                }
+                while (!empty);
+                pathOrUrls = fileInputs.ToArray();
+            }
+
+            foreach (var pathOrUrl in pathOrUrls)
             {
                 version.Files.AddRange(Uri.TryCreate(pathOrUrl, UriKind.Absolute, out var url)
                      ? await Controller.BuildRegistryFilesFromUrlAsync(registry, name, url).ConfigureAwait(false)

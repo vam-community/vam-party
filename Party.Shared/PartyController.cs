@@ -41,8 +41,8 @@ namespace Party.Shared
                 new SceneSerializer(_fs),
                 new ScriptListSerializer(_fs),
                 _config.VirtAMate.SavesDirectory,
-                _config.Scanning.Ignore
-                ).AnalyzeSaves(filters ?? new string[0]);
+                _config.Scanning.Ignore)
+                    .AnalyzeSaves(filters ?? new string[0]);
         }
 
         public Task<List<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string name, string path)
