@@ -140,7 +140,7 @@ namespace Party.CLI.Commands
             }
 
             string baseUrl = null;
-            foreach (var file in version.Files.OrderBy(f => f.Filename?.Count(c => c == '/' || c == '\\') ?? int.MaxValue).ThenBy(f => f.Filename ?? f.LocalPath))
+            foreach (var file in version.Files)
             {
                 if (!string.IsNullOrEmpty(file.Url)) continue;
 
