@@ -22,11 +22,11 @@ namespace Party.Shared.Utils
             }
             catch (DirectoryNotFoundException)
             {
-                return null;
+                return Task.FromResult<string>(null);
             }
             catch (FileNotFoundException)
             {
-                return null;
+                return Task.FromResult<string>(null);
             }
             return Task.FromResult(GetHash(lines));
         }

@@ -76,12 +76,12 @@ namespace Party.Shared.Models
     {
         public static readonly Regex ValidVersionNameRegex = new Regex(@"^(?<Major>0|[1-9][0-9]{0,3})\.(?<Minor>0|[1-9][0-9]{0,3})\.(?<Revision>0|[1-9][0-9]{0,3})(-(?<Extra>[a-z0-9]{1,32}))?$", RegexOptions.Compiled);
 
-        private List<RegistryFile> _files;
+        private SortedSet<RegistryFile> _files;
 
         public RegistryVersionString Version { get; set; }
         public DateTimeOffset Created { get; set; }
         public string Notes { get; set; }
-        public List<RegistryFile> Files { get => _files ?? (_files = new List<RegistryFile>()); set => _files = value; }
+        public SortedSet<RegistryFile> Files { get => _files ?? (_files = new SortedSet<RegistryFile>()); set => _files = value; }
 
         int IComparable<RegistryScriptVersion>.CompareTo(RegistryScriptVersion other)
         {
@@ -94,13 +94,29 @@ namespace Party.Shared.Models
         }
     }
 
-    public class RegistryFile
+    public class RegistryFile : IComparable<RegistryFile>, IComparable
     {
         // TODO: Ensure this only contains valid characters
         public string Filename { get; set; }
         public string LocalPath { get; set; }
         public string Url { get; set; }
         public RegistryFileHash Hash { get; set; }
+
+        int IComparable<RegistryFile>.CompareTo(RegistryFile other)
+        {
+            var thisSlashes = Filename?.Count(c => c == '/') ?? 0;
+            var otherSlashes = other.Filename?.Count(c => c == '/') ?? 0;
+            if (thisSlashes > otherSlashes)
+                return 1;
+            else if (thisSlashes < otherSlashes)
+                return -1;
+            return (Filename ?? LocalPath)?.CompareTo(other.Filename ?? other.LocalPath) ?? 0;
+        }
+
+        int IComparable.CompareTo(object other)
+        {
+            return (this as IComparable<RegistryFile>).CompareTo(other as RegistryFile);
+        }
     }
 
     public class RegistryFileHash

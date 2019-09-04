@@ -35,7 +35,7 @@ namespace Party.Shared.Handlers
                 if (saves != null && package.Versions != null)
                 {
                     // TODO: We should consider all files from a specific version of plugin together
-                    var allFilesFromAllVersions = package.Versions.SelectMany(v => v.Files ?? new List<RegistryFile>());
+                    var allFilesFromAllVersions = package.Versions.SelectMany(v => v.Files ?? new SortedSet<RegistryFile>());
                     scripts = allFilesFromAllVersions.SelectMany(regFile => saves.ScriptsByFilename.Values.Where(saveFile => saveFile.Hash == regFile.Hash.Value)).Distinct().ToArray();
                     scenes = scripts.SelectMany(s => s.Scenes).Distinct().ToArray();
                 }

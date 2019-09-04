@@ -28,7 +28,7 @@ namespace Party.CLI
                             {
                                 Version = "1.2.3",
                                 Created = created,
-                                Files = new List<RegistryFile>
+                                Files = new SortedSet<RegistryFile>
                                 {
                                     new RegistryFile
                                     {

@@ -47,13 +47,13 @@ namespace Party.Shared
                     .AnalyzeSaves(filters ?? new string[0]);
         }
 
-        public Task<List<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string path)
+        public Task<SortedSet<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string path)
         {
             return new RegistryFilesFromPathHandler(SavesDirectory, _fs)
                 .BuildFiles(registry, path);
         }
 
-        public Task<List<RegistryFile>> BuildRegistryFilesFromUrlAsync(Registry registry, Uri url)
+        public Task<SortedSet<RegistryFile>> BuildRegistryFilesFromUrlAsync(Registry registry, Uri url)
         {
             return new RegistryFilesFromUrlHandler(_http)
                 .BuildFiles(registry, url);
@@ -150,8 +150,8 @@ namespace Party.Shared
     {
         Task<Registry> GetRegistryAsync(params string[] registries);
         Task<SavesMap> GetSavesAsync(string[] items = null);
-        Task<List<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string path);
-        Task<List<RegistryFile>> BuildRegistryFilesFromUrlAsync(Registry registry, Uri url);
+        Task<SortedSet<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string path);
+        Task<SortedSet<RegistryFile>> BuildRegistryFilesFromUrlAsync(Registry registry, Uri url);
         IEnumerable<SearchResult> Search(Registry registry, SavesMap saves, string query);
         Task<InstalledPackageInfoResult> GetInstalledPackageInfoAsync(string name, RegistryScriptVersion version);
         Task<InstalledPackageInfoResult> InstallPackageAsync(InstalledPackageInfoResult info);

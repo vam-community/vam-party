@@ -19,12 +19,12 @@ namespace Party.Shared.Handlers
             _http = http ?? throw new ArgumentNullException(nameof(http));
         }
 
-        public async Task<List<RegistryFile>> BuildFiles(Registry registry, Uri url)
+        public async Task<SortedSet<RegistryFile>> BuildFiles(Registry registry, Uri url)
         {
             if (registry is null) throw new ArgumentNullException(nameof(registry));
             if (url is null) throw new ArgumentNullException(nameof(url));
 
-            return new List<RegistryFile> { await GetFileFromUrl(url) };
+            return new SortedSet<RegistryFile> { await GetFileFromUrl(url) };
         }
 
         private async Task<RegistryFile> GetFileFromUrl(Uri url)

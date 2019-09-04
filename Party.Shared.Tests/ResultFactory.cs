@@ -30,7 +30,7 @@ namespace Party.Shared
             return new RegistryScriptVersion
             {
                 Version = version,
-                Files = files.ToList()
+                Files = new SortedSet<RegistryFile>(files)
             };
         }
 
