@@ -25,8 +25,8 @@ namespace Party.CLI.Commands
             return command;
         }
 
-        public ShowCommand(IConsoleRenderer renderer, PartyConfiguration config, DirectoryInfo saves, IPartyController controller)
-            : base(renderer, config, saves, controller)
+        public ShowCommand(IConsoleRenderer renderer, PartyConfiguration config, DirectoryInfo vam, IPartyController controller)
+            : base(renderer, config, vam, controller)
         {
         }
 

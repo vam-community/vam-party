@@ -71,10 +71,10 @@ namespace Party.Shared
                 .GetInstalledPackageInfoAsync(name, version);
         }
 
-        public Task<InstalledPackageInfoResult> InstallPackageAsync(InstalledPackageInfoResult info)
+        public Task<InstalledPackageInfoResult> InstallPackageAsync(InstalledPackageInfoResult info, bool force)
         {
             return new InstallPackageHandler(_fs, _http)
-                .InstallPackageAsync(info);
+                .InstallPackageAsync(info, force);
         }
         public RegistrySavesMatch[] MatchSavesToRegistry(SavesMap saves, Registry registry)
         {
@@ -154,7 +154,7 @@ namespace Party.Shared
         Task<SortedSet<RegistryFile>> BuildRegistryFilesFromUrlAsync(Registry registry, Uri url);
         IEnumerable<SearchResult> Search(Registry registry, SavesMap saves, string query);
         Task<InstalledPackageInfoResult> GetInstalledPackageInfoAsync(string name, RegistryScriptVersion version);
-        Task<InstalledPackageInfoResult> InstallPackageAsync(InstalledPackageInfoResult info);
+        Task<InstalledPackageInfoResult> InstallPackageAsync(InstalledPackageInfoResult info, bool force);
         RegistrySavesMatch[] MatchSavesToRegistry(SavesMap saves, Registry registry);
         Task<(string before, string after)[]> UpdateScriptInSceneAsync(Scene scene, Script local, InstalledPackageInfoResult info);
         string GetDisplayPath(string fullPath);

@@ -41,8 +41,8 @@ namespace Party.CLI.Commands
             public FileInfo Registry { get; set; }
         }
 
-        public PublishCommand(IConsoleRenderer renderer, PartyConfiguration config, DirectoryInfo saves, IPartyController controller)
-            : base(renderer, config, saves, controller)
+        public PublishCommand(IConsoleRenderer renderer, PartyConfiguration config, DirectoryInfo vam, IPartyController controller)
+            : base(renderer, config, vam, controller)
         {
         }
 

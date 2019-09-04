@@ -25,6 +25,7 @@ namespace Party.CLI.Commands
             command.AddOption(new Option("--warnings", "Show warnings such as broken scenes or missing scripts"));
             command.AddOption(new Option("--noop", "Prints what the script will do, but won't actually do anything"));
             command.AddOption(new Option("--verbose", "Prints every change that will be done on every scene"));
+            command.AddOption(new Option("--force", "Install even if hashes don't match, or files will be missing") { Argument = new Argument<bool>() });
 
             command.Handler = CommandHandler.Create<UpgradeArguments>(async args =>
             {
@@ -43,10 +44,11 @@ namespace Party.CLI.Commands
             public bool Warnings { get; set; }
             public bool Noop { get; set; }
             public bool Verbose { get; set; }
+            public bool Force { get; set; }
         }
 
-        public UpgradeCommand(IConsoleRenderer renderer, PartyConfiguration config, DirectoryInfo saves, IPartyController controller)
-            : base(renderer, config, saves, controller)
+        public UpgradeCommand(IConsoleRenderer renderer, PartyConfiguration config, DirectoryInfo vam, IPartyController controller)
+            : base(renderer, config, vam, controller)
         {
         }
 
@@ -95,7 +97,8 @@ namespace Party.CLI.Commands
             if (statuses.Length != 1)
             {
                 PrintCorruptedInstallInfo(info);
-                return;
+                if (!args.Force)
+                    return;
             }
 
             var status = statuses[0];
@@ -103,7 +106,8 @@ namespace Party.CLI.Commands
             if (status == InstalledPackageInfoResult.FileStatus.HashMismatch)
             {
                 PrintCorruptedInstallInfo(info);
-                return;
+                if (!args.Force)
+                    return;
             }
 
             if (status == InstalledPackageInfoResult.FileStatus.NotInstalled)
@@ -114,7 +118,7 @@ namespace Party.CLI.Commands
                     {
                         Renderer.WriteLine("  Skipping install because the --noop option was specified", ConsoleColor.Yellow);
                     }
-                    else if (latestVersion.Files.Where(f => f.Url == null && f.LocalPath != null).Any(f => !Controller.Exists(f.LocalPath)))
+                    else if (!args.Force && latestVersion.Files.Where(f => f.Url == null && f.LocalPath != null).Any(f => !Controller.Exists(f.LocalPath)))
                     {
                         Renderer.WriteLine($"  Cannot upgrade automatically because some companion files must be downloaded. Get them from: {match.Script.Homepage ?? match.Script.Repository ?? "(no link provided)"}", ConsoleColor.Yellow);
                         return;
@@ -122,7 +126,7 @@ namespace Party.CLI.Commands
                     else
                     {
                         Renderer.Write($"  Installing...");
-                        info = await Controller.InstallPackageAsync(info);
+                        info = await Controller.InstallPackageAsync(info, args.Force);
                         Renderer.WriteLine($"  Downloaded in {info.InstallFolder}:", ConsoleColor.Green);
                         foreach (var file in info.Files)
                         {

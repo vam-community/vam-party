@@ -54,7 +54,7 @@ namespace Party.Shared.Handlers
                 var hash = await Hashing.GetHashAsync(_fs, filePath);
                 if (file.Hash.Type != Hashing.Type)
                 {
-                    throw new InvalidOperationException($"Unsupported hash tye: {file.Hash.Type}");
+                    throw new InvalidOperationException($"Unsupported hash type: {file.Hash.Type}");
                 }
                 if (hash == file.Hash.Value)
                 {
@@ -64,6 +64,10 @@ namespace Party.Shared.Handlers
                 {
                     fileInfo.Status = InstalledPackageInfoResult.FileStatus.HashMismatch;
                 }
+            }
+            else if (file.Ignore)
+            {
+                fileInfo.Status = InstalledPackageInfoResult.FileStatus.Ignored;
             }
             else
             {

@@ -17,49 +17,58 @@ namespace Party.CLI.Commands
             var command = new Command("get", "Downloads a package (script) into the saves folder");
             AddCommonOptions(command);
             command.AddArgument(new Argument<string>("package", null) { Arity = ArgumentArity.ExactlyOne });
-            command.AddOption(new Option("--version", "Choose a specific version to install") { Argument = new Argument<string>("version", null) });
+            command.AddOption(new Option("--version", "Choose a specific version to install") { Argument = new Argument<string>() });
             command.AddOption(new Option("--noop", "Do not install, just check what it will do"));
+            command.AddOption(new Option("--force", "Install even if hashes don't match, or files will be missing") { Argument = new Argument<bool>() });
 
-            command.Handler = CommandHandler.Create(async (DirectoryInfo saves, string package, string version, bool noop) =>
+            command.Handler = CommandHandler.Create<GetArguments>(async args =>
             {
-                await new GetCommand(renderer, config, saves, controller).ExecuteAsync(package, version, noop);
+                await new GetCommand(renderer, config, args.VaM, controller).ExecuteAsync(args);
             });
             return command;
         }
 
-        public GetCommand(IConsoleRenderer renderer, PartyConfiguration config, DirectoryInfo saves, IPartyController controller)
-            : base(renderer, config, saves, controller)
+        public class GetArguments : CommonArguments
+        {
+            public string Package { get; set; }
+            public string Version { get; set; }
+            public bool Noop { get; set; }
+            public bool Force { get; set; }
+        }
+
+        public GetCommand(IConsoleRenderer renderer, PartyConfiguration config, DirectoryInfo vam, IPartyController controller)
+            : base(renderer, config, vam, controller)
         {
         }
 
-        private async Task ExecuteAsync(string package, string version, bool noop)
+        private async Task ExecuteAsync(GetArguments args)
         {
-            if (string.IsNullOrWhiteSpace(package))
+            if (string.IsNullOrWhiteSpace(args.Package))
             {
                 throw new UserInputException("You must specify a package");
             }
 
             var registry = await Controller.GetRegistryAsync().ConfigureAwait(false);
 
-            var registryPackage = registry.Scripts.FirstOrDefault(s => s.Name.Equals(package, StringComparison.InvariantCultureIgnoreCase));
+            var registryPackage = registry.Scripts.FirstOrDefault(s => s.Name.Equals(args.Package, StringComparison.InvariantCultureIgnoreCase));
 
             if (registryPackage == null)
             {
-                throw new RegistryException($"Package not found: '{package}'");
+                throw new RegistryException($"Package not found: '{args.Package}'");
             }
 
             var registryPackageVersion = registryPackage.GetLatestVersion();
-            if (!string.IsNullOrEmpty(version))
+            if (!string.IsNullOrEmpty(args.Version))
             {
-                registryPackageVersion = registryPackage.Versions.FirstOrDefault(p => p.Version.ToString().Equals(version));
+                registryPackageVersion = registryPackage.Versions.FirstOrDefault(p => p.Version.ToString().Equals(args.Version));
                 if (registryPackageVersion == null)
                 {
-                    throw new RegistryException($"Package version not found: '{package}' version '{version}'");
+                    throw new RegistryException($"Package version not found: '{args.Package}' version '{args.Version}'");
                 }
             }
 
             var notBundled = registryPackageVersion.Files.Where(f => f.Url == null && f.LocalPath != null).Select(f => (file: f, exists: Controller.Exists(f.LocalPath))).ToArray();
-            if (notBundled.Any(file => !file.exists))
+            if (!args.Force && notBundled.Any(file => !file.exists))
             {
                 Renderer.WriteLine($"Some files are not available for download and must be downloaded at {registryPackage.Homepage ?? registryPackage.Repository ?? "(no link provided)"}");
                 foreach (var file in notBundled)
@@ -80,7 +89,7 @@ namespace Party.CLI.Commands
 
             ValidateStatuses(distinctStatuses);
 
-            if (noop)
+            if (args.Noop)
             {
                 Renderer.WriteLine($"Package {registryPackage.Name} v{registryPackageVersion.Version} by {registryPackage.Author ?? "?"}");
                 Renderer.WriteLine($"Files will be downloaded in {filesStatuses.InstallFolder}:");
@@ -93,7 +102,7 @@ namespace Party.CLI.Commands
                 return;
             }
 
-            var installResult = await Controller.InstallPackageAsync(filesStatuses);
+            var installResult = await Controller.InstallPackageAsync(filesStatuses, args.Force);
 
             Renderer.WriteLine($"Installed package {registryPackage.Name} v{registryPackageVersion.Version} by {registryPackage.Author ?? "?"}");
             Renderer.WriteLine($"Files downloaded in {filesStatuses.InstallFolder}:");

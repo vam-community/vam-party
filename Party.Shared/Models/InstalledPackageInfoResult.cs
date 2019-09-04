@@ -13,7 +13,8 @@ namespace Party.Shared.Models
         {
             NotInstalled,
             Installed,
-            HashMismatch
+            HashMismatch,
+            Ignored
         }
 
         public class InstalledFileInfo

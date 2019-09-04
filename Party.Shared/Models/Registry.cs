@@ -101,6 +101,7 @@ namespace Party.Shared.Models
         public string LocalPath { get; set; }
         public string Url { get; set; }
         public RegistryFileHash Hash { get; set; }
+        public bool Ignore { get; set; }
 
         int IComparable<RegistryFile>.CompareTo(RegistryFile other)
         {

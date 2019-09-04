@@ -13,11 +13,11 @@ namespace Party.CLI.Commands
 {
     public abstract class CommandBase
     {
-        private static PartyConfiguration GetConfig(PartyConfiguration config, DirectoryInfo saves)
+        private static PartyConfiguration GetConfig(PartyConfiguration config, DirectoryInfo vam)
         {
-            if (saves != null)
+            if (vam != null)
             {
-                config.VirtAMate.VirtAMateInstallFolder = Path.GetFullPath(saves.FullName, Environment.CurrentDirectory);
+                config.VirtAMate.VirtAMateInstallFolder = Path.GetFullPath(vam.FullName, Environment.CurrentDirectory);
             }
             return config;
         }
@@ -26,10 +26,10 @@ namespace Party.CLI.Commands
         protected PartyConfiguration Config { get; }
         protected IPartyController Controller { get; }
 
-        protected CommandBase(IConsoleRenderer renderer, PartyConfiguration config, DirectoryInfo saves, IPartyController controller)
+        protected CommandBase(IConsoleRenderer renderer, PartyConfiguration config, DirectoryInfo vam, IPartyController controller)
         {
             Renderer = renderer;
-            Config = GetConfig(config, saves);
+            Config = GetConfig(config, vam);
             Controller = controller;
         }
 

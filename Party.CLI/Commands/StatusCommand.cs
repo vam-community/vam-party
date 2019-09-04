@@ -36,8 +36,8 @@ namespace Party.CLI.Commands
             public bool Unregistered { get; set; }
         }
 
-        public StatusCommand(IConsoleRenderer renderer, PartyConfiguration config, DirectoryInfo saves, IPartyController controller)
-            : base(renderer, config, saves, controller)
+        public StatusCommand(IConsoleRenderer renderer, PartyConfiguration config, DirectoryInfo vam, IPartyController controller)
+            : base(renderer, config, vam, controller)
         {
         }
 

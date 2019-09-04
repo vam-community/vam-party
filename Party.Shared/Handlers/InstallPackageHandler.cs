@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Party.Shared.Exceptions;
@@ -21,10 +22,10 @@ namespace Party.Shared.Handlers
             _http = http ?? throw new ArgumentNullException(nameof(http));
         }
 
-        public async Task<InstalledPackageInfoResult> InstallPackageAsync(InstalledPackageInfoResult info)
+        public async Task<InstalledPackageInfoResult> InstallPackageAsync(InstalledPackageInfoResult info, bool force)
         {
             var files = new List<InstalledPackageInfoResult.InstalledFileInfo>();
-            foreach (var file in info.Files)
+            foreach (var file in info.Files.Where(f => !f.RegistryFile.Ignore))
             {
                 var directory = Path.GetDirectoryName(file.Path);
                 if (!_fs.Directory.Exists(directory))
@@ -41,7 +42,7 @@ namespace Party.Shared.Handlers
                 var content = await response.Content.ReadAsStringAsync();
                 var lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
                 var hash = Hashing.GetHash(lines);
-                if (hash != file.RegistryFile.Hash.Value)
+                if (!force && hash != file.RegistryFile.Hash.Value)
                 {
                     throw new PackageInstallationException($"Hash mismatch between registry file '{file.RegistryFile.Filename}' ({file.RegistryFile.Hash.Value}) and downloaded file '{file.RegistryFile.Url}' ({hash})");
                 }
