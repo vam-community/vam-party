@@ -8,11 +8,11 @@ namespace Party.Shared.Handlers
 {
     public class SearchHandler
     {
-        private readonly PartyConfiguration _config;
+        private readonly string[] _trustedDomains;
 
-        public SearchHandler(PartyConfiguration config)
+        public SearchHandler(string[] trustedDomains)
         {
-            _config = config ?? throw new System.ArgumentNullException(nameof(config));
+            _trustedDomains = trustedDomains ?? throw new ArgumentNullException(nameof(trustedDomains));
         }
 
         public IEnumerable<SearchResult> Search(Registry registry, SavesMap saves, string query)
@@ -29,15 +29,27 @@ namespace Party.Shared.Handlers
                         continue;
                     }
                 }
-                var trusted = package.Versions?.SelectMany(v => v.Files).All(f => _config.Registry.TrustedDomains.Any(t => f.Url.StartsWith(t))) ?? false;
+                var trusted = package.Versions?
+                    .SelectMany(v => v.Files)
+                    .Where(f => f.Url != null && !f.Ignore)
+                    .All(f => _trustedDomains.Any(t => f.Url.StartsWith(t)))
+                    ?? false;
                 Script[] scripts = null;
                 Scene[] scenes = null;
                 if (saves != null && package.Versions != null)
                 {
                     // TODO: We should consider all files from a specific version of plugin together
-                    var allFilesFromAllVersions = package.Versions.SelectMany(v => v.Files ?? new SortedSet<RegistryFile>());
-                    scripts = allFilesFromAllVersions.SelectMany(regFile => saves.ScriptsByFilename.Values.Where(saveFile => saveFile.Hash == regFile.Hash.Value)).Distinct().ToArray();
-                    scenes = scripts.SelectMany(s => s.Scenes).Distinct().ToArray();
+                    var allFilesFromAllVersions = package.Versions
+                        .SelectMany(v => v.Files ?? new SortedSet<RegistryFile>());
+                    scripts = allFilesFromAllVersions
+                        .Where(regFile => regFile.Hash?.Value != null)
+                        .SelectMany(regFile => saves.ScriptsByFilename.Values.Where(localScript => localScript.Hash == regFile.Hash.Value))
+                        .Distinct()
+                        .ToArray();
+                    scenes = scripts
+                        .SelectMany(s => s.Scenes)
+                        .Distinct()
+                        .ToArray();
                 }
                 yield return new SearchResult
                 {

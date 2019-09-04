@@ -43,6 +43,8 @@ namespace Party.CLI.Commands
 
         private async Task ExecuteAsync(StatusArguments args)
         {
+            Controller.HealthCheck();
+
             Renderer.WriteLine("Analyzing the saves folder and downloading the scripts list from the registry...");
             var (saves, registry) = await GetSavesAndRegistryAsync(args.Filters);
 

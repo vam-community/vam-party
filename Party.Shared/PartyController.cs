@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Party.Shared.Exceptions;
 using Party.Shared.Handlers;
 using Party.Shared.Models;
 using Party.Shared.Resources;
@@ -28,6 +29,12 @@ namespace Party.Shared
             _fs = new FileSystem();
             _http = new HttpClient();
             _http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Party", Version));
+        }
+
+        public void HealthCheck()
+        {
+            if (!_fs.Directory.Exists(SavesDirectory))
+                throw new SavesException($"Could not find the '{SavesDirectory}' directory under '{_config.VirtAMate.VirtAMateInstallFolder}'. Either put party.exe in your Virt-A-Mate installation folder, or specify --vam in the options.");
         }
 
         public Task<Registry> GetRegistryAsync(params string[] registries)
@@ -61,7 +68,7 @@ namespace Party.Shared
 
         public IEnumerable<SearchResult> Search(Registry registry, SavesMap saves, string query)
         {
-            return new SearchHandler(_config)
+            return new SearchHandler(_config.Registry.TrustedDomains)
                 .Search(registry, saves, query);
         }
 
@@ -148,6 +155,7 @@ namespace Party.Shared
 
     public interface IPartyController
     {
+        void HealthCheck();
         Task<Registry> GetRegistryAsync(params string[] registries);
         Task<SavesMap> GetSavesAsync(string[] items = null);
         Task<SortedSet<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string path);

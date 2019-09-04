@@ -12,14 +12,7 @@ namespace Party.Shared.Handlers
         [SetUp]
         public void BeforeEach()
         {
-            var config = new PartyConfiguration
-            {
-                Registry = new PartyConfigurationRegistry
-                {
-                    TrustedDomains = new[] { "https://example.org" }
-                }
-            };
-            _handler = new SearchHandler(config);
+            _handler = new SearchHandler(new[] { "https://example.org" });
         }
 
         [Test]

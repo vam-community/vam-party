@@ -54,6 +54,8 @@ namespace Party.CLI.Commands
 
         private async Task ExecuteAsync(UpgradeArguments args)
         {
+            Controller.HealthCheck();
+
             if (args.All && args.Filters != null)
                 throw new UserInputException("You cannot specify --all and an item to upgrade at the same time");
             else if (!args.All && args.Filters == null)

@@ -18,11 +18,17 @@ namespace Party.CLI.Commands
             command.AddArgument(new Argument<string>("package", null));
             command.AddOption(new Option("--warnings", "Show warnings such as broken scenes or missing scripts"));
 
-            command.Handler = CommandHandler.Create(async (DirectoryInfo saves, string package, bool warnings) =>
+            command.Handler = CommandHandler.Create<ShowArguments>(async args =>
             {
-                await new ShowCommand(renderer, config, saves, controller).ExecuteAsync(package, warnings);
+                await new ShowCommand(renderer, config, args.VaM, controller).ExecuteAsync(args);
             });
             return command;
+        }
+
+        public class ShowArguments : CommonArguments
+        {
+            public string Package { get; set; }
+            public bool Warnings { get; set; }
         }
 
         public ShowCommand(IConsoleRenderer renderer, PartyConfiguration config, DirectoryInfo vam, IPartyController controller)
@@ -30,15 +36,17 @@ namespace Party.CLI.Commands
         {
         }
 
-        private async Task ExecuteAsync(string package, bool warnings)
+        private async Task ExecuteAsync(ShowArguments args)
         {
+            Controller.HealthCheck();
+
             var (saves, registry) = await GetSavesAndRegistryAsync();
 
-            var registryPackage = registry.Scripts?.FirstOrDefault(p => p.Name.Equals(package, StringComparison.InvariantCultureIgnoreCase));
+            var registryPackage = registry.Scripts?.FirstOrDefault(p => p.Name.Equals(args.Package, StringComparison.InvariantCultureIgnoreCase));
 
             if (registryPackage == null)
             {
-                throw new UserInputException($"Could not find package {package}");
+                throw new UserInputException($"Could not find package {args.Package}");
             }
 
             var registryVersion = registryPackage.GetLatestVersion();
@@ -48,7 +56,7 @@ namespace Party.CLI.Commands
                 throw new RegistryException("Package does not have any versions");
             }
 
-            PrintWarnings(warnings, saves.Errors);
+            PrintWarnings(args.Warnings, saves.Errors);
 
             Renderer.WriteLine($"Package {registryPackage.Name}");
 
@@ -74,9 +82,9 @@ namespace Party.CLI.Commands
             }
 
             Renderer.WriteLine("Files:");
-            foreach (var file in registryVersion.Files)
+            foreach (var file in registryVersion.Files.Where(f => !f.Ignore && f.Filename != null))
             {
-                Renderer.WriteLine($"- {file.Filename}: {file.Url}");
+                Renderer.WriteLine($"- {file.Filename}: {file.Url ?? "not available in registry"}");
             }
         }
     }

@@ -48,6 +48,8 @@ namespace Party.CLI.Commands
 
         private async Task ExecuteAsync(PublishArguments args)
         {
+            Controller.HealthCheck();
+
             Registry registry;
             if (args.Registry != null)
             {

@@ -13,6 +13,7 @@ namespace Party.CLI
         [SetUICulture("en-US")]
         public async Task Show()
         {
+            _controller.Setup(x => x.HealthCheck());
             DateTimeOffset created = new DateTimeOffset(2010, 11, 12, 0, 0, 0, 0, TimeSpan.Zero);
             _controller.Setup(x => x.GetRegistryAsync()).ReturnsAsync(new Registry
             {

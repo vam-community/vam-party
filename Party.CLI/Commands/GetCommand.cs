@@ -43,6 +43,8 @@ namespace Party.CLI.Commands
 
         private async Task ExecuteAsync(GetArguments args)
         {
+            Controller.HealthCheck();
+
             if (string.IsNullOrWhiteSpace(args.Package))
             {
                 throw new UserInputException("You must specify a package");
