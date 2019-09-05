@@ -24,6 +24,7 @@ namespace Party.Shared.Serializers
             {
                 Formatting = Formatting.Indented,
                 NullValueHandling = NullValueHandling.Ignore,
+                DefaultValueHandling = DefaultValueHandling.Ignore,
                 DateParseHandling = DateParseHandling.DateTimeOffset,
                 DateFormatHandling = DateFormatHandling.IsoDateFormat,
                 DateFormatString = "yyyy-MM-dd",

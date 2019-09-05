@@ -1,6 +1,6 @@
 {
   "VirtAMate": {
-    "SavesDirectory": "../../../../TestData"
+    "VirtAMateInstallFolder": "../../../../TestData"
   },
   "Scanning": {
     "Ignore": ["scene\\MeshedVR", "Person", "Downloads", "Dev"]
