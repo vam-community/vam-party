@@ -75,7 +75,7 @@ namespace Party.CLI.Commands
                 Renderer.WriteLine($"Some files are not available for download and must be downloaded at {registryPackage.Homepage ?? registryPackage.Repository ?? "(no link provided)"}");
                 foreach (var file in notBundled)
                 {
-                    Renderer.Write($"  - {file.file}");
+                    Renderer.Write($"  - {file.file.LocalPath}");
                     if (file.exists)
                         Renderer.Write($" [exists]", ConsoleColor.Green);
                     else

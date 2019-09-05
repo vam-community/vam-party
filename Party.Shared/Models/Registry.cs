@@ -66,9 +66,9 @@ namespace Party.Shared.Models
             return Name?.CompareTo(other.Name) ?? 0;
         }
 
-        int IComparable.CompareTo(object other)
+        int IComparable.CompareTo(object obj)
         {
-            return (this as IComparable<RegistryScript>).CompareTo(other as RegistryScript);
+            return (this as IComparable<RegistryScript>).CompareTo(obj as RegistryScript);
         }
     }
 
@@ -88,9 +88,9 @@ namespace Party.Shared.Models
             return (Version as IComparable<RegistryVersionString>).CompareTo(other.Version);
         }
 
-        int IComparable.CompareTo(object other)
+        int IComparable.CompareTo(object obj)
         {
-            return (this as IComparable<RegistryScriptVersion>).CompareTo(other as RegistryScriptVersion);
+            return (this as IComparable<RegistryScriptVersion>).CompareTo(obj as RegistryScriptVersion);
         }
     }
 
@@ -114,9 +114,9 @@ namespace Party.Shared.Models
             return (Filename ?? LocalPath)?.CompareTo(other.Filename ?? other.LocalPath) ?? 0;
         }
 
-        int IComparable.CompareTo(object other)
+        int IComparable.CompareTo(object obj)
         {
-            return (this as IComparable<RegistryFile>).CompareTo(other as RegistryFile);
+            return (this as IComparable<RegistryFile>).CompareTo(obj as RegistryFile);
         }
     }
 
@@ -126,7 +126,7 @@ namespace Party.Shared.Models
         public string Value { get; set; }
     }
 
-    public struct RegistryVersionString : IComparable, IComparable<RegistryVersionString>
+    public struct RegistryVersionString : IComparable, IComparable<RegistryVersionString>, IEquatable<RegistryVersionString>
     {
         public RegistryVersionString(string version)
         {
@@ -187,12 +187,17 @@ namespace Party.Shared.Models
                     return 1;
             }
 
-            return other.Extra.CompareTo(Extra);
+            return string.CompareOrdinal(other.Extra, Extra);
         }
 
-        int IComparable.CompareTo(object other)
+        int IComparable.CompareTo(object obj)
         {
-            return (this as IComparable<RegistryVersionString>).CompareTo((RegistryVersionString)other);
+            return (this as IComparable<RegistryVersionString>).CompareTo((RegistryVersionString)obj);
+        }
+
+        bool IEquatable<RegistryVersionString>.Equals(RegistryVersionString other)
+        {
+            return Major == other.Major && Minor == other.Minor && Revision == other.Revision && Extra == other.Extra;
         }
 
         public static implicit operator string(RegistryVersionString d) => d.ToString();
@@ -210,9 +215,9 @@ namespace Party.Shared.Models
             return Name?.CompareTo(other.Name) ?? 0;
         }
 
-        int IComparable.CompareTo(object other)
+        int IComparable.CompareTo(object obj)
         {
-            return (this as IComparable<RegistryAuthor>).CompareTo(other as RegistryAuthor);
+            return (this as IComparable<RegistryAuthor>).CompareTo(obj as RegistryAuthor);
         }
     }
 }

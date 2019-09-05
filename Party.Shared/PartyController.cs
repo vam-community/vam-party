@@ -43,7 +43,7 @@ namespace Party.Shared
                 .AcquireAsync(registries);
         }
 
-        public Task<SavesMap> GetSavesAsync(string[] filters)
+        public Task<SavesMap> GetSavesAsync(string[] filters = null)
         {
             return new SavesResolverHandler(
                 _fs,
@@ -157,7 +157,7 @@ namespace Party.Shared
     {
         void HealthCheck();
         Task<Registry> GetRegistryAsync(params string[] registries);
-        Task<SavesMap> GetSavesAsync(string[] items = null);
+        Task<SavesMap> GetSavesAsync(string[] filters = null);
         Task<SortedSet<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string path);
         Task<SortedSet<RegistryFile>> BuildRegistryFilesFromUrlAsync(Registry registry, Uri url);
         IEnumerable<SearchResult> Search(Registry registry, SavesMap saves, string query);
@@ -165,10 +165,10 @@ namespace Party.Shared
         Task<InstalledPackageInfoResult> InstallPackageAsync(InstalledPackageInfoResult info, bool force);
         RegistrySavesMatch[] MatchSavesToRegistry(SavesMap saves, Registry registry);
         Task<(string before, string after)[]> UpdateScriptInSceneAsync(Scene scene, Script local, InstalledPackageInfoResult info);
-        string GetDisplayPath(string fullPath);
-        string GetRelativePath(string fullPath, string parentPath);
+        string GetDisplayPath(string path);
+        string GetRelativePath(string path, string parentPath);
         void SaveToFile(string data, string path, bool restrict = true);
-        void Delete(string fullPath);
-        bool Exists(string localPath);
+        void Delete(string path);
+        bool Exists(string path);
     }
 }

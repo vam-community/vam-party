@@ -53,7 +53,6 @@ namespace Party.CLI.Commands
             {
                 var script = result.Package;
                 var latestVersion = script.GetLatestVersion();
-                var trustNotice = result.Trusted ? "" : " [NOT TRUSTED]";
 
                 Renderer.Write(script.Name, ConsoleColor.Blue);
                 Renderer.Write($" v{latestVersion.Version}", ConsoleColor.Cyan);
