@@ -62,6 +62,12 @@ namespace Party.CLI.Commands
 
             Renderer.WriteLine($"Last version v{registryVersion.Version}, published {registryVersion.Created.ToLocalTime().ToString("D")}");
 
+            Renderer.WriteLine("Versions:");
+            foreach (var version in registryPackage.Versions)
+            {
+                Renderer.WriteLine($"- v{version.Version}, published {version.Created.ToLocalTime().ToString("D")}: {version.Notes ?? "(no release notes)"}");
+            }
+
             if (registryPackage.Description != null)
                 Renderer.WriteLine($"Description: {registryPackage.Description}");
             if (registryPackage.Tags != null)
