@@ -26,10 +26,10 @@ namespace Party.Shared.Models
 
         public void AssertNoDuplicates(RegistryScriptVersion version)
         {
-            var hashes = version.Files.Select(f => f.Hash.Value).ToArray();
+            var hashes = version.Files.Where(f => f.Hash?.Value != null).Select(f => f.Hash.Value).ToArray();
             var match = Scripts
                 .SelectMany(s => s.Versions.Where(v => !ReferenceEquals(v, version)).Select(v => (s, v)))
-                .FirstOrDefault(x => x.v.Files.Count == hashes.Length && x.v.Files.All(f => hashes.Contains(f.Hash.Value)));
+                .FirstOrDefault(x => x.v.Files.Count == hashes.Length && x.v.Files.All(f => hashes.Contains(f.Hash?.Value)));
 
             if (match.v != null)
                 throw new UserInputException($"This version contains exactly the same file count and file hashes as {match.s.Name} v{match.v.Version}.");

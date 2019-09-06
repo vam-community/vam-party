@@ -25,6 +25,7 @@ namespace Party.CLI.Commands
             command.AddOption(new Option("--package-author", "The author name of your package") { Argument = new Argument<string>() });
             command.AddOption(new Option("--registry", "Path the the index.json file of your locally cloned registry") { Argument = new Argument<FileInfo>().ExistingOnly() });
             command.AddOption(new Option("--saves", "Specify a custom saves folder, e.g. when the script is not in the Virt-A-Mate folder") { Argument = new Argument<DirectoryInfo>().ExistingOnly() });
+            command.AddOption(new Option("--quiet", "Just print the hash and metadata, no questions asked"));
 
             command.Handler = CommandHandler.Create<PublishArguments>(async args =>
             {
@@ -41,6 +42,7 @@ namespace Party.CLI.Commands
             public string PackageAuthor { get; set; }
             public FileInfo Registry { get; set; }
             public DirectoryInfo Saves { get; set; }
+            public bool Quiet { get; set; }
         }
 
         public PublishCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller, CommonArguments args)
@@ -65,13 +67,13 @@ namespace Party.CLI.Commands
                 registry = await Controller.GetRegistryAsync();
             }
 
-            var name = args.PackageName ?? Renderer.Ask("Package Name: ", false, RegistryScript.ValidNameRegex, "my-package");
+            var name = args.PackageName ?? (args.Quiet ? "unnamed" : Renderer.Ask("Package Name: ", false, RegistryScript.ValidNameRegex, "my-package"));
 
             var script = registry.GetOrCreateScript(name);
             var version = script.CreateVersion();
 
             var pathOrUrls = args.Input;
-            if (pathOrUrls == null || pathOrUrls.Length == 0)
+            if (!args.Quiet && (pathOrUrls == null || pathOrUrls.Length == 0))
             {
                 Renderer.WriteLine("No files were provided; please enter each file, folder or url. When done, enter an empty line.");
                 var fileInputs = new List<string>();
@@ -102,7 +104,7 @@ namespace Party.CLI.Commands
             var isNew = script.Versions.Count == 1;
 
             // TODO: Validate all fields
-            if (!isNew && string.IsNullOrEmpty(args.PackageVersion))
+            if (!args.Quiet && !isNew && string.IsNullOrEmpty(args.PackageVersion))
             {
                 Renderer.WriteLine($"This package already exists (by {script.Author ?? "Unknown User"}), a new version will be added to it.");
 
@@ -114,51 +116,59 @@ namespace Party.CLI.Commands
             }
 
             version.Created = DateTimeOffset.Now;
-            version.Version = args.PackageVersion ?? Renderer.Ask("Package Version: ", true, RegistryScriptVersion.ValidVersionNameRegex, "1.0.0");
+            version.Version = args.PackageVersion ?? (args.Quiet ? "1.0.0" : Renderer.Ask("Package version: ", true, RegistryScriptVersion.ValidVersionNameRegex, "1.0.0"));
 
-            if (!isNew)
+            if (!args.Quiet && !isNew)
             {
                 version.Notes = Renderer.Ask("Release notes: ");
             }
 
             if (isNew)
             {
-                Renderer.WriteLine("Looks like a new package in the registry! If this was not what you expected, you might have mistyped the package name; press CTRL+C if you want to abort.");
+                if (!args.Quiet)
+                    Renderer.WriteLine("Looks like a new package in the registry! If this was not what you expected, you might have mistyped the package name; press CTRL+C if you want to abort.");
 
-                var author = Renderer.Ask("Author Name: ", true);
+                var author = args.PackageAuthor ?? (args.Quiet ? "Anonymous" : Renderer.Ask("Author Name: ", true));
                 if (!registry.Authors.Any(a => a.Name.Equals(author, StringComparison.InvariantCultureIgnoreCase)))
                 {
                     registry.Authors.Add(new RegistryAuthor
                     {
                         Name = author,
-                        Github = Renderer.Ask($"GitHub Profile URL: "),
-                        Reddit = Renderer.Ask($"Reddit Profile URL: ")
+                        Github = args.Quiet ? null : Renderer.Ask($"GitHub Profile URL: "),
+                        Reddit = args.Quiet ? null : Renderer.Ask($"Reddit Profile URL: ")
                     });
                 }
 
                 script.Author = author;
-                script.Description = Renderer.Ask("Description: ");
-                script.Tags = (Renderer.Ask("Tags (comma-separated list): ") ?? "").Split(',').Select(x => x.Trim()).Where(x => x != "").ToList();
-                script.Homepage = Renderer.Ask("Package Homepage URL: ");
-                script.Repository = Renderer.Ask("Package Repository URL: ");
+
+                if (!args.Quiet)
+                {
+                    script.Description = Renderer.Ask("Description: ");
+                    script.Tags = (Renderer.Ask("Tags (comma-separated list): ") ?? "").Split(',').Select(x => x.Trim()).Where(x => x != "").ToList();
+                    script.Homepage = Renderer.Ask("Package Homepage URL: ");
+                    script.Repository = Renderer.Ask("Package Repository URL: ");
+                }
             }
 
-            string baseUrl = null;
-            foreach (var file in version.Files)
+            if (!args.Quiet)
             {
-                if (!string.IsNullOrEmpty(file.Url)) continue;
+                string baseUrl = null;
+                foreach (var file in version.Files)
+                {
+                    if (!string.IsNullOrEmpty(file.Url)) continue;
 
-                if (baseUrl != null)
-                {
-                    var fileUrl = $"{baseUrl}{file.Filename.Replace(" ", "%20")}";
-                    file.Url = Renderer.Ask($"{file.Filename} URL ({fileUrl}): ") ?? fileUrl;
-                }
-                else
-                {
-                    file.Url = Renderer.Ask($"{file.Filename} URL: ", true);
-                    if (file.Url.EndsWith("/" + file.Filename.Replace(" ", "%20")))
+                    if (baseUrl != null)
                     {
-                        baseUrl = file.Url.Substring(0, file.Url.LastIndexOf("/") + 1);
+                        var fileUrl = $"{baseUrl}{file.Filename.Replace(" ", "%20")}";
+                        file.Url = Renderer.Ask($"{file.Filename} URL ({fileUrl}): ") ?? fileUrl;
+                    }
+                    else
+                    {
+                        file.Url = Renderer.Ask($"{file.Filename} URL: ", true);
+                        if (file.Url.EndsWith("/" + file.Filename.Replace(" ", "%20")))
+                        {
+                            baseUrl = file.Url.Substring(0, file.Url.LastIndexOf("/") + 1);
+                        }
                     }
                 }
             }

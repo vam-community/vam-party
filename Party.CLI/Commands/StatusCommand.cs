@@ -52,7 +52,7 @@ namespace Party.CLI.Commands
 
             PrintWarnings(args.Warnings, saves.Errors);
 
-            foreach (var match in matches.OrderBy(m => m.Script.Name))
+            foreach (var match in matches.OrderBy(m => m.Script.Name).ThenBy(m => m.Version))
             {
                 Renderer.Write(match.Script.Name, ConsoleColor.Green);
                 Renderer.Write(" ");
