@@ -45,6 +45,7 @@ namespace Party.CLI
         {
             var rootCommand = new RootCommand("Party: A Virt-A-Mate package manager")
             {
+                HelpCommand.CreateCommand(_renderer, _config, _controller),
                 SearchCommand.CreateCommand(_renderer, _config, _controller),
                 GetCommand.CreateCommand(_renderer, _config, _controller),
                 ShowCommand.CreateCommand(_renderer, _config, _controller),

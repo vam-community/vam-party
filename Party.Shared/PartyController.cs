@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Party.Shared.Exceptions;
 using Party.Shared.Handlers;
 using Party.Shared.Models;
@@ -95,6 +97,18 @@ namespace Party.Shared
                 .UpdateScripts(scene, local, info);
         }
 
+        public async Task<string> GetPartyUpdatesAvailable()
+        {
+            var response = await _http.GetAsync("https://api.github.com/repos/vam-community/vam-party/releases/latest");
+            if (response.StatusCode == HttpStatusCode.NotFound)
+                return null;
+            response.EnsureSuccessStatusCode();
+            using var stream = await response.Content.ReadAsStreamAsync();
+            using var reader = new StreamReader(stream);
+            using var jsonReader = new JsonTextReader(reader);
+            return new JsonSerializer().Deserialize<GitHubReleaseInfo>(jsonReader)?.Name;
+        }
+
         public string GetDisplayPath(string path)
         {
             return GetRelativePath(path, SavesDirectory);
@@ -165,6 +179,7 @@ namespace Party.Shared
         Task<InstalledPackageInfoResult> InstallPackageAsync(InstalledPackageInfoResult info, bool force);
         RegistrySavesMatch[] MatchSavesToRegistry(SavesMap saves, Registry registry);
         Task<(string before, string after)[]> UpdateScriptInSceneAsync(Scene scene, Script local, InstalledPackageInfoResult info);
+        Task<string> GetPartyUpdatesAvailable();
         string GetDisplayPath(string path);
         string GetRelativePath(string path, string parentPath);
         void SaveToFile(string data, string path, bool restrict = true);
