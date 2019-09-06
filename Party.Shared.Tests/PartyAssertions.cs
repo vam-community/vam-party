@@ -9,7 +9,7 @@ namespace Party.Shared
         {
             var expectedJson = JsonConvert.SerializeObject(expected);
             var actualJson = JsonConvert.SerializeObject(actual);
-            Assert.AreEqual(expectedJson, actualJson);
+            Assert.AreEqual(expectedJson, actualJson, JsonConvert.SerializeObject(actual, Formatting.Indented));
         }
     }
 }

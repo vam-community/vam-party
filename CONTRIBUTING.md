@@ -31,3 +31,15 @@ Pull requests are welcome, but they _must_ follow the style of the surrounding c
 - Stay calm, be polite. Remember this is done on our free time, for free.
 - No pornographic or explicit discussions here. Let's keep this about the features and the code.
 - Be inclusive. No discriminatory comments will be tolerated.
+
+## Feature ideas
+
+If you want to take on an idea, please [create an issue](https://github.com/vam-community/vam-party/issues/new) explaining how you intend on implementing it, so everyone can discuss it and the maintainers can approve your idea, so no one is disappointed!
+
+- A new `party repair` command that finds all missing scripts in a scene and replaces them with a reference to the installed one, one already in the Saves folder, or downloads it if `--get` was specified.
+- Group by script, version, file or scene in `party status`. The default of grouping by script is not that useful.
+- In `party upgrade` and `party status`, allow specifying a folder (e.g. everything in `Saves/scenes/My Scene`).
+- Show scene statistics in `party show` such as how many atoms by types, how many scripts, etc.
+- Show script statistics in `party show` such as how many lines, and the hash
+- Colored output and output cleanup in `party show`
+- Check for party updates at launch

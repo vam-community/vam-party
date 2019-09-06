@@ -5,7 +5,6 @@ using System;
 using System.CommandLine;
 using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Party.CLI
 {
@@ -33,13 +32,19 @@ namespace Party.CLI
             _renderer.Setup(x => x.Out).Returns(outWriter);
             _renderer.Setup(x => x.Error).Returns(outWriter);
             _controller = new Mock<IPartyController>(MockBehavior.Strict);
+            _controller.SetupProperty(mock => mock.ChecksEnabled);
             var config = PartyConfigurationFactory.Create(@"C:\VaM");
             _program = new Program(_renderer.Object, config, _controller.Object);
         }
 
         protected string[] GetOutput()
         {
-            return _out.ToString().Trim().Split(new[] { '\r', '\n' });
+            var output = _out.ToString().Trim();
+            if (output.Contains("Exception: "))
+            {
+                Assert.Fail($"Exception detected:{Environment.NewLine}{output}");
+            }
+            return output.Split(new[] { '\r', '\n' });
         }
 
         private class ColorStub : IDisposable

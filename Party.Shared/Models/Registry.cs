@@ -34,6 +34,13 @@ namespace Party.Shared.Models
             if (match.v != null)
                 throw new UserInputException($"This version contains exactly the same file count and file hashes as {match.s.Name} v{match.v.Version}.");
         }
+
+        public IEnumerable<(RegistryScript script, RegistryScriptVersion version, RegistryFile file)> FlattenFiles()
+        {
+            return Scripts
+                .SelectMany(script => script.Versions.Select(version => (script, version))
+                .SelectMany(sv => sv.version.Files.Select(file => (sv.script, sv.version, file))));
+        }
     }
 
     public class RegistryScript : IComparable<RegistryScript>, IComparable

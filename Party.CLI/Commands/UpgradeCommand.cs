@@ -67,7 +67,7 @@ namespace Party.CLI.Commands
 
             PrintWarnings(args.Warnings, saves.Errors);
 
-            foreach (var match in matches)
+            foreach (var match in matches.HashMatches)
             {
                 await HandleOne(match, args);
             }

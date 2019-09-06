@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Party.Shared.Models;
 using Party.Shared.Resources;
@@ -7,22 +8,39 @@ namespace Party.Shared.Handlers
 {
     public class RegistrySavesMatchHandler
     {
-        public RegistrySavesMatch[] Match(SavesMap saves, Registry registry)
+        public RegistrySavesMatches Match(SavesMap saves, Registry registry)
         {
-            var registryVersionsByHash = registry.Scripts
-                .SelectMany(s => s.Versions.Select(v => (s, v)))
-                .SelectMany(sv => sv.v.Files.Where(f => f.Hash?.Value != null).Select(f => (script: sv.s, version: sv.v, file: f)))
+            var flattened = registry.FlattenFiles().ToList();
+            var scripts = new List<Script>(saves.Scripts);
+
+            var withHash = flattened
+                .Where(svf => svf.file.Hash?.Value != null)
                 .GroupBy(svf => svf.file.Hash.Value)
                 .ToDictionary(svf => svf.Key, svf => svf.First());
+            var byHash = MatchByHash(scripts, withHash).ToArray();
+            var matchedByHash = new HashSet<Script>(byHash.Select(m => m.Local));
 
-            return Match(saves, registryVersionsByHash).ToArray();
+            scripts = scripts.Where(s => !matchedByHash.Contains(s)).ToList();
+            var withFilename = flattened
+                .Where(svf => svf.file.Filename != null)
+                .GroupBy(svf => Path.GetFileName(svf.file.Filename))
+                .ToDictionary(g => g.Key, g => g.FirstOrDefault());
+            var byFilename = MatchByFilename(scripts, withFilename).ToArray();
+            var matchedByFilename = new HashSet<Script>(byFilename.Concat(byHash).Select(m => m.Local));
+
+            return new RegistrySavesMatches
+            {
+                HashMatches = byHash,
+                FilenameMatches = byFilename,
+                NoMatches = scripts.Where(s => !matchedByFilename.Contains(s)).ToArray()
+            };
         }
 
-        public IEnumerable<RegistrySavesMatch> Match(SavesMap saves, Dictionary<string, (RegistryScript script, RegistryScriptVersion version, RegistryFile file)> registryVersionsByHash)
+        private IEnumerable<RegistrySavesMatch> MatchByHash(IEnumerable<Script> scripts, Dictionary<string, (RegistryScript script, RegistryScriptVersion version, RegistryFile file)> byHash)
         {
-            foreach (var script in saves.Scripts)
+            foreach (var script in scripts)
             {
-                if (!registryVersionsByHash.TryGetValue(script.Hash, out var svf))
+                if (!byHash.TryGetValue(script.Hash, out var svf))
                 {
                     continue;
                 }
@@ -33,13 +51,26 @@ namespace Party.Shared.Handlers
                         continue;
                 }
 
-                yield return new RegistrySavesMatch
+                yield return new RegistrySavesMatch(svf, script);
+            }
+        }
+
+        private IEnumerable<RegistrySavesMatch> MatchByFilename(IEnumerable<Script> scripts, Dictionary<string, (RegistryScript script, RegistryScriptVersion version, RegistryFile file)> byFilename)
+        {
+            foreach (var script in scripts)
+            {
+                if (script is ScriptList)
                 {
-                    Script = svf.script,
-                    Version = svf.version,
-                    File = svf.file,
-                    Local = script
-                };
+                    // We'll only match simple cases
+                    continue;
+                }
+
+                if (!byFilename.TryGetValue(script.FileName, out var svf))
+                {
+                    continue;
+                }
+
+                yield return new RegistrySavesMatch(svf, script);
             }
         }
     }

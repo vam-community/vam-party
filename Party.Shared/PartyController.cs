@@ -90,7 +90,7 @@ namespace Party.Shared
             return new InstallPackageHandler(_fs, _http)
                 .InstallPackageAsync(info, force);
         }
-        public RegistrySavesMatch[] MatchSavesToRegistry(SavesMap saves, Registry registry)
+        public RegistrySavesMatches MatchSavesToRegistry(SavesMap saves, Registry registry)
         {
             return new RegistrySavesMatchHandler()
                 .Match(saves, registry);
@@ -187,7 +187,7 @@ namespace Party.Shared
         IEnumerable<SearchResult> Search(Registry registry, SavesMap saves, string query);
         Task<InstalledPackageInfoResult> GetInstalledPackageInfoAsync(string name, RegistryScriptVersion version);
         Task<InstalledPackageInfoResult> InstallPackageAsync(InstalledPackageInfoResult info, bool force);
-        RegistrySavesMatch[] MatchSavesToRegistry(SavesMap saves, Registry registry);
+        RegistrySavesMatches MatchSavesToRegistry(SavesMap saves, Registry registry);
         Task<(string before, string after)[]> UpdateScriptInSceneAsync(Scene scene, Script local, InstalledPackageInfoResult info);
         Task<string> GetPartyUpdatesAvailable();
         string GetDisplayPath(string path);

@@ -34,7 +34,7 @@ namespace Party.Shared
             };
         }
 
-        internal static RegistryFile RegFile(string filename, string hash, string url)
+        internal static RegistryFile RegFile(string filename, string hash, string url = null)
         {
             return new RegistryFile
             {
