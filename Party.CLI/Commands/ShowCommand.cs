@@ -20,7 +20,7 @@ namespace Party.CLI.Commands
 
             command.Handler = CommandHandler.Create<ShowArguments>(async args =>
             {
-                await new ShowCommand(renderer, config, args.VaM, controller).ExecuteAsync(args);
+                await new ShowCommand(renderer, config, controller, args).ExecuteAsync(args);
             });
             return command;
         }
@@ -31,8 +31,8 @@ namespace Party.CLI.Commands
             public bool Warnings { get; set; }
         }
 
-        public ShowCommand(IConsoleRenderer renderer, PartyConfiguration config, DirectoryInfo vam, IPartyController controller)
-            : base(renderer, config, vam, controller)
+        public ShowCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller, CommonArguments args)
+            : base(renderer, config, controller, args)
         {
         }
 

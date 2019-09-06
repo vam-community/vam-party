@@ -23,7 +23,7 @@ namespace Party.CLI.Commands
 
             command.Handler = CommandHandler.Create<StatusArguments>(async args =>
             {
-                await new StatusCommand(renderer, config, args.VaM, controller).ExecuteAsync(args);
+                await new StatusCommand(renderer, config, controller, args).ExecuteAsync(args);
             });
             return command;
         }
@@ -36,8 +36,8 @@ namespace Party.CLI.Commands
             public bool Unregistered { get; set; }
         }
 
-        public StatusCommand(IConsoleRenderer renderer, PartyConfiguration config, DirectoryInfo vam, IPartyController controller)
-            : base(renderer, config, vam, controller)
+        public StatusCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller, CommonArguments args)
+            : base(renderer, config, controller, args)
         {
         }
 

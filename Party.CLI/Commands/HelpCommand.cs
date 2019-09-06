@@ -1,8 +1,6 @@
 ﻿using System;
 using System.CommandLine;
 using System.CommandLine.Invocation;
-using System.IO;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Party.Shared;
 
@@ -14,13 +12,17 @@ namespace Party.CLI.Commands
         {
             var command = new Command("help", "Show useful information about party")
             {
-                Handler = CommandHandler.Create(() => new HelpCommand(renderer, config, null, controller).ExecuteAsync())
+                Handler = CommandHandler.Create<HelpArguments>(args => new HelpCommand(renderer, config, controller, args).ExecuteAsync())
             };
             return command;
         }
 
-        public HelpCommand(IConsoleRenderer renderer, PartyConfiguration config, DirectoryInfo vam, IPartyController controller)
-            : base(renderer, config, vam, controller)
+        public class HelpArguments : CommonArguments
+        {
+        }
+
+        public HelpCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller, CommonArguments args)
+            : base(renderer, config, controller, args)
         {
         }
 

@@ -28,7 +28,6 @@ namespace Party.Shared.Handlers
             if (registry is null) throw new ArgumentNullException(nameof(registry));
             if (path is null) throw new ArgumentNullException(nameof(path));
 
-            if (!_fs.Path.IsPathRooted(path)) throw new InvalidOperationException($"Path must be rooted prior to being sent to this handler: {path}");
             if (!path.StartsWith(_savesDirectory)) throw new UserInputException($"Path must be inside the saves directory.\nPath: {path}\nSaves: {_savesDirectory}");
 
             var files = GetFilesFromFileSystem(path);

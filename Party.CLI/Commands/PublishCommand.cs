@@ -24,10 +24,11 @@ namespace Party.CLI.Commands
             command.AddOption(new Option("--package-version", "The version of your package") { Argument = new Argument<string>() });
             command.AddOption(new Option("--package-author", "The author name of your package") { Argument = new Argument<string>() });
             command.AddOption(new Option("--registry", "Path the the index.json file of your locally cloned registry") { Argument = new Argument<FileInfo>().ExistingOnly() });
+            command.AddOption(new Option("--saves", "Specify a custom saves folder, e.g. when the script is not in the Virt-A-Mate folder") { Argument = new Argument<DirectoryInfo>().ExistingOnly() });
 
             command.Handler = CommandHandler.Create<PublishArguments>(async args =>
             {
-                await new PublishCommand(renderer, config, args.VaM, controller).ExecuteAsync(args);
+                await new PublishCommand(renderer, config, controller, args).ExecuteAsync(args);
             });
             return command;
         }
@@ -39,10 +40,11 @@ namespace Party.CLI.Commands
             public string PackageVersion { get; set; }
             public string PackageAuthor { get; set; }
             public FileInfo Registry { get; set; }
+            public DirectoryInfo Saves { get; set; }
         }
 
-        public PublishCommand(IConsoleRenderer renderer, PartyConfiguration config, DirectoryInfo vam, IPartyController controller)
-            : base(renderer, config, vam, controller)
+        public PublishCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller, CommonArguments args)
+            : base(renderer, config, controller, args)
         {
         }
 
@@ -90,7 +92,7 @@ namespace Party.CLI.Commands
             {
                 version.Files.AddRange(pathOrUrl.StartsWith("http") && Uri.TryCreate(pathOrUrl, UriKind.Absolute, out var url)
                      ? await Controller.BuildRegistryFilesFromUrlAsync(registry, url).ConfigureAwait(false)
-                     : await Controller.BuildRegistryFilesFromPathAsync(registry, Path.GetFullPath(pathOrUrl)).ConfigureAwait(false));
+                     : await Controller.BuildRegistryFilesFromPathAsync(registry, Path.GetFullPath(pathOrUrl), args.Saves).ConfigureAwait(false));
             }
 
             registry.AssertNoDuplicates(version);

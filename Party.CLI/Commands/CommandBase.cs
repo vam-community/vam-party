@@ -26,21 +26,24 @@ namespace Party.CLI.Commands
         protected PartyConfiguration Config { get; }
         protected IPartyController Controller { get; }
 
-        protected CommandBase(IConsoleRenderer renderer, PartyConfiguration config, DirectoryInfo vam, IPartyController controller)
+        protected CommandBase(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller, CommonArguments args)
         {
             Renderer = renderer;
-            Config = GetConfig(config, vam);
+            Config = GetConfig(config, args.VaM);
             Controller = controller;
+            Controller.ChecksEnabled = args.Force;
         }
 
         protected static void AddCommonOptions(Command command)
         {
             command.AddOption(new Option("--vam", "Specify the Virt-A-Mate install folder") { Argument = new Argument<DirectoryInfo>().ExistingOnly() });
+            command.AddOption(new Option("--force", "Ignores most security checks and health checks"));
         }
 
         public abstract class CommonArguments
         {
             public DirectoryInfo VaM { get; set; }
+            public bool Force { get; set; }
         }
 
         protected async Task<(SavesMap, Registry)> GetSavesAndRegistryAsync(string[] filters = null)

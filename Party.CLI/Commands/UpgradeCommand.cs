@@ -25,11 +25,10 @@ namespace Party.CLI.Commands
             command.AddOption(new Option("--warnings", "Show warnings such as broken scenes or missing scripts"));
             command.AddOption(new Option("--noop", "Prints what the script will do, but won't actually do anything"));
             command.AddOption(new Option("--verbose", "Prints every change that will be done on every scene"));
-            command.AddOption(new Option("--force", "Install even if hashes don't match, or files will be missing") { Argument = new Argument<bool>() });
 
             command.Handler = CommandHandler.Create<UpgradeArguments>(async args =>
             {
-                await new UpgradeCommand(renderer, config, args.VaM, controller).ExecuteAsync(args);
+                await new UpgradeCommand(renderer, config, controller, args).ExecuteAsync(args);
             });
             return command;
         }
@@ -44,11 +43,10 @@ namespace Party.CLI.Commands
             public bool Warnings { get; set; }
             public bool Noop { get; set; }
             public bool Verbose { get; set; }
-            public bool Force { get; set; }
         }
 
-        public UpgradeCommand(IConsoleRenderer renderer, PartyConfiguration config, DirectoryInfo vam, IPartyController controller)
-            : base(renderer, config, vam, controller)
+        public UpgradeCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller, CommonArguments args)
+            : base(renderer, config, controller, args)
         {
         }
 

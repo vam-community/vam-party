@@ -19,11 +19,10 @@ namespace Party.CLI.Commands
             command.AddArgument(new Argument<string>("package", null) { Arity = ArgumentArity.ExactlyOne });
             command.AddOption(new Option("--version", "Choose a specific version to install") { Argument = new Argument<string>() });
             command.AddOption(new Option("--noop", "Do not install, just check what it will do"));
-            command.AddOption(new Option("--force", "Install even if hashes don't match, or files will be missing") { Argument = new Argument<bool>() });
 
             command.Handler = CommandHandler.Create<GetArguments>(async args =>
             {
-                await new GetCommand(renderer, config, args.VaM, controller).ExecuteAsync(args);
+                await new GetCommand(renderer, config, controller, args).ExecuteAsync(args);
             });
             return command;
         }
@@ -33,11 +32,10 @@ namespace Party.CLI.Commands
             public string Package { get; set; }
             public string Version { get; set; }
             public bool Noop { get; set; }
-            public bool Force { get; set; }
         }
 
-        public GetCommand(IConsoleRenderer renderer, PartyConfiguration config, DirectoryInfo vam, IPartyController controller)
-            : base(renderer, config, vam, controller)
+        public GetCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller, CommonArguments args)
+            : base(renderer, config, controller, args)
         {
         }
 

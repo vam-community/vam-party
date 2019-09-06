@@ -20,7 +20,7 @@ namespace Party.CLI.Commands
 
             command.Handler = CommandHandler.Create<SearchArguments>(async args =>
             {
-                await new SearchCommand(renderer, config, args.VaM, controller).ExecuteAsync(args);
+                await new SearchCommand(renderer, config, controller, args).ExecuteAsync(args);
             });
             return command;
         }
@@ -32,8 +32,8 @@ namespace Party.CLI.Commands
             public bool Warnings { get; set; }
         }
 
-        public SearchCommand(IConsoleRenderer renderer, PartyConfiguration config, DirectoryInfo vam, IPartyController controller)
-            : base(renderer, config, vam, controller)
+        public SearchCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller, CommonArguments args)
+            : base(renderer, config, controller, args)
         {
         }
 

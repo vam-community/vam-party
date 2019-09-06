@@ -18,6 +18,8 @@ namespace Party.Shared
 {
     public class PartyController : IPartyController
     {
+        public bool ChecksEnabled { get; set; }
+
         private static string Version { get; } = typeof(PartyController).Assembly.GetName().Version.ToString();
         private readonly PartyConfiguration _config;
         private readonly HttpClient _http;
@@ -35,6 +37,9 @@ namespace Party.Shared
 
         public void HealthCheck()
         {
+            if (!ChecksEnabled)
+                return;
+
             if (!_fs.Directory.Exists(SavesDirectory))
                 throw new SavesException($"Could not find the '{SavesDirectory}' directory under '{_config.VirtAMate.VirtAMateInstallFolder}'. Either put party.exe in your Virt-A-Mate installation folder, or specify --vam in the options.");
         }
@@ -56,10 +61,10 @@ namespace Party.Shared
                     .AnalyzeSaves(filters ?? new string[0]);
         }
 
-        public Task<SortedSet<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string path)
+        public Task<SortedSet<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string path, DirectoryInfo saves)
         {
-            return new RegistryFilesFromPathHandler(SavesDirectory, _fs)
-                .BuildFiles(registry, path);
+            return new RegistryFilesFromPathHandler(saves?.FullName ?? SavesDirectory, _fs)
+                .BuildFiles(registry, saves != null ? path : SanitizePath(path));
         }
 
         public Task<SortedSet<RegistryFile>> BuildRegistryFilesFromUrlAsync(Registry registry, Uri url)
@@ -157,22 +162,27 @@ namespace Party.Shared
         private string SanitizePath(string path)
         {
             path = Path.GetFullPath(path, _config.VirtAMate.VirtAMateInstallFolder);
-            if (!path.StartsWith(_config.VirtAMate.VirtAMateInstallFolder)) throw new UnauthorizedAccessException($"Cannot delete file {path} because it is not in the Virt-A-Mate installation folder.");
-            var localPath = path.Substring(_config.VirtAMate.VirtAMateInstallFolder.Length).TrimStart(new[] { '/', '\\' });
-            var directorySeparatorIndex = localPath.IndexOf('\\');
-            if (directorySeparatorIndex == -1) throw new UnauthorizedAccessException($"Cannot access files directly at Virt-A-Mate's root");
-            var subFolder = localPath.Substring(0, directorySeparatorIndex);
-            if (!_config.VirtAMate.VirtAMateAllowedSubfolders.Contains(subFolder)) throw new UnauthorizedAccessException($"Virt-A-Mate subfolder {subFolder} is not allowed");
+            if (ChecksEnabled)
+            {
+                if (!path.StartsWith(_config.VirtAMate.VirtAMateInstallFolder)) throw new UnauthorizedAccessException($"Cannot process path '{path}' because it is not in the Virt-A-Mate installation folder.");
+                var localPath = path.Substring(_config.VirtAMate.VirtAMateInstallFolder.Length).TrimStart(new[] { '/', '\\' });
+                var directorySeparatorIndex = localPath.IndexOf('\\');
+                if (directorySeparatorIndex == -1) throw new UnauthorizedAccessException($"Cannot access files directly at Virt-A-Mate's root");
+                var subFolder = localPath.Substring(0, directorySeparatorIndex);
+                if (!_config.VirtAMate.VirtAMateAllowedSubfolders.Contains(subFolder)) throw new UnauthorizedAccessException($"Accessing Virt-A-Mate subfolder '{subFolder}' is not allowed");
+            }
             return path;
         }
     }
 
     public interface IPartyController
     {
+        bool ChecksEnabled { get; set; }
+
         void HealthCheck();
         Task<Registry> GetRegistryAsync(params string[] registries);
         Task<SavesMap> GetSavesAsync(string[] filters = null);
-        Task<SortedSet<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string path);
+        Task<SortedSet<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string path, DirectoryInfo saves);
         Task<SortedSet<RegistryFile>> BuildRegistryFilesFromUrlAsync(Registry registry, Uri url);
         IEnumerable<SearchResult> Search(Registry registry, SavesMap saves, string query);
         Task<InstalledPackageInfoResult> GetInstalledPackageInfoAsync(string name, RegistryScriptVersion version);
