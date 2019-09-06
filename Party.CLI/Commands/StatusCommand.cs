@@ -52,23 +52,36 @@ namespace Party.CLI.Commands
 
             PrintWarnings(args.Warnings, saves.Errors);
 
-            foreach (var match in matches.OrderBy(m => m.Script.Name).ThenBy(m => m.Version))
+            foreach (var matchScript in matches.GroupBy(m => m.Script))
             {
-                Renderer.Write(match.Script.Name, ConsoleColor.Green);
-                Renderer.Write(" ");
-                Renderer.Write($"v{match.Version.Version}", ConsoleColor.Gray);
-                if (!match.Local.FullPath.StartsWith(Config.Scanning.PackagesFolder))
+                foreach (var matchVersion in matchScript.GroupBy(s => s.Version))
                 {
+                    Renderer.Write(matchScript.Key.Name, ConsoleColor.Green);
                     Renderer.Write(" ");
-                    Renderer.Write($"\"{Controller.GetDisplayPath(match.Local.FullPath)}\"", ConsoleColor.DarkGray);
+                    Renderer.Write($"v{matchVersion.Key.Version}", ConsoleColor.Gray);
+                    var localFiles = matchVersion.Select(v => v.Local).ToList();
+                    var nonInstalledLocalFiles = localFiles.Where(l => !l.FullPath.StartsWith(Config.Scanning.PackagesFolder)).ToList();
+                    if (nonInstalledLocalFiles.Count > 0)
+                    {
+                        var filesSummary = localFiles.Select(l => l.FullPath).Select(Controller.GetDisplayPath).OrderBy(p => p).ToList();
+                        Renderer.Write(" ");
+                        if (filesSummary.Count == 1)
+                        {
+                            Renderer.Write($"\"{filesSummary.FirstOrDefault()}\"", ConsoleColor.DarkGray);
+                        }
+                        else
+                        {
+                            Renderer.Write($"\"{filesSummary.FirstOrDefault()}\" and {filesSummary.Count - 1} others...", ConsoleColor.DarkGray);
+                        }
+                    }
+                    Renderer.Write(" ");
+                    Renderer.Write($"referenced by {Pluralize(localFiles.Sum(l => l.Scenes?.Count() ?? 0), "scene", "scenes")}", ConsoleColor.DarkCyan);
+                    var latestVersion = matchScript.Key.GetLatestVersion();
+                    if (matchVersion.Key != latestVersion)
+                        Renderer.Write($" [update available: v{latestVersion.Version}]", ConsoleColor.Blue);
+                    Renderer.WriteLine();
+                    if (args.Scenes) PrintScenes(localFiles.SelectMany(l => l.Scenes).Distinct().ToList());
                 }
-                Renderer.Write(" ");
-                Renderer.Write($"referenced by {Pluralize(match.Local.Scenes?.Count() ?? 0, "scene", "scenes")}", ConsoleColor.DarkCyan);
-                var latestVersion = match.Script.GetLatestVersion();
-                if (match.Version != latestVersion)
-                    Renderer.Write($" [update available: v{latestVersion.Version}]", ConsoleColor.Blue);
-                Renderer.WriteLine();
-                if (args.Scenes) PrintScenes(match.Local.Scenes);
             }
 
             if (args.Unregistered)
