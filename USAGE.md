@@ -113,7 +113,7 @@ You can also specify a script, a scene or a package name to show if you don't wa
 
 Options:
 
-- `--scenes` shows every scene actually referencing the script
+- `--breakdown` shows every file/scene actually referencing the script
 - `--warnings` prints warnings found while scanning your saves folder
 - `--unregistered` prints every script that was found but did not match a package
 
@@ -160,6 +160,8 @@ Options:
 - `--package-name` the name of the package (lowercase, underscore, hyphen and numbers only)
 - `--package-author` the author name (allows spaces)
 - `--package-version` the version of the package to publish, either in the format `0.0.0` or `0.0.0-suffix`.
+- `--saves` allows specifying another saves folder, e.g. when publishing scripts from the vam-packages folder
+- `--quiet` chooses defaults for every option (e.g. when you just want to get the json output)
 
 ## Configuration
 

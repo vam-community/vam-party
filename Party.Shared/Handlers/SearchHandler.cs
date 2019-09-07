@@ -43,7 +43,7 @@ namespace Party.Shared.Handlers
                         .SelectMany(v => v.Files ?? new SortedSet<RegistryFile>());
                     scripts = allFilesFromAllVersions
                         .Where(regFile => regFile.Hash?.Value != null)
-                        .SelectMany(regFile => saves.ScriptsByFilename.Values.Where(localScript => localScript.Hash == regFile.Hash.Value))
+                        .SelectMany(regFile => saves.Scripts.Where(localScript => localScript.Hash == regFile.Hash.Value))
                         .Distinct()
                         .ToArray();
                     scenes = scripts

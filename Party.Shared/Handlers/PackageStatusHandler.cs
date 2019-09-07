@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
+using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared.Models;
 using Party.Shared.Utils;
@@ -30,7 +31,7 @@ namespace Party.Shared.Handlers
             }
             var installPath = Path.Combine(basePath, name, version.Version);
             var files = new List<InstalledPackageInfoResult.InstalledFileInfo>();
-            foreach (var file in version.Files)
+            foreach (var file in version.Files.Where(f => !f.Ignore && f.Filename != null))
             {
                 files.Add(await GetPackageFileInfo(installPath, file).ConfigureAwait(false));
             }

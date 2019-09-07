@@ -58,7 +58,7 @@ namespace Party.Shared
         {
             private readonly List<Script> _scripts = new List<Script>();
             private readonly List<Scene> _scenes = new List<Scene>();
-            private readonly List<string> _errors = new List<string>();
+            private readonly List<(string file, string error)> _errors = new List<(string file, string error)>();
 
             internal SavesMapBuilder WithScript(Script script, out Script outScript)
             {
@@ -85,7 +85,7 @@ namespace Party.Shared
             {
                 return new SavesMap
                 {
-                    ScriptsByFilename = _scripts.ToDictionary(s => s.FullPath, s => s),
+                    Scripts = _scripts.ToArray(),
                     Scenes = _scenes.ToArray(),
                     Errors = _errors.ToArray()
                 };

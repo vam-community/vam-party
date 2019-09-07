@@ -48,34 +48,38 @@ namespace Party.CLI.Commands
 
         protected async Task<(SavesMap, Registry)> GetSavesAndRegistryAsync(string[] filters = null)
         {
+            // NOTE: When specifying --noop to status, it puts --noop in a filter, and returns nothing. Try to avoid that, or at least specify why nothing has been returned?
+
             var filterPackages = filters?.Where(f => f.IndexOf(".") == -1).ToArray();
             var filterPaths = filters?.Where(f => !filterPackages.Contains(f)).ToArray();
 
-            var registryTask = Controller.GetRegistryAsync();
+            using var registryTask = Controller.GetRegistryAsync();
             // TODO: If the item is a package (no extension), resolve it to a path (if the plugin was not downloaded, throw)
-            var savesTask = Controller.GetSavesAsync(filterPaths?.Select(Path.GetFullPath).ToArray());
+            // TODO: When the filter is a scene, mark every script that was not referenced by that scene as not safe for cleanup; also remove them for display
+            using var savesTask = Controller.GetSavesAsync(filterPaths?.Select(Path.GetFullPath).ToArray());
 
             await Task.WhenAll();
 
             var registry = await registryTask;
             var saves = await savesTask;
 
+            // TODO: Put in controller
             if (filterPackages != null && filterPackages.Length > 0)
             {
                 var packageHashes = new HashSet<string>(registry.Scripts.Where(s => filterPackages.Contains(s.Name)).SelectMany(s => s.Versions).SelectMany(v => v.Files).Select(f => f.Hash.Value).Distinct());
-                saves.ScriptsByFilename = saves.ScriptsByFilename.Where(s =>
+                saves.Scripts = saves.Scripts.Where(s =>
                 {
-                    if (s.Value is ScriptList scriptList)
+                    if (s is ScriptList scriptList)
                         return new[] { scriptList.Hash }.Concat(scriptList.Scripts.Select(c => c.Hash)).All(h => packageHashes.Contains(h));
                     else
-                        return packageHashes.Contains(s.Value.Hash);
-                }).ToDictionary(s => s.Key, s => s.Value);
+                        return packageHashes.Contains(s.Hash);
+                }).ToArray();
             }
 
             return (saves, registry);
         }
 
-        protected void PrintWarnings(bool details, string[] errors)
+        protected void PrintWarnings(bool details, (string file, string error)[] errors)
         {
             if (errors == null || errors.Length == 0) return;
 
@@ -84,10 +88,10 @@ namespace Party.CLI.Commands
                 using (Renderer.WithColor(ConsoleColor.Yellow))
                 {
                     Renderer.WriteLine("Scene warnings:");
-                    foreach (var error in errors)
+                    foreach (var (file, error) in errors)
                     {
                         Renderer.Error.Write("  ");
-                        Renderer.Error.WriteLine(error);
+                        Renderer.Error.WriteLine($"{Controller.GetDisplayPath(file)}: {error}");
                     }
                 }
                 Renderer.WriteLine();

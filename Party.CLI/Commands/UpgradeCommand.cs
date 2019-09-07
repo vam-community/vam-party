@@ -1,7 +1,6 @@
 ﻿using System;
 using System.CommandLine;
 using System.CommandLine.Invocation;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
@@ -207,7 +206,7 @@ namespace Party.CLI.Commands
             {
                 Renderer.Write($"new version available: v{updateToVersion.Version}", ConsoleColor.Magenta);
                 Renderer.WriteLine();
-                Renderer.WriteLine($"  Version release {updateToVersion.Created.ToLocalTime().ToString("D")}: {updateToVersion.Notes ?? "No release notes"}");
+                Renderer.WriteLine($"  Released {updateToVersion.Created.ToLocalTime().ToString("D")}: {updateToVersion.Notes ?? "No release notes"}");
             }
         }
 
