@@ -61,7 +61,7 @@ Scans for scenes referencing scripts that are available in the registry, and use
 
 Update a specific scene (and all scripts it uses) or script (and all scenes referencing it):
 
-    > party upgrade Saves\Scripts\Some Script.cs
+    > party upgrade "Saves\scenes\My Scene.json"
 
 Update a specific package (and all scenes referencing it):
 

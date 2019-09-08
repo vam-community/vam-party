@@ -26,7 +26,8 @@ Find out which scripts you're already using, and if updates are available:
 
 Upgrade your scenes and scripts with up-to-date versions from creators:
 
-    > party upgrade
+    > party upgrade Saves\scenes\My Scene.json
+    > party upgrade improved-pov
 
 Publish your own scripts:
 
