@@ -58,7 +58,7 @@ namespace Party.Shared
         {
             private readonly List<Script> _scripts = new List<Script>();
             private readonly List<Scene> _scenes = new List<Scene>();
-            private readonly List<(string file, string error)> _errors = new List<(string file, string error)>();
+            private readonly List<SavesError> _errors = new List<SavesError>();
 
             internal SavesMapBuilder WithScript(Script script, out Script outScript)
             {

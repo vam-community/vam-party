@@ -3,5 +3,10 @@
     "obj": true
   },
   "omnisharp.enableEditorConfigSupport": true,
-  "omnisharp.enableRoslynAnalyzers": true
+  "omnisharp.enableRoslynAnalyzers": true,
+  "cSpell.words": [
+    "Serializers",
+    "Virt",
+    "cslist"
+  ]
 }

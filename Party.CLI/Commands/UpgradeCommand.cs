@@ -16,7 +16,7 @@ namespace Party.CLI.Commands
             var command = new Command("upgrade", "Updates scenes to reference scripts from the Party folder. You can specify a package, scene or script to upgrade. If you don't specify anything, all scenes and scripts will be upgraded.");
             AddCommonOptions(command);
             // TODO: Specify specific scenes and/or specific scripts and/or specific packages to upgrade
-            command.AddArgument(new Argument<string>("filters") { Arity = ArgumentArity.ZeroOrMore });
+            command.AddArgument(new Argument<string>("filter"));
             command.AddOption(new Option("--all", "Upgrade everything"));
             command.AddOption(new Option("--get", "Downloads registered scripts that were not already downloaded"));
             command.AddOption(new Option("--fix", "Updates scenes referencing scripts that are not yet in the party folder"));
@@ -34,7 +34,7 @@ namespace Party.CLI.Commands
 
         public class UpgradeArguments : CommonArguments
         {
-            public string[] Filters { get; set; }
+            public string Filter { get; set; }
             public bool All { get; set; }
             public bool Get { get; set; }
             public bool Fix { get; set; }
@@ -53,14 +53,14 @@ namespace Party.CLI.Commands
         {
             Controller.HealthCheck();
 
-            if (args.All && args.Filters != null)
+            if (args.All && args.Filter != null)
                 throw new UserInputException("You cannot specify --all and an item to upgrade at the same time");
-            else if (!args.All && args.Filters == null)
+            else if (!args.All && args.Filter == null)
                 throw new UserInputException("You must specify what to upgrade (a .cs, .cslist, .json or package name), or pass --all to upgrade everything");
 
             // TODO: If the item is a package (no extension), resolve it to a path (if the plugin was not downloaded, throw)
             Renderer.WriteLine("Analyzing the saves folder and downloading the scripts list from the registry...");
-            var (saves, registry) = await GetSavesAndRegistryAsync(args.Filters);
+            var (saves, registry) = await GetSavesAndRegistryAsync(args.Filter);
 
             var matches = Controller.MatchSavesToRegistry(saves, registry);
 

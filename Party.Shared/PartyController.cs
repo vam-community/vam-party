@@ -50,15 +50,16 @@ namespace Party.Shared
                 .AcquireAsync(registries);
         }
 
-        public Task<SavesMap> GetSavesAsync(string[] filters = null)
+        public Task<SavesMap> GetSavesAsync(string filter = null)
         {
             return new SavesResolverHandler(
                 _fs,
                 new SceneSerializer(_fs),
                 new ScriptListSerializer(_fs),
+                _config.VirtAMate.VirtAMateInstallFolder,
                 SavesDirectory,
                 _config.Scanning.Ignore)
-                    .AnalyzeSaves(filters ?? new string[0]);
+                    .AnalyzeSaves(filter);
         }
 
         public Task<SortedSet<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string path, DirectoryInfo saves)
@@ -181,7 +182,7 @@ namespace Party.Shared
 
         void HealthCheck();
         Task<Registry> GetRegistryAsync(params string[] registries);
-        Task<SavesMap> GetSavesAsync(string[] filters = null);
+        Task<SavesMap> GetSavesAsync(string filter = null);
         Task<SortedSet<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string path, DirectoryInfo saves);
         Task<SortedSet<RegistryFile>> BuildRegistryFilesFromUrlAsync(Registry registry, Uri url);
         IEnumerable<SearchResult> Search(Registry registry, SavesMap saves, string query);

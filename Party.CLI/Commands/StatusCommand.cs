@@ -17,7 +17,7 @@ namespace Party.CLI.Commands
         {
             var command = new Command("status", "Shows the state of the current scripts and scenes");
             AddCommonOptions(command);
-            command.AddArgument(new Argument<string>("filters") { Arity = ArgumentArity.ZeroOrMore });
+            command.AddArgument(new Argument<string>("filter"));
             command.AddOption(new Option("--breakdown", "Show the list of scenes and files for each script"));
             command.AddOption(new Option("--warnings", "Show warnings such as broken scenes or missing scripts"));
             command.AddOption(new Option("--unregistered", "Show all scripts that were not registered"));
@@ -31,7 +31,7 @@ namespace Party.CLI.Commands
 
         public class StatusArguments : CommonArguments
         {
-            public string[] Filters { get; set; }
+            public string Filter { get; set; }
             public bool Breakdown { get; set; }
             public bool Warnings { get; set; }
             public bool Unregistered { get; set; }
@@ -47,7 +47,7 @@ namespace Party.CLI.Commands
             Controller.HealthCheck();
 
             Renderer.WriteLine("Analyzing the saves folder and downloading the scripts list from the registry...");
-            var (saves, registry) = await GetSavesAndRegistryAsync(args.Filters);
+            var (saves, registry) = await GetSavesAndRegistryAsync(args.Filter);
 
             var matches = Controller.MatchSavesToRegistry(saves, registry);
 

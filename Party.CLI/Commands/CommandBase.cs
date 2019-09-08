@@ -46,17 +46,17 @@ namespace Party.CLI.Commands
             public bool Force { get; set; }
         }
 
-        protected async Task<(SavesMap, Registry)> GetSavesAndRegistryAsync(string[] filters = null)
+        protected async Task<(SavesMap, Registry)> GetSavesAndRegistryAsync(string filter = null)
         {
             // NOTE: When specifying --noop to status, it puts --noop in a filter, and returns nothing. Try to avoid that, or at least specify why nothing has been returned?
 
-            var filterPackages = filters?.Where(f => f.IndexOf(".") == -1).ToArray();
-            var filterPaths = filters?.Where(f => !filterPackages.Contains(f)).ToArray();
+            var filterPackage = filter != null && filter.IndexOf(".") == -1;
+            var filterPath = filter != null && !filterPackage;
 
             using var registryTask = Controller.GetRegistryAsync();
             // TODO: If the item is a package (no extension), resolve it to a path (if the plugin was not downloaded, throw)
             // TODO: When the filter is a scene, mark every script that was not referenced by that scene as not safe for cleanup; also remove them for display
-            using var savesTask = Controller.GetSavesAsync(filterPaths?.Select(Path.GetFullPath).ToArray());
+            using var savesTask = Controller.GetSavesAsync(filterPath ? Path.GetFullPath(filter) : null);
 
             await Task.WhenAll();
 
@@ -64,9 +64,9 @@ namespace Party.CLI.Commands
             var saves = await savesTask;
 
             // TODO: Put in controller
-            if (filterPackages != null && filterPackages.Length > 0)
+            if (filterPackage)
             {
-                var packageHashes = new HashSet<string>(registry.Scripts.Where(s => filterPackages.Contains(s.Name)).SelectMany(s => s.Versions).SelectMany(v => v.Files).Select(f => f.Hash.Value).Distinct());
+                var packageHashes = new HashSet<string>(registry.Scripts.Where(s => filter.Equals(s.Name, StringComparison.InvariantCultureIgnoreCase)).SelectMany(s => s.Versions).SelectMany(v => v.Files).Select(f => f.Hash.Value).Distinct());
                 saves.Scripts = saves.Scripts.Where(s =>
                 {
                     if (s is ScriptList scriptList)
@@ -79,7 +79,7 @@ namespace Party.CLI.Commands
             return (saves, registry);
         }
 
-        protected void PrintWarnings(bool details, (string file, string error)[] errors)
+        protected void PrintWarnings(bool details, SavesError[] errors)
         {
             if (errors == null || errors.Length == 0) return;
 
@@ -88,10 +88,10 @@ namespace Party.CLI.Commands
                 using (Renderer.WithColor(ConsoleColor.Yellow))
                 {
                     Renderer.WriteLine("Scene warnings:");
-                    foreach (var (file, error) in errors)
+                    foreach (var error in errors)
                     {
                         Renderer.Error.Write("  ");
-                        Renderer.Error.WriteLine($"{Controller.GetDisplayPath(file)}: {error}");
+                        Renderer.Error.WriteLine($"{Controller.GetDisplayPath(error.File)}: {error.Error}");
                     }
                 }
                 Renderer.WriteLine();

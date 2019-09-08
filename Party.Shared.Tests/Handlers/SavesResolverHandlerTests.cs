@@ -21,7 +21,7 @@ namespace Party.Shared
             });
             var handler = Create(fileSystem);
 
-            var result = await handler.AnalyzeSaves(new string[0]);
+            var result = await handler.AnalyzeSaves(null);
 
             PartyAssertions.AreDeepEqual(
                 ResultFactory.SavesMap().Build(),
@@ -38,7 +38,7 @@ namespace Party.Shared
             });
             var handler = Create(fileSystem, new[] { @"C:\VaM\Saves\Ignored" });
 
-            var result = await handler.AnalyzeSaves(new string[0]);
+            var result = await handler.AnalyzeSaves(null);
 
             PartyAssertions.AreDeepEqual(
                 ResultFactory.SavesMap().Build(),
@@ -55,7 +55,7 @@ namespace Party.Shared
             });
             var handler = Create(fileSystem);
 
-            var result = await handler.AnalyzeSaves(new string[0]);
+            var result = await handler.AnalyzeSaves(null);
 
             PartyAssertions.AreDeepEqual(
                 ResultFactory.SavesMap()
@@ -74,7 +74,7 @@ namespace Party.Shared
             });
             var handler = Create(fileSystem);
 
-            var result = await handler.AnalyzeSaves(new string[0]);
+            var result = await handler.AnalyzeSaves(null);
 
             PartyAssertions.AreDeepEqual(
                 ResultFactory.SavesMap()
@@ -94,7 +94,7 @@ namespace Party.Shared
             });
             var handler = Create(fileSystem);
 
-            var result = await handler.AnalyzeSaves(new string[0]);
+            var result = await handler.AnalyzeSaves(null);
 
             Assert.That(result.Errors, Is.Empty);
             Assert.That(result.Scripts.Select(s => s.FullPath), Is.EquivalentTo(new[] { @"C:\VaM\Saves\Script 1.cs" }));
@@ -113,7 +113,7 @@ namespace Party.Shared
             });
             var handler = Create(fileSystem);
 
-            var result = await handler.AnalyzeSaves(new string[0]);
+            var result = await handler.AnalyzeSaves(null);
 
             Assert.That(result.Errors, Is.Empty);
             Assert.That(result.Scripts.Select(s => s.FullPath), Is.EquivalentTo(new[] { @"C:\VaM\Saves\Downloads\Scene 1\Script 1.cs" }));
@@ -132,7 +132,7 @@ namespace Party.Shared
             });
             var handler = Create(fileSystem);
 
-            var result = await handler.AnalyzeSaves(new string[0]);
+            var result = await handler.AnalyzeSaves(null);
 
             PartyAssertions.AreDeepEqual(
                 ResultFactory.SavesMap()
@@ -155,7 +155,7 @@ namespace Party.Shared
             });
             var handler = Create(fileSystem);
 
-            var result = await handler.AnalyzeSaves(new string[0]);
+            var result = await handler.AnalyzeSaves(null);
 
             Assert.That(result.Errors, Is.Empty);
             Assert.That(result.Scripts.Select(s => s.FullPath), Is.EquivalentTo(new[] { @"C:\VaM\Saves\Downloads\Scene 1\Add Me.cslist" }));
@@ -170,6 +170,7 @@ namespace Party.Shared
                 fileSystem,
                 new SceneSerializer(fileSystem),
                 new ScriptListSerializer(fileSystem),
+                @"C:\VaM",
                 @"C:\VaM\Saves",
                 ignoredPaths ?? new string[0]);
         }
