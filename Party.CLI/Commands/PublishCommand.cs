@@ -90,11 +90,14 @@ namespace Party.CLI.Commands
                 pathOrUrls = fileInputs.ToArray();
             }
 
-            foreach (var pathOrUrl in pathOrUrls)
+            if (pathOrUrls != null)
             {
-                version.Files.AddRange(pathOrUrl.StartsWith("http") && Uri.TryCreate(pathOrUrl, UriKind.Absolute, out var url)
-                     ? await Controller.BuildRegistryFilesFromUrlAsync(registry, url).ConfigureAwait(false)
-                     : await Controller.BuildRegistryFilesFromPathAsync(registry, Path.GetFullPath(pathOrUrl), args.Saves).ConfigureAwait(false));
+                foreach (var pathOrUrl in pathOrUrls)
+                {
+                    version.Files.AddRange(pathOrUrl.StartsWith("http") && Uri.TryCreate(pathOrUrl, UriKind.Absolute, out var url)
+                         ? await Controller.BuildRegistryFilesFromUrlAsync(registry, url).ConfigureAwait(false)
+                         : await Controller.BuildRegistryFilesFromPathAsync(registry, Path.GetFullPath(pathOrUrl), args.Saves).ConfigureAwait(false));
+                }
             }
 
             registry.AssertNoDuplicates(version);

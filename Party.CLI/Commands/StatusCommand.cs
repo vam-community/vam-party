@@ -88,7 +88,6 @@ namespace Party.CLI.Commands
                     Renderer.Write($"\"{Controller.GetDisplayPath(script.FullPath)}\"", ConsoleColor.DarkGray);
                     Renderer.Write(" ");
                     Renderer.Write($"referenced by {Pluralize(script.Scenes?.Count() ?? 0, "scene", "scenes")}", ConsoleColor.DarkCyan);
-                    var filename = script.FileName;
                     Renderer.Write(Environment.NewLine);
                     if (args.Breakdown)
                         PrintScenes("- ", script.Scenes);
