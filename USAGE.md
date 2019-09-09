@@ -152,7 +152,7 @@ If you do not provide a version and package name, party will ask for one. If it'
 
     > party publish --registry "C:\...\vam-registry\v1\index.json"
 
-For more details and a walkthrough, see the [instructions on vam-registry](https://github.com/vam-community/vam-registry/blob/master/INSTRUCTIONS.md).
+For more details and a walkthrough, see the [instructions on vam-registry](https://github.com/vam-community/vam-registry/blob/master/PUBLISHING.md).
 
 Options:
 

@@ -37,7 +37,7 @@ namespace Party.CLI.Commands
                 Renderer.WriteLine($"You are running the latest version!");
             Renderer.WriteLine("For help on available commands, type party -h");
             Renderer.WriteLine("For documentation on available commands, see: https://github.com/vam-community/vam-party/blob/master/USAGE.md");
-            Renderer.WriteLine("For instructions on publishing to the registry, see: https://github.com/vam-community/vam-registry/blob/master/INSTRUCTIONS.md");
+            Renderer.WriteLine("For instructions on publishing to the registry, see: https://github.com/vam-community/vam-registry/blob/master/PUBLISHING.md");
             Renderer.WriteLine("To report a bug, please file an issue here: https://github.com/vam-community/vam-party/issues");
         }
     }
