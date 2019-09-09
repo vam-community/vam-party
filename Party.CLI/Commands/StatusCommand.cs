@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
 using Party.Shared.Models;
-using Party.Shared.Resources;
 
 namespace Party.CLI.Commands
 {
@@ -100,7 +99,7 @@ namespace Party.CLI.Commands
             Renderer.Write(script.Name, ConsoleColor.Green);
             Renderer.Write(" ");
             Renderer.Write($"v{version.Version}", ConsoleColor.Gray);
-            var nonInstalledLocalFiles = localFiles.Where(l => !l.FullPath.StartsWith(Config.Scanning.PackagesFolder)).ToList();
+            var nonInstalledLocalFiles = localFiles.Where(l => !l.FullPath.StartsWith(Config.VirtAMate.PackagesFolder)).ToList();
             if (nonInstalledLocalFiles.Count > 0)
             {
                 var filesSummary = nonInstalledLocalFiles.Select(l => l.FullPath).Select(Controller.GetDisplayPath).OrderBy(p => p.Length).ToList();

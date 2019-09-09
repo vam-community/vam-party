@@ -11,7 +11,6 @@ using Newtonsoft.Json;
 using Party.Shared.Exceptions;
 using Party.Shared.Handlers;
 using Party.Shared.Models;
-using Party.Shared.Resources;
 using Party.Shared.Serializers;
 
 namespace Party.Shared
@@ -58,7 +57,7 @@ namespace Party.Shared
                 new ScriptListSerializer(_fs),
                 _config.VirtAMate.VirtAMateInstallFolder,
                 SavesDirectory,
-                _config.Scanning.Ignore)
+                _config.VirtAMate.IgnoredFolders)
                     .AnalyzeSaves(filter);
         }
 
@@ -82,7 +81,7 @@ namespace Party.Shared
 
         public Task<InstalledPackageInfoResult> GetInstalledPackageInfoAsync(string name, RegistryScriptVersion version)
         {
-            return new PackageStatusHandler(_fs, SavesDirectory, _config.Scanning.PackagesFolder)
+            return new PackageStatusHandler(_fs, SavesDirectory, _config.VirtAMate.PackagesFolder)
                 .GetInstalledPackageInfoAsync(name, version);
         }
 
@@ -170,7 +169,7 @@ namespace Party.Shared
                 var directorySeparatorIndex = localPath.IndexOf('\\');
                 if (directorySeparatorIndex == -1) throw new UnauthorizedAccessException($"Cannot access files directly at Virt-A-Mate's root");
                 var subFolder = localPath.Substring(0, directorySeparatorIndex);
-                if (!_config.VirtAMate.VirtAMateAllowedSubfolders.Contains(subFolder)) throw new UnauthorizedAccessException($"Accessing Virt-A-Mate subfolder '{subFolder}' is not allowed");
+                if (!_config.VirtAMate.AllowedSubfolders.Contains(subFolder)) throw new UnauthorizedAccessException($"Accessing Virt-A-Mate subfolder '{subFolder}' is not allowed");
             }
             return path;
         }

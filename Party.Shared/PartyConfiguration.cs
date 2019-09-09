@@ -5,7 +5,6 @@ namespace Party.Shared
     public class PartyConfiguration
     {
         public PartyConfigurationVirtAMate VirtAMate { get; set; }
-        public PartyConfigurationScanning Scanning { get; set; }
         public PartyConfigurationRegistry Registry { get; set; }
     }
 
@@ -25,12 +24,8 @@ namespace Party.Shared
             set => _virtAMateInstallFolder = Path.GetFullPath(value, _baseDirectory);
         }
 
-        public string[] VirtAMateAllowedSubfolders { get; set; }
-    }
-
-    public class PartyConfigurationScanning
-    {
-        public string[] Ignore { get; set; }
+        public string[] AllowedSubfolders { get; set; }
+        public string[] IgnoredFolders { get; set; }
         public string PackagesFolder { get; set; }
     }
 

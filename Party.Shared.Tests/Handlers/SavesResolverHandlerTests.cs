@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Party.Shared.Handlers;
-using Party.Shared.Resources;
+using Party.Shared.Models;
 using Party.Shared.Serializers;
 
 namespace Party.Shared

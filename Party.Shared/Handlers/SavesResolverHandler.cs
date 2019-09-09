@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared.Exceptions;
 using Party.Shared.Models;
-using Party.Shared.Resources;
 using Party.Shared.Serializers;
 using Party.Shared.Utils;
 

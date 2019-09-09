@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Party.Shared.Resources;
 using Party.Shared.Models;
 
 namespace Party.Shared

@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared.Models;
-using Party.Shared.Resources;
 using Party.Shared.Serializers;
 
 namespace Party.Shared.Handlers

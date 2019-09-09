@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Party.Shared.Resources;
 
 namespace Party.Shared.Models
 {

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Party.Shared.Models;
-using Party.Shared.Resources;
 
 namespace Party.Shared.Handlers
 {

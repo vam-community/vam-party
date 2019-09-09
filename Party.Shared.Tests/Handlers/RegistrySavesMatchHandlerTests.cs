@@ -1,7 +1,6 @@
 using NUnit.Framework;
 using Party.Shared.Handlers;
 using Party.Shared.Models;
-using Party.Shared.Resources;
 
 namespace Party.Shared
 {
