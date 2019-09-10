@@ -33,7 +33,7 @@ namespace Party.Shared.Serializers
             }
             catch (JsonReaderException exc)
             {
-                throw new SavesException($"There was an issue loading scene '{path}': {exc.Message}", exc);
+                throw new SavesException(exc.Message, exc);
             }
         }
 
@@ -59,7 +59,7 @@ namespace Party.Shared.Serializers
             }
             catch (JsonReaderException exc)
             {
-                throw new SavesException($"There was an issue loading scene '{path}': {exc.Message}", exc);
+                throw new SavesException(exc.Message, exc);
             }
         }
 

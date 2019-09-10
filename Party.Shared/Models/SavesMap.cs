@@ -13,11 +13,19 @@ namespace Party.Shared.Models
     {
         public string File { get; }
         public string Error { get; }
+        public SavesErrorLevel Level { get; }
 
-        public SavesError(string file, string error)
+        public SavesError(string file, string error, SavesErrorLevel level)
         {
             File = file;
             Error = error;
+            Level = level;
         }
+    }
+
+    public enum SavesErrorLevel
+    {
+        Warning = 1,
+        Error = 2
     }
 }

@@ -78,19 +78,38 @@ namespace Party.CLI.Commands
             return (saves, registry);
         }
 
-        protected void PrintWarnings(bool details, SavesError[] errors)
+        protected void PrintWarnings(bool details, SavesError[] logs)
         {
-            if (errors == null || errors.Length == 0) return;
+            if (logs == null || logs.Length == 0) return;
+
+            var grouped = logs.GroupBy(l => l.Level).ToDictionary(g => g.Key, g => g.ToArray());
+            grouped.TryGetValue(SavesErrorLevel.Error, out var errors);
+            grouped.TryGetValue(SavesErrorLevel.Warning, out var warnings);
 
             if (details)
             {
-                using (Renderer.WithColor(ConsoleColor.Yellow))
+                if (errors != null)
                 {
-                    Renderer.WriteLine("Scene warnings:");
-                    foreach (var error in errors)
+                    using (Renderer.WithColor(ConsoleColor.Red))
                     {
-                        Renderer.Error.Write("  ");
-                        Renderer.Error.WriteLine($"{Controller.GetDisplayPath(error.File)}: {error.Error}");
+                        Renderer.WriteLine("Errors:");
+                        foreach (var error in errors)
+                        {
+                            Renderer.Error.WriteLine($"  {Controller.GetDisplayPath(error.File)}: {error.Error}");
+                        }
+                    }
+                    Renderer.WriteLine();
+                }
+
+                if (warnings != null)
+                {
+                    using (Renderer.WithColor(ConsoleColor.Yellow))
+                    {
+                        Renderer.WriteLine("Warnings:");
+                        foreach (var error in warnings)
+                        {
+                            Renderer.Error.WriteLine($"  {Controller.GetDisplayPath(error.File)}: {error.Error}");
+                        }
                     }
                 }
                 Renderer.WriteLine();
@@ -99,7 +118,7 @@ namespace Party.CLI.Commands
             {
                 using (Renderer.WithColor(ConsoleColor.Yellow))
                 {
-                    Renderer.Error.WriteLine($"There were {errors.Length} errors in the saves folder. Run with --warnings to print them.");
+                    Renderer.Error.WriteLine($"There were {warnings?.Length ?? 0} warnings and {errors?.Length ?? 0} errors in the saves folder. Run with --warnings to print them.");
                 }
             }
         }
