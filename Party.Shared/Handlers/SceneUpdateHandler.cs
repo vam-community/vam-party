@@ -19,7 +19,7 @@ namespace Party.Shared.Handlers
             _serializer = serializer;
         }
 
-        public async Task<(string before, string after)[]> UpdateScripts(Scene scene, Script local, InstalledPackageInfoResult info)
+        public async Task<(string before, string after)[]> UpdateScripts(Scene scene, Script local, LocalPackageInfo info)
         {
             var changes = new List<(string before, string after)>();
 
@@ -35,7 +35,7 @@ namespace Party.Shared.Handlers
             return result.ToArray();
         }
 
-        private IEnumerable<(string before, string after)> GetTransform(Script local, InstalledPackageInfoResult info)
+        private IEnumerable<(string before, string after)> GetTransform(Script local, LocalPackageInfo info)
         {
             var after = ToRelative(info.Files.First(f => f.RegistryFile.Hash.Value == local.Hash).Path);
             yield return (before: ToRelative(local.FullPath), after);

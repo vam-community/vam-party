@@ -59,7 +59,7 @@ namespace Party.CLI.Commands
                 throw new UserInputException("You must specify what to upgrade (a .cs, .cslist, .json or package name), or pass --all to upgrade everything");
 
             // TODO: If the item is a package (no extension), resolve it to a path (if the plugin was not downloaded, throw)
-            Renderer.WriteLine("Analyzing the saves folder and downloading the scripts list from the registry...");
+            Renderer.WriteLine("Analyzing the saves folder and gettings the packages list from the registry...");
             var (saves, registry) = await GetSavesAndRegistryAsync(args.Filter);
 
             var matches = Controller.MatchSavesToRegistry(saves, registry);
@@ -102,14 +102,14 @@ namespace Party.CLI.Commands
 
             var status = statuses[0];
 
-            if (status == InstalledPackageInfoResult.FileStatus.HashMismatch)
+            if (status == LocalPackageInfo.FileStatus.HashMismatch)
             {
                 PrintCorruptedInstallInfo(info);
                 if (!args.Force)
                     return;
             }
 
-            if (status == InstalledPackageInfoResult.FileStatus.NotInstalled)
+            if (status == LocalPackageInfo.FileStatus.NotInstalled)
             {
                 if (args.Get)
                 {
@@ -138,7 +138,7 @@ namespace Party.CLI.Commands
                     Renderer.WriteLine($"  Skipping downloading to the party folder because this package is not installed (run again with --get to download it)", ConsoleColor.DarkYellow);
                 }
             }
-            else if (status != InstalledPackageInfoResult.FileStatus.Installed)
+            else if (status != LocalPackageInfo.FileStatus.Installed)
             {
                 throw new NotImplementedException($"Status {status} is not implemented");
             }
@@ -190,7 +190,7 @@ namespace Party.CLI.Commands
             }
         }
 
-        private void PrintScriptToPackage(RegistrySavesMatch match, RegistryScriptVersion updateToVersion)
+        private void PrintScriptToPackage(RegistrySavesMatch match, RegistryPackageVersion updateToVersion)
         {
             Renderer.Write($"Script ");
             Renderer.Write(Controller.GetDisplayPath(match.Local.FullPath), ConsoleColor.Blue);
@@ -210,7 +210,7 @@ namespace Party.CLI.Commands
             }
         }
 
-        private void PrintCorruptedInstallInfo(InstalledPackageInfoResult info)
+        private void PrintCorruptedInstallInfo(LocalPackageInfo info)
         {
             using (Renderer.WithColor(ConsoleColor.Red))
             {

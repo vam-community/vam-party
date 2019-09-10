@@ -2,7 +2,7 @@ using System.Linq;
 
 namespace Party.Shared.Models
 {
-    public class InstalledPackageInfoResult
+    public class LocalPackageInfo
     {
         public InstalledFileInfo[] Files { get; set; }
         public string InstallFolder { get; set; }

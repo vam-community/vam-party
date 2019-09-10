@@ -7,26 +7,26 @@ namespace Party.Shared
     internal static class ResultFactory
     {
         #region Registry
-        internal static Registry Reg(params RegistryScript[] scripts)
+        internal static Registry Reg(params RegistryPackage[] scripts)
         {
             return new Registry
             {
-                Scripts = new SortedSet<RegistryScript>(scripts)
+                Packages = new SortedSet<RegistryPackage>(scripts)
             };
         }
 
-        internal static RegistryScript RegScript(string name, params RegistryScriptVersion[] versions)
+        internal static RegistryPackage RegScript(string name, params RegistryPackageVersion[] versions)
         {
-            return new RegistryScript
+            return new RegistryPackage
             {
                 Name = name,
-                Versions = new SortedSet<RegistryScriptVersion>(versions)
+                Versions = new SortedSet<RegistryPackageVersion>(versions)
             };
         }
 
-        internal static RegistryScriptVersion RegVer(string version, params RegistryFile[] files)
+        internal static RegistryPackageVersion RegVer(string version, params RegistryFile[] files)
         {
-            return new RegistryScriptVersion
+            return new RegistryPackageVersion
             {
                 Version = version,
                 Files = new SortedSet<RegistryFile>(files)
@@ -38,7 +38,7 @@ namespace Party.Shared
             return new RegistryFile
             {
                 Filename = filename,
-                Hash = new RegistryFileHash
+                Hash = new RegistryHash
                 {
                     Value = hash
                 },

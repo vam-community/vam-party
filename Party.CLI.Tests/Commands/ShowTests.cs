@@ -17,15 +17,15 @@ namespace Party.CLI
             DateTimeOffset created = new DateTimeOffset(2010, 11, 12, 0, 0, 0, 0, TimeSpan.Zero);
             _controller.Setup(x => x.GetRegistryAsync()).ReturnsAsync(new Registry
             {
-                Scripts = new SortedSet<RegistryScript>(new[]
+                Packages = new SortedSet<RegistryPackage>(new[]
                 {
-                    new RegistryScript
+                    new RegistryPackage
                     {
                         Name = "cool-thing",
                         Author = "some dude",
-                        Versions = new SortedSet<RegistryScriptVersion>(new []
+                        Versions = new SortedSet<RegistryPackageVersion>(new []
                         {
-                            new RegistryScriptVersion
+                            new RegistryPackageVersion
                             {
                                 Version = "1.2.3",
                                 Created = created,
@@ -73,9 +73,9 @@ namespace Party.CLI
                         Reddit = "https://reddit.com/...profile"
                     }
                 }),
-                Scripts = new SortedSet<RegistryScript>(new[]
+                Packages = new SortedSet<RegistryPackage>(new[]
                 {
-                    new RegistryScript
+                    new RegistryPackage
                     {
                         Name = "cool-thing",
                         Author = "some dude",
@@ -83,9 +83,9 @@ namespace Party.CLI
                         Description = "This does some things",
                         Homepage = "https://reddit.com/...homepage",
                         Repository = "https://github.com/...repo",
-                        Versions = new SortedSet<RegistryScriptVersion>(new []
+                        Versions = new SortedSet<RegistryPackageVersion>(new []
                         {
-                            new RegistryScriptVersion
+                            new RegistryPackageVersion
                             {
                                 Version = "1.2.3",
                                 Created = created,

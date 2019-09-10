@@ -13,7 +13,7 @@ namespace Party.Shared.Serializers
             return SerializeInternal(registry) + Environment.NewLine;
         }
 
-        public string Serialize(RegistryScript registry)
+        public string Serialize(RegistryPackage registry)
         {
             return SerializeInternal(registry);
         }

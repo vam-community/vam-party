@@ -43,7 +43,7 @@ namespace Party.Shared.Handlers
             {
                 Filename = filename,
                 Url = url.ToString(),
-                Hash = new RegistryFileHash
+                Hash = new RegistryHash
                 {
                     Type = Hashing.Type,
                     Value = hash

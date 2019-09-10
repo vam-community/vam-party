@@ -22,9 +22,9 @@ namespace Party.Shared.Handlers
             _http = http ?? throw new ArgumentNullException(nameof(http));
         }
 
-        public async Task<InstalledPackageInfoResult> InstallPackageAsync(InstalledPackageInfoResult info, bool force)
+        public async Task<LocalPackageInfo> InstallPackageAsync(LocalPackageInfo info, bool force)
         {
-            var files = new List<InstalledPackageInfoResult.InstalledFileInfo>();
+            var files = new List<LocalPackageInfo.InstalledFileInfo>();
             foreach (var file in info.Files.Where(f => !f.RegistryFile.Ignore))
             {
                 var directory = Path.GetDirectoryName(file.Path);
@@ -32,7 +32,7 @@ namespace Party.Shared.Handlers
                 {
                     Directory.CreateDirectory(directory);
                 }
-                var fileResult = new InstalledPackageInfoResult.InstalledFileInfo
+                var fileResult = new LocalPackageInfo.InstalledFileInfo
                 {
                     Path = file.Path,
                     RegistryFile = file.RegistryFile
@@ -47,10 +47,10 @@ namespace Party.Shared.Handlers
                     throw new PackageInstallationException($"Hash mismatch between registry file '{file.RegistryFile.Filename}' ({file.RegistryFile.Hash.Value}) and downloaded file '{file.RegistryFile.Url}' ({hash})");
                 }
                 _fs.File.WriteAllText(file.Path, content);
-                fileResult.Status = InstalledPackageInfoResult.FileStatus.Installed;
+                fileResult.Status = LocalPackageInfo.FileStatus.Installed;
                 files.Add(fileResult);
             }
-            return new InstalledPackageInfoResult
+            return new LocalPackageInfo
             {
                 InstallFolder = info.InstallFolder,
                 Files = files.ToArray()

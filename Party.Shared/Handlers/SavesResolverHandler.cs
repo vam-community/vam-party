@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
@@ -123,7 +124,7 @@ namespace Party.Shared.Handlers
                 }
             }
 
-            var scripts = (await Task.WhenAll(scriptTasks).ConfigureAwait(false)).ToDictionary(x => x.FullPath, x => x);
+            var scripts = new ConcurrentDictionary<string, Script>((await Task.WhenAll(scriptTasks).ConfigureAwait(false)).ToDictionary(x => x.FullPath, x => x));
             var errors = new List<SavesError>();
 
             if (scriptListFiles != null)

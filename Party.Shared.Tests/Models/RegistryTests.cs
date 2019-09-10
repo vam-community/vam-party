@@ -12,7 +12,7 @@ namespace Party.Shared
         [TestCase("package25")]
         public void CanValidateNames(string name)
         {
-            Assert.That(RegistryScript.ValidNameRegex.IsMatch(name), Is.True);
+            Assert.That(RegistryPackage.ValidNameRegex.IsMatch(name), Is.True);
         }
     }
 
@@ -21,13 +21,13 @@ namespace Party.Shared
         [Test]
         public void CanGetLatestVersion()
         {
-            var script = new RegistryScript
+            var script = new RegistryPackage
             {
-                Versions = new SortedSet<RegistryScriptVersion>(new[]
+                Versions = new SortedSet<RegistryPackageVersion>(new[]
                 {
-                    new RegistryScriptVersion{ Version = "1.0.0" },
-                    new RegistryScriptVersion{ Version = "2.0.5" },
-                    new RegistryScriptVersion{ Version = "2.0.4" },
+                    new RegistryPackageVersion{ Version = "1.0.0" },
+                    new RegistryPackageVersion{ Version = "2.0.5" },
+                    new RegistryPackageVersion{ Version = "2.0.4" },
                 })
             };
 
@@ -37,13 +37,13 @@ namespace Party.Shared
         [Test]
         public void CanSort()
         {
-            var script = new RegistryScript
+            var script = new RegistryPackage
             {
-                Versions = new SortedSet<RegistryScriptVersion>(new[]
+                Versions = new SortedSet<RegistryPackageVersion>(new[]
                 {
-                    new RegistryScriptVersion{ Version = "1.0.0" },
-                    new RegistryScriptVersion{ Version = "2.0.5" },
-                    new RegistryScriptVersion{ Version = "2.0.4" },
+                    new RegistryPackageVersion{ Version = "1.0.0" },
+                    new RegistryPackageVersion{ Version = "2.0.5" },
+                    new RegistryPackageVersion{ Version = "2.0.4" },
                 })
             };
 
@@ -59,7 +59,7 @@ namespace Party.Shared
         [TestCase("2.0.4-preview5")]
         public void CanValidateVersionNames(string version)
         {
-            Assert.That(RegistryScriptVersion.ValidVersionNameRegex.IsMatch(version), Is.True);
+            Assert.That(RegistryPackageVersion.ValidVersionNameRegex.IsMatch(version), Is.True);
         }
     }
 

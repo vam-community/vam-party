@@ -45,7 +45,7 @@ namespace Party.Shared.Handlers
                 registryFiles.Add(new RegistryFile
                 {
                     Filename = local,
-                    Hash = new RegistryFileHash
+                    Hash = new RegistryHash
                     {
                         Type = Hashing.Type,
                         Value = await Hashing.GetHashAsync(_fs, full).ConfigureAwait(false)

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.CommandLine;
 using System.CommandLine.Invocation;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
@@ -14,7 +13,7 @@ namespace Party.CLI.Commands
     {
         public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller)
         {
-            var command = new Command("get", "Downloads a package (script) into the saves folder");
+            var command = new Command("get", "Downloads a package (script, morph or scene) into the saves folder");
             AddCommonOptions(command);
             command.AddArgument(new Argument<string>("package", null) { Arity = ArgumentArity.ExactlyOne });
             command.AddOption(new Option("--version", "Choose a specific version to install") { Argument = new Argument<string>() });
@@ -50,7 +49,7 @@ namespace Party.CLI.Commands
 
             var registry = await Controller.GetRegistryAsync().ConfigureAwait(false);
 
-            var registryPackage = registry.Scripts.FirstOrDefault(s => s.Name.Equals(args.Package, StringComparison.InvariantCultureIgnoreCase));
+            var registryPackage = registry.Packages.FirstOrDefault(s => s.Name.Equals(args.Package, StringComparison.InvariantCultureIgnoreCase));
 
             if (registryPackage == null)
             {
@@ -112,7 +111,7 @@ namespace Party.CLI.Commands
             }
         }
 
-        private void ValidateStatuses(InstalledPackageInfoResult.FileStatus[] distinctStatuses)
+        private void ValidateStatuses(LocalPackageInfo.FileStatus[] distinctStatuses)
         {
             if (distinctStatuses.Length > 1)
             {
@@ -126,9 +125,9 @@ namespace Party.CLI.Commands
 
             switch (distinctStatuses.FirstOrDefault())
             {
-                case InstalledPackageInfoResult.FileStatus.Installed:
+                case LocalPackageInfo.FileStatus.Installed:
                     throw new UserInputException("Plugin already installed");
-                case InstalledPackageInfoResult.FileStatus.HashMismatch:
+                case LocalPackageInfo.FileStatus.HashMismatch:
                     throw new PackageInstallationException("Installed plugin does not match the registry version. Did you modified it?");
                 default:
                     return;

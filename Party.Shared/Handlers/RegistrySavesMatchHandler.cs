@@ -35,7 +35,7 @@ namespace Party.Shared.Handlers
             };
         }
 
-        private IEnumerable<RegistrySavesMatch> MatchByHash(IEnumerable<Script> scripts, Dictionary<string, (RegistryScript script, RegistryScriptVersion version, RegistryFile file)> byHash)
+        private IEnumerable<RegistrySavesMatch> MatchByHash(IEnumerable<Script> scripts, Dictionary<string, (RegistryPackage script, RegistryPackageVersion version, RegistryFile file)> byHash)
         {
             foreach (var script in scripts)
             {
@@ -54,7 +54,7 @@ namespace Party.Shared.Handlers
             }
         }
 
-        private IEnumerable<RegistrySavesMatch> MatchByFilename(IEnumerable<Script> scripts, Dictionary<string, (RegistryScript script, RegistryScriptVersion version, RegistryFile file)> byFilename)
+        private IEnumerable<RegistrySavesMatch> MatchByFilename(IEnumerable<Script> scripts, Dictionary<string, (RegistryPackage script, RegistryPackageVersion version, RegistryFile file)> byFilename)
         {
             foreach (var script in scripts)
             {

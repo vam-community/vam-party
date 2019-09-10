@@ -65,7 +65,7 @@ namespace Party.CLI.Commands
             // TODO: Put in controller
             if (filterPackage)
             {
-                var packageHashes = new HashSet<string>(registry.Scripts.Where(s => filter.Equals(s.Name, StringComparison.InvariantCultureIgnoreCase)).SelectMany(s => s.Versions).SelectMany(v => v.Files).Select(f => f.Hash.Value).Distinct());
+                var packageHashes = new HashSet<string>(registry.Packages.Where(s => filter.Equals(s.Name, StringComparison.InvariantCultureIgnoreCase)).SelectMany(s => s.Versions).SelectMany(v => v.Files).Select(f => f.Hash.Value).Distinct());
                 saves.Scripts = saves.Scripts.Where(s =>
                 {
                     if (s is ScriptList scriptList)

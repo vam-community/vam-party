@@ -98,7 +98,7 @@ Options:
 Prints the list of all installed scripts, identify the ones that are out of date, and flag scenes that reference scripts from a folder other than the party installation folder.
 
     > party status
-    Analyzing the saves folder and downloading the scripts list from the registry...
+    Analyzing the saves folder and gettings the packages list from the registry...
     There were 3 errors in the saves folder. Run with --warnings to print them.
     some-script 1.0.0 "Script Name.cs" (referenced by 2 scenes)
     - scene\Some Scene.json

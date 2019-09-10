@@ -34,12 +34,12 @@ namespace Party.Shared.Handlers
             var registry = registries[0];
             foreach (var additional in registries.Skip(1))
             {
-                foreach (var additionalScript in additional.Scripts)
+                foreach (var additionalScript in additional.Packages)
                 {
-                    var script = registry.Scripts.FirstOrDefault(s => s.Name == additionalScript.Name);
+                    var script = registry.Packages.FirstOrDefault(s => s.Name == additionalScript.Name);
                     if (script == null)
                     {
-                        registry.Scripts.Add(additionalScript);
+                        registry.Packages.Add(additionalScript);
                     }
                     else
                     {

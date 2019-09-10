@@ -1,7 +1,6 @@
 ﻿using System;
 using System.CommandLine;
 using System.CommandLine.Invocation;
-using System.IO;
 using System.Threading.Tasks;
 using Party.Shared;
 using Party.Shared.Models;
@@ -12,7 +11,7 @@ namespace Party.CLI.Commands
     {
         public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller)
         {
-            var command = new Command("search", "Search for scripts and packages in the registry");
+            var command = new Command("search", "Search for packages in the registry");
             AddCommonOptions(command);
             command.AddArgument(new Argument<string>("query", null));
             command.AddOption(new Option("--no-usage", "Do not show usage information from scenes (runs faster)"));
@@ -51,13 +50,13 @@ namespace Party.CLI.Commands
 
             foreach (var result in Controller.Search(registry, saves, args.Query))
             {
-                var script = result.Package;
-                var latestVersion = script.GetLatestVersion();
+                var package = result.Package;
+                var latestVersion = package.GetLatestVersion();
 
-                Renderer.Write(script.Name, ConsoleColor.Blue);
+                Renderer.Write(package.Name, ConsoleColor.Blue);
                 Renderer.Write($" v{latestVersion.Version}", ConsoleColor.Cyan);
                 Renderer.Write($" by ");
-                Renderer.Write(script.Author ?? "?", ConsoleColor.Magenta);
+                Renderer.Write(package.Author ?? "?", ConsoleColor.Magenta);
                 if (!result.Trusted)
                 {
                     Renderer.Write($" [NOT TRUSTED]", ConsoleColor.Red);

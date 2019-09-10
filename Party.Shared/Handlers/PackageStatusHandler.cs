@@ -22,7 +22,7 @@ namespace Party.Shared.Handlers
             _packagesFolder = packagesFolder ?? throw new ArgumentNullException(nameof(packagesFolder));
         }
 
-        public async Task<InstalledPackageInfoResult> GetInstalledPackageInfoAsync(string name, RegistryScriptVersion version)
+        public async Task<LocalPackageInfo> GetInstalledPackageInfoAsync(string name, RegistryPackageVersion version)
         {
             var basePath = Path.GetFullPath(_packagesFolder, _savesDirectory);
             if (!basePath.StartsWith(_savesDirectory))
@@ -30,22 +30,22 @@ namespace Party.Shared.Handlers
                 throw new UnauthorizedAccessException($"The packages folder must be within the saves directory: '{basePath}'");
             }
             var installPath = Path.Combine(basePath, name, version.Version);
-            var files = new List<InstalledPackageInfoResult.InstalledFileInfo>();
+            var files = new List<LocalPackageInfo.InstalledFileInfo>();
             foreach (var file in version.Files.Where(f => !f.Ignore && f.Filename != null))
             {
                 files.Add(await GetPackageFileInfo(installPath, file).ConfigureAwait(false));
             }
-            return new InstalledPackageInfoResult
+            return new LocalPackageInfo
             {
                 InstallFolder = basePath,
                 Files = files.ToArray()
             };
         }
 
-        private async Task<InstalledPackageInfoResult.InstalledFileInfo> GetPackageFileInfo(string installPath, RegistryFile file)
+        private async Task<LocalPackageInfo.InstalledFileInfo> GetPackageFileInfo(string installPath, RegistryFile file)
         {
             var filePath = Path.Combine(installPath, file.Filename);
-            var fileInfo = new InstalledPackageInfoResult.InstalledFileInfo
+            var fileInfo = new LocalPackageInfo.InstalledFileInfo
             {
                 Path = filePath,
                 RegistryFile = file
@@ -59,20 +59,20 @@ namespace Party.Shared.Handlers
                 }
                 if (hash == file.Hash.Value)
                 {
-                    fileInfo.Status = InstalledPackageInfoResult.FileStatus.Installed;
+                    fileInfo.Status = LocalPackageInfo.FileStatus.Installed;
                 }
                 else
                 {
-                    fileInfo.Status = InstalledPackageInfoResult.FileStatus.HashMismatch;
+                    fileInfo.Status = LocalPackageInfo.FileStatus.HashMismatch;
                 }
             }
             else if (file.Ignore)
             {
-                fileInfo.Status = InstalledPackageInfoResult.FileStatus.Ignored;
+                fileInfo.Status = LocalPackageInfo.FileStatus.Ignored;
             }
             else
             {
-                fileInfo.Status = InstalledPackageInfoResult.FileStatus.NotInstalled;
+                fileInfo.Status = LocalPackageInfo.FileStatus.NotInstalled;
             }
             return fileInfo;
         }

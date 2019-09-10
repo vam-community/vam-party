@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Invocation;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
@@ -16,7 +15,7 @@ namespace Party.CLI.Commands
         {
             var command = new Command("status", "Shows the state of the current scripts and scenes");
             AddCommonOptions(command);
-            command.AddArgument(new Argument<string>("filter"));
+            command.AddArgument(new Argument<string>("filter") { Arity = ArgumentArity.ZeroOrOne });
             command.AddOption(new Option("--breakdown", "Show the list of scenes and files for each script"));
             command.AddOption(new Option("--warnings", "Show warnings such as broken scenes or missing scripts"));
             command.AddOption(new Option("--unregistered", "Show all scripts that were not registered"));
@@ -45,25 +44,32 @@ namespace Party.CLI.Commands
         {
             Controller.HealthCheck();
 
-            Renderer.WriteLine("Analyzing the saves folder and downloading the scripts list from the registry...");
+            Renderer.WriteLine("Analyzing the saves folder and gettings the packages list from the registry...");
             var (saves, registry) = await GetSavesAndRegistryAsync(args.Filter);
 
             var matches = Controller.MatchSavesToRegistry(saves, registry);
 
             PrintWarnings(args.Warnings, saves.Errors);
 
-            foreach (var matchScript in matches.HashMatches.GroupBy(m => m.Script).OrderBy(g => g.Key.Name))
+            if (matches.HashMatches.Length == 0)
             {
-                foreach (var matchVersion in matchScript.GroupBy(s => s.Version).OrderBy(g => g.Key.Version))
+                Renderer.WriteLine("No scripts where found", ConsoleColor.Red);
+            }
+            else
+            {
+                foreach (var matchScript in matches.HashMatches.GroupBy(m => m.Script).OrderBy(g => g.Key.Name))
                 {
-                    var localFiles = matchVersion.Select(v => v.Local).ToList();
-                    PrintScript(matchScript.Key, matchVersion.Key, localFiles);
-                    if (args.Breakdown)
+                    foreach (var matchVersion in matchScript.GroupBy(s => s.Version).OrderBy(g => g.Key.Version))
                     {
-                        foreach (var localFile in localFiles.OrderBy(p => p.FullPath))
+                        var localFiles = matchVersion.Select(v => v.Local).ToList();
+                        PrintScript(matchScript.Key, matchVersion.Key, localFiles);
+                        if (args.Breakdown)
                         {
-                            Renderer.WriteLine($"- Script: {Controller.GetDisplayPath(localFile.FullPath)}");
-                            PrintScenes("  - Scene: ", localFile.Scenes.ToList());
+                            foreach (var localFile in localFiles.OrderBy(p => p.FullPath))
+                            {
+                                Renderer.WriteLine($"- Script: {Controller.GetDisplayPath(localFile.FullPath)}");
+                                PrintScenes("  - Scene: ", localFile.Scenes.ToList());
+                            }
                         }
                     }
                 }
@@ -94,7 +100,7 @@ namespace Party.CLI.Commands
             }
         }
 
-        private void PrintScript(RegistryScript script, RegistryScriptVersion version, IReadOnlyCollection<Script> localFiles)
+        private void PrintScript(RegistryPackage script, RegistryPackageVersion version, IReadOnlyCollection<Script> localFiles)
         {
             Renderer.Write(script.Name, ConsoleColor.Green);
             Renderer.Write(" ");

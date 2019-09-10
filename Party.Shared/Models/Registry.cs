@@ -8,42 +8,46 @@ namespace Party.Shared.Models
 {
     public class Registry
     {
-        private SortedSet<RegistryScript> _scripts;
         private SortedSet<RegistryAuthor> _authors;
+        private SortedSet<RegistryPackage> _packages;
 
         public SortedSet<RegistryAuthor> Authors { get => _authors ?? (_authors = new SortedSet<RegistryAuthor>()); set => _authors = value; }
-        public SortedSet<RegistryScript> Scripts { get => _scripts ?? (_scripts = new SortedSet<RegistryScript>()); set => _scripts = value; }
+        public SortedSet<RegistryPackage> Packages { get => _packages ?? (_packages = new SortedSet<RegistryPackage>()); set => _packages = value; }
+        [Obsolete]
+        public SortedSet<RegistryPackage> Scripts { get => null; set => _packages = value; }
 
-        public RegistryScript GetOrCreateScript(string name)
+        public RegistryPackage GetOrCreatePackage(string name)
         {
-            var script = Scripts.FirstOrDefault(s => s.Name == name);
+            var script = Packages.FirstOrDefault(s => s.Name == name);
             if (script != null) return script;
 
-            script = new RegistryScript { Name = name, Versions = new SortedSet<RegistryScriptVersion>() };
-            Scripts.Add(script);
+            script = new RegistryPackage { Name = name, Versions = new SortedSet<RegistryPackageVersion>() };
+            Packages.Add(script);
             return script;
         }
 
-        public void AssertNoDuplicates(RegistryScriptVersion version)
+        public void AssertNoDuplicates(RegistryPackageVersion version)
         {
             var hashes = version.Files.Where(f => f.Hash?.Value != null).Select(f => f.Hash.Value).ToArray();
-            var match = Scripts
+            var conflictingVersion = Packages
                 .SelectMany(s => s.Versions.Where(v => !ReferenceEquals(v, version)).Select(v => (s, v)))
                 .FirstOrDefault(x => x.v.Files.Count == hashes.Length && x.v.Files.All(f => hashes.Contains(f.Hash?.Value)));
 
-            if (match.v != null)
-                throw new UserInputException($"This version contains exactly the same file count and file hashes as {match.s.Name} v{match.v.Version}.");
+            if (conflictingVersion.v != null)
+                throw new UserInputException($"This version contains exactly the same file count and file hashes as {conflictingVersion.s.Name} v{conflictingVersion.v.Version}.");
+
+            // TODO: Also assert there are no conflicting LocalPath in another package, otherwise either make a dependency or ask for a resolution in GitHub
         }
 
-        public IEnumerable<(RegistryScript script, RegistryScriptVersion version, RegistryFile file)> FlattenFiles()
+        public IEnumerable<(RegistryPackage package, RegistryPackageVersion version, RegistryFile file)> FlattenFiles()
         {
-            return Scripts
+            return Packages
                 .SelectMany(script => script.Versions.Select(version => (script, version))
                 .SelectMany(sv => sv.version.Files.Select(file => (sv.script, sv.version, file))));
         }
     }
 
-    public class RegistryScript : IComparable<RegistryScript>, IComparable
+    public class RegistryPackage : IComparable<RegistryPackage>, IComparable
     {
         public static readonly Regex ValidNameRegex = new Regex(@"^[a-z][a-z0-9\-_]{2,127}$");
 
@@ -54,32 +58,32 @@ namespace Party.Shared.Models
         // TODO: Ensure this only contains valid characters
         public string Homepage { get; set; }
         public string Repository { get; set; }
-        public SortedSet<RegistryScriptVersion> Versions { get; set; }
+        public SortedSet<RegistryPackageVersion> Versions { get; set; }
 
-        public RegistryScriptVersion GetLatestVersion()
+        public RegistryPackageVersion GetLatestVersion()
         {
             return Versions.FirstOrDefault();
         }
 
-        public RegistryScriptVersion CreateVersion()
+        public RegistryPackageVersion CreateVersion()
         {
-            var version = new RegistryScriptVersion();
+            var version = new RegistryPackageVersion();
             if (!Versions.Add(version)) throw new InvalidOperationException("Could not create a new version");
             return version;
         }
 
-        int IComparable<RegistryScript>.CompareTo(RegistryScript other)
+        int IComparable<RegistryPackage>.CompareTo(RegistryPackage other)
         {
             return Name?.CompareTo(other.Name) ?? 0;
         }
 
         int IComparable.CompareTo(object obj)
         {
-            return (this as IComparable<RegistryScript>).CompareTo(obj as RegistryScript);
+            return (this as IComparable<RegistryPackage>).CompareTo(obj as RegistryPackage);
         }
     }
 
-    public class RegistryScriptVersion : IComparable<RegistryScriptVersion>, IComparable
+    public class RegistryPackageVersion : IComparable<RegistryPackageVersion>, IComparable
     {
         public static readonly Regex ValidVersionNameRegex = new Regex(@"^(?<Major>0|[1-9][0-9]{0,3})\.(?<Minor>0|[1-9][0-9]{0,3})\.(?<Revision>0|[1-9][0-9]{0,3})(-(?<Extra>[a-z0-9]{1,32}))?$", RegexOptions.Compiled);
 
@@ -90,14 +94,14 @@ namespace Party.Shared.Models
         public string Notes { get; set; }
         public SortedSet<RegistryFile> Files { get => _files ?? (_files = new SortedSet<RegistryFile>()); set => _files = value; }
 
-        int IComparable<RegistryScriptVersion>.CompareTo(RegistryScriptVersion other)
+        int IComparable<RegistryPackageVersion>.CompareTo(RegistryPackageVersion other)
         {
             return (Version as IComparable<RegistryVersionString>).CompareTo(other.Version);
         }
 
         int IComparable.CompareTo(object obj)
         {
-            return (this as IComparable<RegistryScriptVersion>).CompareTo(obj as RegistryScriptVersion);
+            return (this as IComparable<RegistryPackageVersion>).CompareTo(obj as RegistryPackageVersion);
         }
     }
 
@@ -107,7 +111,7 @@ namespace Party.Shared.Models
         public string Filename { get; set; }
         public string LocalPath { get; set; }
         public string Url { get; set; }
-        public RegistryFileHash Hash { get; set; }
+        public RegistryHash Hash { get; set; }
         public bool Ignore { get; set; }
 
         int IComparable<RegistryFile>.CompareTo(RegistryFile other)
@@ -127,7 +131,7 @@ namespace Party.Shared.Models
         }
     }
 
-    public class RegistryFileHash
+    public class RegistryHash
     {
         public string Type { get; set; }
         public string Value { get; set; }
@@ -137,7 +141,7 @@ namespace Party.Shared.Models
     {
         public RegistryVersionString(string version)
         {
-            var result = RegistryScriptVersion.ValidVersionNameRegex.Match(version);
+            var result = RegistryPackageVersion.ValidVersionNameRegex.Match(version);
             if (!result.Success) throw new RegistryException($"Invalid version number: '{version}'");
             Major = int.Parse(result.Groups["Major"].Value);
             Minor = int.Parse(result.Groups["Minor"].Value);

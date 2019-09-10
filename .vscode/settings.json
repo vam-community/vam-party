@@ -5,6 +5,7 @@
   "omnisharp.enableEditorConfigSupport": true,
   "omnisharp.enableRoslynAnalyzers": true,
   "cSpell.words": [
+    "Arity",
     "Serializers",
     "Virt",
     "codacy",

@@ -67,10 +67,10 @@ namespace Party.CLI.Commands
                 registry = await Controller.GetRegistryAsync();
             }
 
-            var name = args.PackageName ?? (args.Quiet ? "unnamed" : Renderer.Ask("Package Name: ", false, RegistryScript.ValidNameRegex, "my-package"));
+            var name = args.PackageName ?? (args.Quiet ? "unnamed" : Renderer.Ask("Package Name: ", false, RegistryPackage.ValidNameRegex, "my-package"));
 
-            var script = registry.GetOrCreateScript(name);
-            var version = script.CreateVersion();
+            var package = registry.GetOrCreatePackage(name);
+            var version = package.CreateVersion();
 
             var pathOrUrls = args.Input;
             if (!args.Quiet && (pathOrUrls == null || pathOrUrls.Length == 0))
@@ -102,24 +102,24 @@ namespace Party.CLI.Commands
 
             registry.AssertNoDuplicates(version);
 
-            if (script == null || version == null || script.Versions == null) throw new NullReferenceException($"Error in {nameof(Controller.BuildRegistryFilesFromPathAsync)}: Null values were returned.");
+            if (package == null || version == null || package.Versions == null) throw new NullReferenceException($"Error in {nameof(Controller.BuildRegistryFilesFromPathAsync)}: Null values were returned.");
 
-            var isNew = script.Versions.Count == 1;
+            var isNew = package.Versions.Count == 1;
 
             // TODO: Validate all fields
             if (!args.Quiet && !isNew && string.IsNullOrEmpty(args.PackageVersion))
             {
-                Renderer.WriteLine($"This package already exists (by {script.Author ?? "Unknown User"}), a new version will be added to it.");
+                Renderer.WriteLine($"This package already exists (by {package.Author ?? "Unknown User"}), a new version will be added to it.");
 
-                Renderer.WriteLine($"Latest {Math.Min(5, script.Versions.Count - 1)} versions:");
-                foreach (var existingVersion in script.Versions.Where(v => !ReferenceEquals(v, version)).Take(5))
+                Renderer.WriteLine($"Latest {Math.Min(5, package.Versions.Count - 1)} versions:");
+                foreach (var existingVersion in package.Versions.Where(v => !ReferenceEquals(v, version)).Take(5))
                 {
                     Renderer.WriteLine($"- {existingVersion.Version}");
                 }
             }
 
             version.Created = DateTimeOffset.Now;
-            version.Version = args.PackageVersion ?? (args.Quiet ? "1.0.0" : Renderer.Ask("Package version: ", true, RegistryScriptVersion.ValidVersionNameRegex, "1.0.0"));
+            version.Version = args.PackageVersion ?? (args.Quiet ? "1.0.0" : Renderer.Ask("Package version: ", true, RegistryPackageVersion.ValidVersionNameRegex, "1.0.0"));
 
             if (!args.Quiet && !isNew)
             {
@@ -142,14 +142,14 @@ namespace Party.CLI.Commands
                     });
                 }
 
-                script.Author = author;
+                package.Author = author;
 
                 if (!args.Quiet)
                 {
-                    script.Description = Renderer.Ask("Description: ");
-                    script.Tags = (Renderer.Ask("Tags (comma-separated list): ") ?? "").Split(',').Select(x => x.Trim()).Where(x => x != "").ToList();
-                    script.Homepage = Renderer.Ask("Package Homepage URL: ");
-                    script.Repository = Renderer.Ask("Package Repository URL: ");
+                    package.Description = Renderer.Ask("Description: ");
+                    package.Tags = (Renderer.Ask("Tags (comma-separated list): ") ?? "").Split(',').Select(x => x.Trim()).Where(x => x != "").ToList();
+                    package.Homepage = Renderer.Ask("Package Homepage URL: ");
+                    package.Repository = Renderer.Ask("Package Repository URL: ");
                 }
             }
 
@@ -185,7 +185,7 @@ namespace Party.CLI.Commands
             else
             {
                 Renderer.WriteLine("JSON Template:");
-                Renderer.WriteLine(serializer.Serialize(script));
+                Renderer.WriteLine(serializer.Serialize(package));
             }
         }
     }

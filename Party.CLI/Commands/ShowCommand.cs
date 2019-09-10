@@ -1,7 +1,6 @@
 ﻿using System;
 using System.CommandLine;
 using System.CommandLine.Invocation;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
@@ -42,43 +41,43 @@ namespace Party.CLI.Commands
 
             var (saves, registry) = await GetSavesAndRegistryAsync();
 
-            var registryPackage = registry.Scripts?.FirstOrDefault(p => p.Name.Equals(args.Package, StringComparison.InvariantCultureIgnoreCase));
+            var package = registry.Packages?.FirstOrDefault(p => p.Name.Equals(args.Package, StringComparison.InvariantCultureIgnoreCase));
 
-            if (registryPackage == null)
+            if (package == null)
             {
                 throw new UserInputException($"Could not find package {args.Package}");
             }
 
-            var registryVersion = registryPackage.GetLatestVersion();
+            var latestVersion = package.GetLatestVersion();
 
-            if (registryVersion?.Files == null)
+            if (latestVersion?.Files == null)
             {
                 throw new RegistryException("Package does not have any versions");
             }
 
             PrintWarnings(args.Warnings, saves.Errors);
 
-            Renderer.WriteLine($"Package {registryPackage.Name}");
+            Renderer.WriteLine($"Package {package.Name}");
 
-            Renderer.WriteLine($"Last version v{registryVersion.Version}, published {registryVersion.Created.ToLocalTime().ToString("D")}");
+            Renderer.WriteLine($"Last version v{latestVersion.Version}, published {latestVersion.Created.ToLocalTime().ToString("D")}");
 
             Renderer.WriteLine("Versions:");
-            foreach (var version in registryPackage.Versions)
+            foreach (var version in package.Versions)
             {
                 Renderer.WriteLine($"- v{version.Version}, published {version.Created.ToLocalTime().ToString("D")}: {version.Notes ?? "(no release notes)"}");
             }
 
-            if (registryPackage.Description != null)
-                Renderer.WriteLine($"Description: {registryPackage.Description}");
-            if (registryPackage.Tags != null)
-                Renderer.WriteLine($"Tags: {string.Join(", ", registryPackage.Tags)}");
-            if (registryPackage.Repository != null)
-                Renderer.WriteLine($"Repository: {registryPackage.Repository}");
-            if (registryPackage.Homepage != null)
-                Renderer.WriteLine($"Homepage: {registryPackage.Homepage}");
+            if (package.Description != null)
+                Renderer.WriteLine($"Description: {package.Description}");
+            if (package.Tags != null)
+                Renderer.WriteLine($"Tags: {string.Join(", ", package.Tags)}");
+            if (package.Repository != null)
+                Renderer.WriteLine($"Repository: {package.Repository}");
+            if (package.Homepage != null)
+                Renderer.WriteLine($"Homepage: {package.Homepage}");
 
-            Renderer.WriteLine($"Author: {registryPackage.Author}");
-            var registryAuthor = registry.Authors?.FirstOrDefault(a => a.Name == registryPackage.Author);
+            Renderer.WriteLine($"Author: {package.Author}");
+            var registryAuthor = registry.Authors?.FirstOrDefault(a => a.Name == package.Author);
             if (registryAuthor != null)
             {
                 if (registryAuthor.Github != null)
@@ -88,7 +87,7 @@ namespace Party.CLI.Commands
             }
 
             Renderer.WriteLine("Files:");
-            foreach (var file in registryVersion.Files.Where(f => !f.Ignore && f.Filename != null))
+            foreach (var file in latestVersion.Files.Where(f => !f.Ignore && f.Filename != null))
             {
                 Renderer.WriteLine($"- {file.Filename}: {file.Url ?? "not available in registry"}");
             }

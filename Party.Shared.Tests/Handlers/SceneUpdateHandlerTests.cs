@@ -15,15 +15,15 @@ namespace Party.Shared
         {
             var scene = new Scene(@"C:\VaM\Saves\My Scene.json");
             var script = new Script(@"C:\VaM\Saves\My Script.cs", "SOMEHASH");
-            var info = new InstalledPackageInfoResult
+            var info = new LocalPackageInfo
             {
                 Files = new[]
                 {
-                    new InstalledPackageInfoResult.InstalledFileInfo
+                    new LocalPackageInfo.InstalledFileInfo
                     {
                         RegistryFile = new RegistryFile
                         {
-                            Hash = new RegistryFileHash
+                            Hash = new RegistryHash
                             {
                                 Value = "SOMEHASH"
                             }

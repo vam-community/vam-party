@@ -17,9 +17,9 @@ namespace Party.Shared.Handlers
         public IEnumerable<SearchResult> Search(Registry registry, SavesMap saves, string query)
         {
             if (registry is null) throw new ArgumentNullException(nameof(registry));
-            if (registry?.Scripts is null) throw new ArgumentException("registry does not have any scripts", nameof(registry));
+            if (registry?.Packages is null) throw new ArgumentException("registry does not have any scripts", nameof(registry));
 
-            foreach (var package in registry.Scripts)
+            foreach (var package in registry.Packages)
             {
                 if (!string.IsNullOrEmpty(query))
                 {
@@ -60,7 +60,7 @@ namespace Party.Shared.Handlers
             }
         }
 
-        private bool MatchesQuery(RegistryScript package, string query)
+        private bool MatchesQuery(RegistryPackage package, string query)
         {
             if (package.Name?.Contains(query, StringComparison.InvariantCultureIgnoreCase) ?? false)
             {

@@ -41,8 +41,8 @@ namespace Party.Shared
                 .WithScript(new Script($"{_vam}1.cs", "1"), out var local1)
                 .Build();
             RegistryFile file = ResultFactory.RegFile("2.cs", "1");
-            RegistryScriptVersion version = ResultFactory.RegVer("1.0.0", file);
-            RegistryScript script = ResultFactory.RegScript("my-script", version);
+            RegistryPackageVersion version = ResultFactory.RegVer("1.0.0", file);
+            RegistryPackage script = ResultFactory.RegScript("my-script", version);
             var registry = ResultFactory.Reg(script);
 
             var result = _handler.Match(saves, registry);
@@ -62,8 +62,8 @@ namespace Party.Shared
                 .WithScript(new Script($"{_vam}1.cs", "1"), out var local1)
                 .Build();
             RegistryFile file = ResultFactory.RegFile("1.cs", "2");
-            RegistryScriptVersion version = ResultFactory.RegVer("1.0.0", file);
-            RegistryScript script = ResultFactory.RegScript("my-script", version);
+            RegistryPackageVersion version = ResultFactory.RegVer("1.0.0", file);
+            RegistryPackage script = ResultFactory.RegScript("my-script", version);
             var registry = ResultFactory.Reg(script);
 
             var result = _handler.Match(saves, registry);
@@ -83,8 +83,8 @@ namespace Party.Shared
                 .WithScript(new Script($"{_vam}1.cs", "1"), out var local1)
                 .Build();
             RegistryFile file = ResultFactory.RegFile("1.cs", "1");
-            RegistryScriptVersion version = ResultFactory.RegVer("1.0.0", file);
-            RegistryScript script = ResultFactory.RegScript("my-script", version);
+            RegistryPackageVersion version = ResultFactory.RegVer("1.0.0", file);
+            RegistryPackage script = ResultFactory.RegScript("my-script", version);
             var registry = ResultFactory.Reg(script);
 
             var result = _handler.Match(saves, registry);
