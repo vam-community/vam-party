@@ -2,7 +2,7 @@ os: windows
 language: csharp
 mono: none
 env:
-  - VERSION_PREFIX="1.0.0" VERSION_SUFFIX="alpha1"
+  - VERSION_PREFIX="0.2.1" VERSION_SUFFIX="alpha"
 script:
   - choco install dotnetcore-sdk --pre -y
   - choco install opencover.portable codecov -y
