@@ -88,10 +88,12 @@ namespace Party.Shared.Models
         public static readonly Regex ValidVersionNameRegex = new Regex(@"^(?<Major>0|[1-9][0-9]{0,3})\.(?<Minor>0|[1-9][0-9]{0,3})\.(?<Revision>0|[1-9][0-9]{0,3})(-(?<Extra>[a-z0-9]{1,32}))?$", RegexOptions.Compiled);
 
         private SortedSet<RegistryFile> _files;
+        private SortedSet<RegistryPackageDependency> _dependencies;
 
         public RegistryVersionString Version { get; set; }
         public DateTimeOffset Created { get; set; }
         public string Notes { get; set; }
+        public SortedSet<RegistryPackageDependency> Dependencies { get => _dependencies ?? (_dependencies = new SortedSet<RegistryPackageDependency>()); set => _dependencies = value; }
         public SortedSet<RegistryFile> Files { get => _files ?? (_files = new SortedSet<RegistryFile>()); set => _files = value; }
 
         int IComparable<RegistryPackageVersion>.CompareTo(RegistryPackageVersion other)
@@ -102,6 +104,22 @@ namespace Party.Shared.Models
         int IComparable.CompareTo(object obj)
         {
             return (this as IComparable<RegistryPackageVersion>).CompareTo(obj as RegistryPackageVersion);
+        }
+    }
+
+    public class RegistryPackageDependency : IComparable<RegistryPackageDependency>, IComparable
+    {
+        public string Name { get; set; }
+        public string Version { get; set; }
+
+        int IComparable<RegistryPackageDependency>.CompareTo(RegistryPackageDependency other)
+        {
+            return Name?.CompareTo(other.Name) ?? 0;
+        }
+
+        int IComparable.CompareTo(object obj)
+        {
+            return (this as IComparable<RegistryPackageDependency>).CompareTo(obj as RegistryPackageDependency);
         }
     }
 
