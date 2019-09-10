@@ -65,18 +65,15 @@ namespace Party.Shared.Serializers
 
         private void ProcessScripts(JObject json, Func<string, string> transform)
         {
-            var atoms = (JArray)json["atoms"];
-            if (atoms == null) { return; }
+            if (!(json["atoms"] is JArray atoms)) { return; }
             foreach (var atom in atoms)
             {
-                var storables = (JArray)atom["storables"];
-                if (storables == null) { continue; }
+                if (!(atom["storables"] is JArray storables)) { continue; }
                 foreach (var storable in storables)
                 {
                     if ((string)storable["id"] == "PluginManager")
                     {
-                        var plugins = (JObject)storable["plugins"];
-                        if (plugins == null) { continue; }
+                        if (!(storable["plugins"] is JObject plugins)) { continue; }
                         foreach (var plugin in plugins.Properties())
                         {
                             var relativePath = (string)plugin.Value;
