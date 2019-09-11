@@ -4,6 +4,15 @@
     <OutputType>Exe</OutputType>
     <AssemblyName>party</AssemblyName>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <!-- Options: CoreRT (dotnet publish Party.CLI -c Release -r win-x64), SCD (dotnet publish -c release -r win10-x64), NetFull (dotnet publish) -->
+    <PartyBuildMode>NetFull</PartyBuildMode>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(PartyBuildMode)' == 'SCD'">
+    <RuntimeIdentifiers>win10-x64</RuntimeIdentifiers>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(PartyBuildMode)' == 'CoreRT'">
     <IlcInvariantGlobalization>true</IlcInvariantGlobalization>
     <IlcOptimizationPreference>Speed</IlcOptimizationPreference>
   </PropertyGroup>
@@ -12,8 +21,11 @@
     <ProjectReference Include="..\Party.Shared\Party.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(PartyBuildMode)' == 'CoreRT'">
     <PackageReference Include="Microsoft.DotNet.ILCompiler" Version="1.0.0-alpha-*" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.2.4" />
     <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="2.2.0" />
