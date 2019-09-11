@@ -20,14 +20,35 @@ namespace Party.CLI
                 .SetBasePath(Path.Combine(AppContext.BaseDirectory))
                 .AddJsonFile("party.settings.json", optional: true, reloadOnChange: false)
                 .Build();
-            var config = PartyConfigurationFactory.Create(AppContext.BaseDirectory);
-            rootConfig.Bind(config);
 
             var renderer = new ConsoleRenderer(Console.Out, Console.In, Console.Error, (ConsoleColor color) => Console.ForegroundColor = color, () => Console.ResetColor());
+
+            string vamFolder = FindVaMDirectory();
+
+            var config = PartyConfigurationFactory.Create(vamFolder);
+            rootConfig.Bind(config);
 
             var controller = new PartyController(config);
 
             return await new Program(renderer, config, controller).Execute(args).ConfigureAwait(false);
+        }
+
+        private static string FindVaMDirectory()
+        {
+            var vamFolder = AppContext.BaseDirectory;
+            if (vamFolder == null) return null;
+
+            while (!File.Exists(Path.Combine(vamFolder, "VaM.exe")))
+            {
+                var parent = Path.GetDirectoryName(vamFolder);
+                if (parent == null)
+                    return AppContext.BaseDirectory;
+                if (parent == vamFolder)
+                    return AppContext.BaseDirectory;
+                vamFolder = parent;
+            }
+
+            return vamFolder;
         }
 
         private readonly IConsoleRenderer _renderer;

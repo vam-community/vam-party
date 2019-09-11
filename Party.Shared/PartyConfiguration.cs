@@ -15,13 +15,13 @@ namespace Party.Shared
 
         public PartyConfigurationVirtAMate(string baseDirectory)
         {
-            _baseDirectory = baseDirectory;
+            _baseDirectory = baseDirectory != null ? Path.GetFullPath(baseDirectory) : null;
         }
 
         public string VirtAMateInstallFolder
         {
             get => _virtAMateInstallFolder;
-            set => _virtAMateInstallFolder = Path.GetFullPath(Path.Combine(_baseDirectory, value));
+            set => _virtAMateInstallFolder = Path.GetFullPath(_baseDirectory != null && !Path.IsPathRooted(value) ? Path.Combine(_baseDirectory, value) : value);
         }
 
         public string[] AllowedSubfolders { get; set; }
