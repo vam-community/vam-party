@@ -179,7 +179,11 @@ namespace Party.Shared.Models
 
         public override int GetHashCode()
         {
+#if NETSTANDARD2_1
             return HashCode.Combine(Major, Minor, Revision, Extra);
+#else
+            return (Major * 100000000) + (Minor * 100000) + (Revision * 100) + (Extra?.GetHashCode() ?? 0);
+#endif
         }
 
         public override string ToString()

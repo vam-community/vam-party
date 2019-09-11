@@ -24,7 +24,7 @@ namespace Party.Shared.Handlers
 
         public async Task<LocalPackageInfo> GetInstalledPackageInfoAsync(string name, RegistryPackageVersion version)
         {
-            var basePath = Path.GetFullPath(_packagesFolder, _savesDirectory);
+            var basePath = _fs.Path.GetFullPath(_packagesFolder, _savesDirectory);
             if (!basePath.StartsWith(_savesDirectory))
             {
                 throw new UnauthorizedAccessException($"The packages folder must be within the saves directory: '{basePath}'");

@@ -62,19 +62,19 @@ namespace Party.Shared.Handlers
 
         private bool MatchesQuery(RegistryPackage package, string query)
         {
-            if (package.Name?.Contains(query, StringComparison.InvariantCultureIgnoreCase) ?? false)
+            if ((package.Name?.IndexOf(query, StringComparison.InvariantCultureIgnoreCase) ?? -1) > -1)
             {
                 return true;
             }
-            if (package.Author?.Contains(query, StringComparison.InvariantCultureIgnoreCase) ?? false)
+            if ((package.Author?.IndexOf(query, StringComparison.InvariantCultureIgnoreCase) ?? -1) > -1)
             {
                 return true;
             }
-            if (package.Description?.Contains(query, StringComparison.InvariantCultureIgnoreCase) ?? false)
+            if ((package.Description?.IndexOf(query, StringComparison.InvariantCultureIgnoreCase) ?? -1) > -1)
             {
                 return true;
             }
-            if (package.Tags?.Any(tag => tag.Contains(query, StringComparison.InvariantCultureIgnoreCase)) ?? false)
+            if (package.Tags?.Any(tag => tag.IndexOf(query, StringComparison.InvariantCultureIgnoreCase) > -1) ?? false)
             {
                 return true;
             }

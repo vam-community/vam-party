@@ -1,11 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <!-- Options: CoreRT (dotnet publish Party.CLI -c Release -r win-x64), SCD (dotnet publish -c release -r win10-x64), Normal (dotnet publish) -->
     <OutputType>Exe</OutputType>
     <AssemblyName>party</AssemblyName>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
-    <!-- Options: CoreRT (dotnet publish Party.CLI -c Release -r win-x64), SCD (dotnet publish -c release -r win10-x64), NetFull (dotnet publish) -->
-    <PartyBuildMode>NetFull</PartyBuildMode>
+    <PartyBuildMode Condition="'$(PartyBuildMode)' == ''">Normal</PartyBuildMode>
+    <TargetFramework Condition="'$(PartyBuildMode)' == 'Normal'">net48</TargetFramework>
+    <TargetFramework Condition="'$(PartyBuildMode)' != 'Normal'">netcoreapp3.0</TargetFramework>
+    <LangVersion Condition="'$(PartyBuildMode)' == 'Normal'">preview</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(PartyBuildMode)' == 'SCD'">

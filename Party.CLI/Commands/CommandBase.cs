@@ -16,7 +16,7 @@ namespace Party.CLI.Commands
         {
             if (vam != null)
             {
-                config.VirtAMate.VirtAMateInstallFolder = Path.GetFullPath(vam.FullName, Environment.CurrentDirectory);
+                config.VirtAMate.VirtAMateInstallFolder = vam.FullName;
             }
             return config;
         }

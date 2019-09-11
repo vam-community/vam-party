@@ -1,7 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <PartyBuildMode Condition="'$(PartyBuildMode)' == ''">Normal</PartyBuildMode>
+    <TargetFramework Condition="'$(PartyBuildMode)' == 'Normal'">net48</TargetFramework>
+    <TargetFramework Condition="'$(PartyBuildMode)' != 'Normal'">netcoreapp3.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <RootNamespace>Party.Shared</RootNamespace>

@@ -161,7 +161,7 @@ namespace Party.Shared
 
         private string SanitizePath(string path)
         {
-            path = Path.GetFullPath(path, _config.VirtAMate.VirtAMateInstallFolder);
+            path = _fs.Path.GetFullPath(path, _config.VirtAMate.VirtAMateInstallFolder);
             if (ChecksEnabled)
             {
                 if (!path.StartsWith(_config.VirtAMate.VirtAMateInstallFolder)) throw new UnauthorizedAccessException($"Cannot process path '{path}' because it is not in the Virt-A-Mate installation folder.");

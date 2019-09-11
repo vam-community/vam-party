@@ -34,7 +34,7 @@ namespace Party.Shared.Handlers
             _sceneSerializer = sceneSerializer ?? throw new ArgumentNullException(nameof(sceneSerializer));
             _scriptListSerializer = scriptListSerializer ?? throw new ArgumentNullException(nameof(scriptListSerializer));
             _savesDirectory = savesDirectory ?? throw new ArgumentNullException(nameof(savesDirectory));
-            _ignoredPaths = ignoredPaths?.Select(path => Path.GetFullPath(path, savesDirectory)).ToArray() ?? new string[0];
+            _ignoredPaths = ignoredPaths?.Select(path => _fs.Path.GetFullPath(path, savesDirectory)).ToArray() ?? new string[0];
             _vamDirectory = vamDirectory;
         }
 
@@ -53,7 +53,7 @@ namespace Party.Shared.Handlers
 
         private async Task<SavesMap> AnalyzeSavesByScript(string scriptFile)
         {
-            var scripts = new Dictionary<string, Script>();
+            var scripts = new ConcurrentDictionary<string, Script>();
             var errors = new ConcurrentBag<SavesError>();
             var sceneTasks = new Queue<Task<Scene>>();
             foreach (var file in _fs.Directory.EnumerateFiles(_savesDirectory, "*.json", SearchOption.AllDirectories))
@@ -79,7 +79,7 @@ namespace Party.Shared.Handlers
 
         private async Task<SavesMap> AnalyzeSavesByScene(string sceneFile)
         {
-            var scripts = new Dictionary<string, Script>();
+            var scripts = new ConcurrentDictionary<string, Script>();
             var errors = new ConcurrentBag<SavesError>();
             // TODO: ScriptList handling
             var scene = await LoadScene(scripts, errors, sceneFile, true);
@@ -148,7 +148,7 @@ namespace Party.Shared.Handlers
             };
         }
 
-        private async Task<Scene> LoadScene(IDictionary<string, Script> scripts, ConcurrentBag<SavesError> errors, string sceneFile, bool shouldTryLoadingReferences)
+        private async Task<Scene> LoadScene(ConcurrentDictionary<string, Script> scripts, ConcurrentBag<SavesError> errors, string sceneFile, bool shouldTryLoadingReferences)
         {
             var scene = new Scene(sceneFile);
             try
@@ -156,8 +156,8 @@ namespace Party.Shared.Handlers
                 foreach (var scriptRefRelativePath in await _sceneSerializer.GetScriptsAsync(sceneFile).ConfigureAwait(false))
                 {
                     var fullPath = scriptRefRelativePath.Contains('/')
-                        ? Path.GetFullPath(scriptRefRelativePath, _vamDirectory)
-                        : Path.GetFullPath(scriptRefRelativePath, Path.GetDirectoryName(sceneFile));
+                        ? _fs.Path.GetFullPath(scriptRefRelativePath, _vamDirectory)
+                        : _fs.Path.GetFullPath(scriptRefRelativePath, Path.GetDirectoryName(sceneFile));
                     if (scripts.TryGetValue(fullPath, out var scriptRef))
                     {
                         scene.References(scriptRef);
@@ -242,7 +242,7 @@ namespace Party.Shared.Handlers
 
         private string GetScriptListReferenceFullPath(string scriptListFile, string scriptRefRelativePath)
         {
-            return Path.GetFullPath(scriptRefRelativePath, Path.GetDirectoryName(scriptListFile));
+            return _fs.Path.GetFullPath(scriptRefRelativePath, Path.GetDirectoryName(scriptListFile));
         }
     }
 }

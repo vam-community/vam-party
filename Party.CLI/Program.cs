@@ -92,6 +92,9 @@ namespace Party.CLI
 
         private int HandleError(Exception exc)
         {
+            // Since we might get an error while a line is being written:
+            _renderer.Error.WriteLine();
+
             using (_renderer.WithColor(ConsoleColor.Red))
             {
                 if (exc is PartyException partyExc)
@@ -100,15 +103,15 @@ namespace Party.CLI
                     return partyExc.Code;
                 }
 
-                if (exc is UnauthorizedAccessException unauthorizedExc)
-                {
-                    _renderer.Error.WriteLine(unauthorizedExc.Message);
-                    return 2;
-                }
+                // if (exc is UnauthorizedAccessException unauthorizedExc)
+                // {
+                //     _renderer.Error.WriteLine(unauthorizedExc.Message);
+                //     return 2;
+                // }
 
                 _renderer.Error.WriteLine(
                     string.Join(
-                        '\n',
+                        Environment.NewLine,
                         exc.ToString()
                             .Split(new[] { '\r', '\n' })
                             .Where(line => !string.IsNullOrWhiteSpace(line))

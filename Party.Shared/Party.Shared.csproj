@@ -1,6 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <PartyBuildMode Condition="'$(PartyBuildMode)' == ''">Normal</PartyBuildMode>
+    <TargetFramework Condition="'$(PartyBuildMode)' != 'Normal'">netstandard2.1</TargetFramework>
+    <TargetFramework Condition="'$(PartyBuildMode)' == 'Normal'">netstandard2.0</TargetFramework>
+    <LangVersion Condition="'$(PartyBuildMode)' == 'Normal'">preview</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />

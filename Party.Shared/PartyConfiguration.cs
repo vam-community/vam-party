@@ -21,7 +21,7 @@ namespace Party.Shared
         public string VirtAMateInstallFolder
         {
             get => _virtAMateInstallFolder;
-            set => _virtAMateInstallFolder = Path.GetFullPath(value, _baseDirectory);
+            set => _virtAMateInstallFolder = Path.GetFullPath(Path.Combine(_baseDirectory, value));
         }
 
         public string[] AllowedSubfolders { get; set; }
