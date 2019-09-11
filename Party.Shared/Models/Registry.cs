@@ -13,8 +13,6 @@ namespace Party.Shared.Models
 
         public SortedSet<RegistryAuthor> Authors { get => _authors ?? (_authors = new SortedSet<RegistryAuthor>()); set => _authors = value; }
         public SortedSet<RegistryPackage> Packages { get => _packages ?? (_packages = new SortedSet<RegistryPackage>()); set => _packages = value; }
-        [Obsolete]
-        public SortedSet<RegistryPackage> Scripts { get => null; set => _packages = value; }
 
         public RegistryPackage GetOrCreatePackage(string name)
         {
