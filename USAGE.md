@@ -2,7 +2,7 @@
 
 ## Installation
 
-Download `party.exe` from the [latest release](https://github.com/vam-community/vam-party/releases) and put it directly in the Virt-A-Mate directory (next to `VaM.exe`). You'll then need to use a command-line tool (such as powershell or cmd), double-clicking on it won't help you much!
+Download the latest `.zip` file from the [latest release](https://github.com/vam-community/vam-party/releases) and extract it directly in the Virt-A-Mate directory (so the `party` directory should be next to `VaM.exe`). You'll then need to use a command-line tool (such as powershell or cmd) to use it.
 
 ## Commands
 

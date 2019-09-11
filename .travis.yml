@@ -13,8 +13,8 @@ script:
   - powershell "codecov -f coverage.xml -t $env:CODECOV_TOKEN"
   - powershell "dotnet publish Party.CLI -c Release /p:VersionPrefix=$VERSION_PREFIX.$TRAVIS_BUILD_NUMBER /p:VersionSuffix=$VERSION_SUFFIX"
   # - powershell "dotnet publish Party.CLI -c Release -r win-x64 /p:VersionPrefix=$VERSION_PREFIX.$TRAVIS_BUILD_NUMBER /p:VersionSuffix=$VERSION_SUFFIX"
-  - powershell "mv ./Party.CLI/bin/Release/net48/publish ./Party.CLI/bin/Release/net48/party"
-  - powershell "7z a ./Party.CLI/bin/Release/net48/party-$VERSION_PREFIX.$TRAVIS_BUILD_NUMBER.zip ./Party.CLI/bin/Release/net48/party"
+  - powershell "mv ./Party.CLI/bin/Release/net48/publish ./Party.CLI/bin/Release/net48/Party"
+  - powershell "7z a ./Party.CLI/bin/Release/net48/party-$VERSION_PREFIX.$TRAVIS_BUILD_NUMBER.zip ./Party.CLI/bin/Release/net48/Party"
 deploy:
   provider: releases
   skip_cleanup: true
