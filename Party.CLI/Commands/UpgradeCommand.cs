@@ -59,7 +59,6 @@ namespace Party.CLI.Commands
                 throw new UserInputException("You must specify what to upgrade (a .cs, .cslist, .json or package name), or pass --all to upgrade everything");
 
             // TODO: If the item is a package (no extension), resolve it to a path (if the plugin was not downloaded, throw)
-            Renderer.WriteLine("Analyzing the saves folder and gettings the packages list from the registry...");
             var (saves, registry) = await GetSavesAndRegistryAsync(args.Filter);
 
             var matches = Controller.MatchSavesToRegistry(saves, registry);

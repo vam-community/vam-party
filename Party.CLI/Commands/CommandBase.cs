@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Builder;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
 using Party.Shared.Models;
+using Party.Shared.Utils;
 
 namespace Party.CLI.Commands
 {
@@ -48,19 +50,28 @@ namespace Party.CLI.Commands
         protected async Task<(SavesMap, Registry)> GetSavesAndRegistryAsync(string filter = null)
         {
             // NOTE: When specifying --noop to status, it puts --noop in a filter, and returns nothing. Try to avoid that, or at least specify why nothing has been returned?
+            // TODO: This should be done in the Controller
+
+            Renderer.WriteLine("Analyzing the saves folder and gettings the packages list from the registry, please wait...");
 
             var filterPackage = filter != null && filter.IndexOf(".") == -1;
             var filterPath = filter != null && !filterPackage;
 
-            using var registryTask = Controller.GetRegistryAsync();
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            using var registryTask = Metrics.Measure(() => Controller.GetRegistryAsync());
             // TODO: If the item is a package (no extension), resolve it to a path (if the plugin was not downloaded, throw)
             // TODO: When the filter is a scene, mark every script that was not referenced by that scene as not safe for cleanup; also remove them for display
-            using var savesTask = Controller.GetSavesAsync(filterPath ? Path.GetFullPath(filter) : null);
+            using var savesTask = Metrics.Measure(() => Controller.GetSavesAsync(filterPath ? Path.GetFullPath(filter) : null));
 
             await Task.WhenAll();
 
-            var registry = await registryTask;
-            var saves = await savesTask;
+            var (registry, registryTiming) = await registryTask;
+            var (saves, savesTiming) = await savesTask;
+
+            stopwatch.Stop();
+
+            Renderer.WriteLine($"Scanned {saves.Scenes?.Length ?? 0} scenes and {saves.Scripts?.Length ?? 0} scripts in {savesTiming.TotalSeconds:0.00}s, and downloaded {registry.Packages?.Count ?? 0} packages in {registryTiming.TotalSeconds:0.00}s. Total wait time: {stopwatch.Elapsed.TotalSeconds:0.00}s");
 
             // TODO: Put in controller
             if (filterPackage)

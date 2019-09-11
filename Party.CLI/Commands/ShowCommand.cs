@@ -90,6 +90,23 @@ namespace Party.CLI.Commands
                     Renderer.WriteLine($"- Reddit: {registryAuthor.Reddit}");
             }
 
+            if ((latestVersion.Dependencies?.Count ?? 0) > 0)
+            {
+                // TODO: This should be resolved by the Controller
+                Renderer.WriteLine("Dependencies:");
+                foreach (var dependency in latestVersion.Dependencies.Select(d => (d, p: registry.Packages.FirstOrDefault(p => p.Name == d.Name))))
+                {
+                    if (dependency.p == null)
+                    {
+                        Renderer.WriteLine($"- {dependency.d.Name} v{dependency.d.Version} (not found in the registry)");
+                    }
+                    else
+                    {
+                        Renderer.WriteLine($"- {dependency.d.Name} v{dependency.d.Version} by {dependency.p.Author}");
+                    }
+                }
+            }
+
             Renderer.WriteLine("Files:");
             foreach (var file in latestVersion.Files.Where(f => !f.Ignore && f.Filename != null))
             {

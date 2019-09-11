@@ -44,7 +44,6 @@ namespace Party.CLI.Commands
         {
             Controller.HealthCheck();
 
-            Renderer.WriteLine("Analyzing the saves folder and gettings the packages list from the registry...");
             var (saves, registry) = await GetSavesAndRegistryAsync(args.Filter);
 
             var matches = Controller.MatchSavesToRegistry(saves, registry);
