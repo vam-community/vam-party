@@ -43,3 +43,14 @@ If you want to take on an idea, please [create an issue](https://github.com/vam-
 - Show script statistics in `party show` such as how many lines, and the hash
 - Colored output and output cleanup in `party show`
 - Check for party updates at launch
+- Happy paths in tests for all commands and controller methods
+- Ability to bundle morphs, clothing etc in packages (a "type" field on packages that limits available filetypes)
+- Ability to specify dependencies (browse the tree using a hashset to avoid infinite recursion, print in show)
+- Progress indicator (especially in the initial load)
+- Cache results (based on last modified date, i.e. a simple json file with the last results, remember to clear old entries on reload)
+- Catch-all when scanning saves folder so each failing scene gets a log even when an unexpected error happens; move scene logs into the scene itself
+- The saves/registry match should simply return a table with a match type field, not three lists
+- Review all controller namings, and move as much logic as possible out of commands (worst case provide a controller that handles steps)
+- Split models in separate files (e.g. Registry.cs should be come a Registries namespace)
+- Serializers should not run logic; instead, wrap the JObject and use an interface in Model for scenes, and use a model for scripts
+- Resources should be ScriptRef, SceneRef, etc. Not sure if the types are useful here.
