@@ -124,11 +124,11 @@ namespace Party.CLI
                     return partyExc.Code;
                 }
 
-                // if (exc is UnauthorizedAccessException unauthorizedExc)
-                // {
-                //     _renderer.Error.WriteLine(unauthorizedExc.Message);
-                //     return 2;
-                // }
+                if (exc is UnauthorizedAccessException unauthorizedExc)
+                {
+                    _renderer.Error.WriteLine(unauthorizedExc.Message);
+                    return 2;
+                }
 
                 _renderer.Error.WriteLine(
                     string.Join(

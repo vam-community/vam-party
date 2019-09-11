@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
 using Party.Shared.Exceptions;
+using Party.Shared.Models;
 
 namespace Party.CLI.Commands
 {
@@ -38,6 +39,9 @@ namespace Party.CLI.Commands
         private async Task ExecuteAsync(ShowArguments args)
         {
             Controller.HealthCheck();
+
+            if (!RegistryPackage.ValidNameRegex.IsMatch(args.Package))
+                throw new UserInputException("Invalid package name");
 
             var (saves, registry) = await GetSavesAndRegistryAsync();
 
