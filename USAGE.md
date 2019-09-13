@@ -65,7 +65,7 @@ Update a specific scene (and all scripts it uses) or script (and all scenes refe
 
 Update a specific package (and all scenes referencing it):
 
-    > party upgrade my-package
+    > party upgrade scripts/my-package
 
 Since this can affect lots of files, you might want to make a dry run first, see what the script will do:
 
@@ -108,7 +108,7 @@ Prints the list of all installed scripts, identify the ones that are out of date
 
 You can also specify a script, a scene or a package name to show if you don't want to list everything in your Saves folder.
 
-    > party status some-package
+    > party status scripts/some-package
     > party status "Saves\Scripts\Some Script.cs"
     > party status "Saves\scenes\Some Scene.json"
 
@@ -124,7 +124,7 @@ If you also want to list unregistered scripts (scripts that did not match)
 
 Shows more information about a specific package:
 
-    > party show some-package
+    > party show scripts/some-package
     Package some-package, by Some User
     Description: This package does cool stuff
     Tags: tag1, tag2

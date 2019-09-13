@@ -42,19 +42,17 @@ namespace Party.CLI.Commands
         {
             Controller.HealthCheck();
 
-            if (string.IsNullOrWhiteSpace(args.Package))
-            {
-                throw new UserInputException("You must specify a package");
-            }
+            if (!PackageFullName.TryParsePackage(args.Package, out var packageName))
+                throw new UserInputException("Invalid package name. Example: 'scripts/my-script'");
 
             var registry = await Controller.GetRegistryAsync().ConfigureAwait(false);
 
             // TODO: Handle other types
-            var registryPackage = registry.Packages.Scripts.FirstOrDefault(s => s.Name.Equals(args.Package, StringComparison.InvariantCultureIgnoreCase));
+            var registryPackage = registry.Packages.Get(packageName.Type).FirstOrDefault(s => s.Name.Equals(packageName.Name, StringComparison.InvariantCultureIgnoreCase));
 
             if (registryPackage == null)
             {
-                throw new RegistryException($"Package not found: '{args.Package}'");
+                throw new RegistryException($"Package not found: '{packageName}'");
             }
 
             var registryPackageVersion = registryPackage.GetLatestVersion();
@@ -63,7 +61,7 @@ namespace Party.CLI.Commands
                 registryPackageVersion = registryPackage.Versions.FirstOrDefault(p => p.Version.ToString().Equals(args.Version));
                 if (registryPackageVersion == null)
                 {
-                    throw new RegistryException($"Package version not found: '{args.Package}' version '{args.Version}'");
+                    throw new RegistryException($"Package version not found: '{packageName}' version '{args.Version}'");
                 }
             }
 

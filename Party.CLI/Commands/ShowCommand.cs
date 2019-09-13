@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Party.Shared;
 using Party.Shared.Exceptions;
 using Party.Shared.Models;
-using Party.Shared.Models.Registries;
 
 namespace Party.CLI.Commands
 {
@@ -41,13 +40,13 @@ namespace Party.CLI.Commands
         {
             Controller.HealthCheck();
 
-            if (!RegistryPackage.ValidNameRegex.IsMatch(args.Package))
-                throw new UserInputException("Invalid package name");
+            if (!PackageFullName.TryParsePackage(args.Package, out var packageName))
+                throw new UserInputException("Invalid package name. Example: 'scripts/my-script'");
 
             var (saves, registry) = await GetSavesAndRegistryAsync();
 
             // TODO: Should handle other types, and and be handled in the controller
-            var package = registry.Packages.Scripts?.FirstOrDefault(p => p.Name.Equals(args.Package, StringComparison.InvariantCultureIgnoreCase));
+            var package = registry.Packages.Get(packageName.Type)?.FirstOrDefault(p => p.Name.Equals(packageName.Name, StringComparison.InvariantCultureIgnoreCase));
 
             if (package == null)
             {

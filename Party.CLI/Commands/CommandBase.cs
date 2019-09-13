@@ -55,8 +55,8 @@ namespace Party.CLI.Commands
 
             Renderer.WriteLine("Analyzing the saves folder and gettings the packages list from the registry, please wait...");
 
-            var filterPackage = filter != null && filter.IndexOf(".") == -1;
-            var filterPath = filter != null && !filterPackage;
+            var isFilterPackage = PackageFullName.TryParsePackage(filter, out var filterPackage);
+            var filterPath = !isFilterPackage;
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -75,10 +75,10 @@ namespace Party.CLI.Commands
             Renderer.WriteLine($"Scanned {saves.Scenes?.Length ?? 0} scenes and {saves.Scripts?.Length ?? 0} scripts in {savesTiming.TotalSeconds:0.00}s, and downloaded registry in {registryTiming.TotalSeconds:0.00}s. Total wait time: {stopwatch.Elapsed.TotalSeconds:0.00}s");
 
             // TODO: Put in controller
-            if (filterPackage)
+            if (isFilterPackage)
             {
                 // TODO: Filter by type
-                var packageHashes = new HashSet<string>(registry.Packages.Scripts.Where(s => filter.Equals(s.Name, StringComparison.InvariantCultureIgnoreCase)).SelectMany(s => s.Versions).SelectMany(v => v.Files).Select(f => f.Hash.Value).Distinct());
+                var packageHashes = new HashSet<string>(registry.Packages.Get(filterPackage.Type).Where(s => filterPackage.Name.Equals(s.Name, StringComparison.InvariantCultureIgnoreCase)).SelectMany(s => s.Versions).SelectMany(v => v.Files).Select(f => f.Hash.Value).Distinct());
                 saves.Scripts = saves.Scripts.Where(s =>
                 {
                     if (s is ScriptList scriptList)

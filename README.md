@@ -18,7 +18,7 @@ Find packages:
 
 Download a package:
 
-    > party get improved-pov
+    > party get scripts/improved-pov
 
 Find out which scripts you're already using, and if updates are available:
 

@@ -1,4 +1,4 @@
-using Moq;
+﻿using Moq;
 using NUnit.Framework;
 using Party.Shared.Models;
 using Party.Shared.Models.Registries;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Party.CLI
 {
-    public class ShowTests : CommandTestsBase
+    public class ShowCommandTests : CommandTestsBase
     {
         [Test]
         [SetUICulture("en-US")]
@@ -48,7 +48,7 @@ namespace Party.CLI
             });
             _controller.Setup(x => x.GetSavesAsync(null)).ReturnsAsync(new SavesMap());
 
-            var result = await _program.Execute(new[] { "show", "cool-thing" });
+            var result = await _program.Execute(new[] { "show", "scripts/cool-thing" });
 
             Assert.That(GetOutput().Skip(2), Is.EqualTo(new[]{
                 "Package cool-thing",
@@ -113,7 +113,7 @@ namespace Party.CLI
             });
             _controller.Setup(x => x.GetSavesAsync(null)).ReturnsAsync(new SavesMap());
 
-            var result = await _program.Execute(new[] { "show", "cool-thing" });
+            var result = await _program.Execute(new[] { "show", "scripts/cool-thing" });
 
             Assert.That(GetOutput().Skip(2), Is.EqualTo(new[]{
                 "Package cool-thing",
