@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using Party.Shared.Models;
+using Party.Shared.Models.Registries;
 
 namespace Party.Shared.Serializers
 {

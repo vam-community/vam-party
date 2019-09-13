@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
 using Party.Shared.Models;
+using Party.Shared.Models.Registries;
 using Party.Shared.Utils;
 
 namespace Party.CLI.Commands
@@ -59,10 +60,10 @@ namespace Party.CLI.Commands
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            using var registryTask = Metrics.Measure(() => Controller.GetRegistryAsync());
+            var registryTask = Metrics.Measure(() => Controller.GetRegistryAsync());
             // TODO: If the item is a package (no extension), resolve it to a path (if the plugin was not downloaded, throw)
             // TODO: When the filter is a scene, mark every script that was not referenced by that scene as not safe for cleanup; also remove them for display
-            using var savesTask = Metrics.Measure(() => Controller.GetSavesAsync(filterPath ? Path.GetFullPath(filter) : null));
+            var savesTask = Metrics.Measure(() => Controller.GetSavesAsync(filterPath ? Path.GetFullPath(filter) : null));
 
             await Task.WhenAll();
 
@@ -71,12 +72,13 @@ namespace Party.CLI.Commands
 
             stopwatch.Stop();
 
-            Renderer.WriteLine($"Scanned {saves.Scenes?.Length ?? 0} scenes and {saves.Scripts?.Length ?? 0} scripts in {savesTiming.TotalSeconds:0.00}s, and downloaded {registry.Packages?.Count ?? 0} packages in {registryTiming.TotalSeconds:0.00}s. Total wait time: {stopwatch.Elapsed.TotalSeconds:0.00}s");
+            Renderer.WriteLine($"Scanned {saves.Scenes?.Length ?? 0} scenes and {saves.Scripts?.Length ?? 0} scripts in {savesTiming.TotalSeconds:0.00}s, and downloaded registry in {registryTiming.TotalSeconds:0.00}s. Total wait time: {stopwatch.Elapsed.TotalSeconds:0.00}s");
 
             // TODO: Put in controller
             if (filterPackage)
             {
-                var packageHashes = new HashSet<string>(registry.Packages.Where(s => filter.Equals(s.Name, StringComparison.InvariantCultureIgnoreCase)).SelectMany(s => s.Versions).SelectMany(v => v.Files).Select(f => f.Hash.Value).Distinct());
+                // TODO: Filter by type
+                var packageHashes = new HashSet<string>(registry.Packages.Scripts.Where(s => filter.Equals(s.Name, StringComparison.InvariantCultureIgnoreCase)).SelectMany(s => s.Versions).SelectMany(v => v.Files).Select(f => f.Hash.Value).Distinct());
                 saves.Scripts = saves.Scripts.Where(s =>
                 {
                     if (s is ScriptList scriptList)

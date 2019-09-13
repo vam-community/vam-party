@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
 using Party.Shared.Exceptions;
-using Party.Shared.Models;
+using Party.Shared.Models.Registries;
 using Party.Shared.Serializers;
 
 namespace Party.CLI.Commands
@@ -69,7 +69,8 @@ namespace Party.CLI.Commands
 
             var name = args.PackageName ?? (args.Quiet ? "unnamed" : Renderer.Ask("Package Name: ", false, RegistryPackage.ValidNameRegex, "my-package"));
 
-            var package = registry.GetOrCreatePackage(name);
+            // TODO: Handle for other types
+            var package = registry.Packages.Scripts.GetOrCreatePackage(name);
             var version = package.CreateVersion();
 
             var pathOrUrls = args.Input;
@@ -100,7 +101,7 @@ namespace Party.CLI.Commands
                 }
             }
 
-            registry.AssertNoDuplicates(version);
+            registry.Packages.Scripts.AssertNoDuplicates(version);
 
             if (package == null || version == null || package.Versions == null) throw new NullReferenceException($"Error in {nameof(Controller.BuildRegistryFilesFromPathAsync)}: Null values were returned.");
 

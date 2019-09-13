@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using Party.Shared.Exceptions;
 using Party.Shared.Handlers;
 using Party.Shared.Models;
+using Party.Shared.Models.Registries;
 using Party.Shared.Serializers;
 
 namespace Party.Shared

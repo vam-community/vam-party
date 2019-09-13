@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Party.Shared;
 using Party.Shared.Exceptions;
 using Party.Shared.Models;
+using Party.Shared.Models.Registries;
 
 namespace Party.CLI.Commands
 {
@@ -45,7 +46,8 @@ namespace Party.CLI.Commands
 
             var (saves, registry) = await GetSavesAndRegistryAsync();
 
-            var package = registry.Packages?.FirstOrDefault(p => p.Name.Equals(args.Package, StringComparison.InvariantCultureIgnoreCase));
+            // TODO: Should handle other types, and and be handled in the controller
+            var package = registry.Packages.Scripts?.FirstOrDefault(p => p.Name.Equals(args.Package, StringComparison.InvariantCultureIgnoreCase));
 
             if (package == null)
             {
@@ -94,7 +96,7 @@ namespace Party.CLI.Commands
             {
                 // TODO: This should be resolved by the Controller
                 Renderer.WriteLine("Dependencies:");
-                foreach (var dependency in latestVersion.Dependencies.Select(d => (d, p: registry.Packages.FirstOrDefault(p => p.Name == d.Name))))
+                foreach (var dependency in latestVersion.Dependencies.Select(d => (d, p: registry.Packages.Scripts.FirstOrDefault(p => p.Name == d.Name))))
                 {
                     if (dependency.p == null)
                     {

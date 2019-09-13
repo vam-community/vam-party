@@ -5,6 +5,7 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared.Models;
+using Party.Shared.Models.Registries;
 using Party.Shared.Utils;
 
 namespace Party.Shared.Handlers

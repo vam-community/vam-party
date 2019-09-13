@@ -1,3 +1,5 @@
+using Party.Shared.Models.Registries;
+
 namespace Party.Shared.Models
 {
     public class RegistrySavesMatches

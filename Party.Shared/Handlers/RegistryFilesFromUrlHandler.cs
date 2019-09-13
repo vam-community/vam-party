@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Web;
 using Party.Shared.Exceptions;
 using Party.Shared.Models;
+using Party.Shared.Models.Registries;
 using Party.Shared.Utils;
 
 namespace Party.Shared.Handlers

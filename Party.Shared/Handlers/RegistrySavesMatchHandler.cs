@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Party.Shared.Models;
+using Party.Shared.Models.Registries;
 
 namespace Party.Shared.Handlers
 {
@@ -9,7 +10,8 @@ namespace Party.Shared.Handlers
     {
         public RegistrySavesMatches Match(SavesMap saves, Registry registry)
         {
-            var flattened = registry.FlattenFiles().ToList();
+            // TODO: Should handle other types
+            var flattened = registry.Packages.Scripts.FlattenFiles().ToList();
             var scripts = new List<Script>(saves.Scripts);
 
             var withHash = flattened

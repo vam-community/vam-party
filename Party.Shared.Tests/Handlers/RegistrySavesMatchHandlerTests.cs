@@ -40,9 +40,9 @@ namespace Party.Shared
             var saves = ResultFactory.SavesMap()
                 .WithScript(new Script($"{_vam}1.cs", "1"), out var local1)
                 .Build();
-            RegistryFile file = ResultFactory.RegFile("2.cs", "1");
-            RegistryPackageVersion version = ResultFactory.RegVer("1.0.0", file);
-            RegistryPackage script = ResultFactory.RegScript("my-script", version);
+            var file = ResultFactory.RegFile("2.cs", "1");
+            var version = ResultFactory.RegVer("1.0.0", file);
+            var script = ResultFactory.RegScript("my-script", version);
             var registry = ResultFactory.Reg(script);
 
             var result = _handler.Match(saves, registry);
@@ -61,9 +61,9 @@ namespace Party.Shared
             var saves = ResultFactory.SavesMap()
                 .WithScript(new Script($"{_vam}1.cs", "1"), out var local1)
                 .Build();
-            RegistryFile file = ResultFactory.RegFile("1.cs", "2");
-            RegistryPackageVersion version = ResultFactory.RegVer("1.0.0", file);
-            RegistryPackage script = ResultFactory.RegScript("my-script", version);
+            var file = ResultFactory.RegFile("1.cs", "2");
+            var version = ResultFactory.RegVer("1.0.0", file);
+            var script = ResultFactory.RegScript("my-script", version);
             var registry = ResultFactory.Reg(script);
 
             var result = _handler.Match(saves, registry);
@@ -82,9 +82,9 @@ namespace Party.Shared
             var saves = ResultFactory.SavesMap()
                 .WithScript(new Script($"{_vam}1.cs", "1"), out var local1)
                 .Build();
-            RegistryFile file = ResultFactory.RegFile("1.cs", "1");
-            RegistryPackageVersion version = ResultFactory.RegVer("1.0.0", file);
-            RegistryPackage script = ResultFactory.RegScript("my-script", version);
+            var file = ResultFactory.RegFile("1.cs", "1");
+            var version = ResultFactory.RegVer("1.0.0", file);
+            var script = ResultFactory.RegScript("my-script", version);
             var registry = ResultFactory.Reg(script);
 
             var result = _handler.Match(saves, registry);

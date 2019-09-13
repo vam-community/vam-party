@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Party.Shared.Models
 {
     public class SavesMap

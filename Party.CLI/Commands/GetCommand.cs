@@ -49,7 +49,8 @@ namespace Party.CLI.Commands
 
             var registry = await Controller.GetRegistryAsync().ConfigureAwait(false);
 
-            var registryPackage = registry.Packages.FirstOrDefault(s => s.Name.Equals(args.Package, StringComparison.InvariantCultureIgnoreCase));
+            // TODO: Handle other types
+            var registryPackage = registry.Packages.Scripts.FirstOrDefault(s => s.Name.Equals(args.Package, StringComparison.InvariantCultureIgnoreCase));
 
             if (registryPackage == null)
             {

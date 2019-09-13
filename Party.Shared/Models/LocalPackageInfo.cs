@@ -1,4 +1,5 @@
 using System.Linq;
+using Party.Shared.Models.Registries;
 
 namespace Party.Shared.Models
 {

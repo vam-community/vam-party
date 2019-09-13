@@ -11,6 +11,8 @@
     "codacy",
     "codecov",
     "cslist",
-    "lgtm"
+    "editorconfig",
+    "lgtm",
+    "netcoreapp"
   ]
 }

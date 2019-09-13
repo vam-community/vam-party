@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Party.Shared.Models;
+using Party.Shared.Models.Registries;
 
 namespace Party.Shared
 {

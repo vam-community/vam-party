@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Party.Shared;
 using Party.Shared.Exceptions;
 using Party.Shared.Models;
+using Party.Shared.Models.Registries;
 
 namespace Party.CLI.Commands
 {

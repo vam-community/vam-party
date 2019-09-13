@@ -10,126 +10,128 @@
       "name": "William Brown"
     }
   ],
-  "scripts": [
-    {
-      "name": "complex-plugin",
-      "description": "A plugin with a cslist and two files",
-      "tags": ["complex", "test"],
-      "author": "Jane Smith",
-      "versions": [
-        {
-          "version": "0.0.1-alpha",
-          "created": "0001-01-01",
-          "files": [
-            {
-              "filename": "Complex Plugin.cslist",
-              "url": "https://github.com/vam-community/vam-party/raw/3640bf85a6bb76b6cac6454501525b9bb5505ee2/TestData/Saves/Scripts/Complex%20Plugin/Complex%20Plugin.cslist",
-              "hash": {
-                "type": "sha256",
-                "value": "5E765D8319F31EA0B091A804BF4FC9B9313D9D36818D2E2E8B26FCB0B956C698"
+  "packages": {
+    "scripts": [
+      {
+        "name": "complex-plugin",
+        "description": "A plugin with a cslist and two files",
+        "tags": ["complex", "test"],
+        "author": "Jane Smith",
+        "versions": [
+          {
+            "version": "0.0.1-alpha",
+            "created": "0001-01-01",
+            "files": [
+              {
+                "filename": "Complex Plugin.cslist",
+                "url": "https://github.com/vam-community/vam-party/raw/3640bf85a6bb76b6cac6454501525b9bb5505ee2/TestData/Saves/Scripts/Complex%20Plugin/Complex%20Plugin.cslist",
+                "hash": {
+                  "type": "sha256",
+                  "value": "5E765D8319F31EA0B091A804BF4FC9B9313D9D36818D2E2E8B26FCB0B956C698"
+                }
+              },
+              {
+                "filename": "Complex Script 1.cs",
+                "url": "https://github.com/vam-community/vam-party/raw/3640bf85a6bb76b6cac6454501525b9bb5505ee2/TestData/Saves/Scripts/Complex%20Plugin/Complex%20Script%201.cs",
+                "hash": {
+                  "type": "sha256",
+                  "value": "8C18939A09A53D295BAE8CD28ED45720FF12841F32ACBE3B843767F2EB0B0811"
+                }
+              },
+              {
+                "filename": "Complex Script 2.cs",
+                "url": "https://github.com/vam-community/vam-party/raw/3640bf85a6bb76b6cac6454501525b9bb5505ee2/TestData/Saves/Scripts/Complex%20Plugin/Complex%20Script%202.cs",
+                "hash": {
+                  "type": "sha256",
+                  "value": "5EE72D08BE822B417D97F84A0880CB70B02B80031A1FA03776A6592AA3711838"
+                }
+              },
+              {
+                "filename": "Complex Script 3.cs",
+                "url": "https://github.com/vam-community/vam-party/raw/3640bf85a6bb76b6cac6454501525b9bb5505ee2/TestData/Saves/Scripts/Complex%20Plugin/Complex%20Script%203.cs",
+                "hash": {
+                  "type": "sha256",
+                  "value": "7F965649254F55584CFB213D12DD403D31F6502D6B353DE618E7A62FC6680630"
+                }
               }
-            },
-            {
-              "filename": "Complex Script 1.cs",
-              "url": "https://github.com/vam-community/vam-party/raw/3640bf85a6bb76b6cac6454501525b9bb5505ee2/TestData/Saves/Scripts/Complex%20Plugin/Complex%20Script%201.cs",
-              "hash": {
-                "type": "sha256",
-                "value": "8C18939A09A53D295BAE8CD28ED45720FF12841F32ACBE3B843767F2EB0B0811"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "multi-plugin",
+        "description": "This plugin contains two independent scripts",
+        "tags": ["multi", "test"],
+        "author": "William Brown",
+        "versions": [
+          {
+            "version": "12.5.412",
+            "created": "0001-01-01",
+            "files": [
+              {
+                "filename": "Multi Script 1.cs",
+                "url": "https://github.com/vam-community/vam-party/raw/3640bf85a6bb76b6cac6454501525b9bb5505ee2/TestData/Saves/Scripts/Multi%20Plugin/Multi%20Script%201.cs",
+                "hash": {
+                  "type": "sha256",
+                  "value": "D09580C4F9060C444A970013FC228AD0F1052F38031701347B4BB629B24E0E74"
+                }
+              },
+              {
+                "filename": "Multi Script 2.cs",
+                "url": "https://github.com/vam-community/vam-party/raw/3640bf85a6bb76b6cac6454501525b9bb5505ee2/TestData/Saves/Scripts/Multi%20Plugin/Multi%20Script%202.cs",
+                "hash": {
+                  "type": "sha256",
+                  "value": "4AF3E406F92B9D4D075ABA37A626C4C28DAC5F91C5905CC3D2A02DE8C1FBA94C"
+                }
               }
-            },
-            {
-              "filename": "Complex Script 2.cs",
-              "url": "https://github.com/vam-community/vam-party/raw/3640bf85a6bb76b6cac6454501525b9bb5505ee2/TestData/Saves/Scripts/Complex%20Plugin/Complex%20Script%202.cs",
-              "hash": {
-                "type": "sha256",
-                "value": "5EE72D08BE822B417D97F84A0880CB70B02B80031A1FA03776A6592AA3711838"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "simple-script-1",
+        "description": "This is a simple package",
+        "tags": ["simple", "test"],
+        "author": "John Doe",
+        "versions": [
+          {
+            "version": "1.0.0",
+            "created": "0001-01-01",
+            "files": [
+              {
+                "filename": "Simple Script 1.cs",
+                "url": "https://github.com/vam-community/vam-party/raw/3640bf85a6bb76b6cac6454501525b9bb5505ee2/TestData/Saves/Scripts/Simple%20Script%201.cs",
+                "hash": {
+                  "type": "sha256",
+                  "value": "B249529FEFB64007FA361EA2374248A83CA275AB01AB19B03C34A45219FB2A20"
+                }
               }
-            },
-            {
-              "filename": "Complex Script 3.cs",
-              "url": "https://github.com/vam-community/vam-party/raw/3640bf85a6bb76b6cac6454501525b9bb5505ee2/TestData/Saves/Scripts/Complex%20Plugin/Complex%20Script%203.cs",
-              "hash": {
-                "type": "sha256",
-                "value": "7F965649254F55584CFB213D12DD403D31F6502D6B353DE618E7A62FC6680630"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "unused-script",
+        "description": "This plugin is not used in any scenes",
+        "tags": ["unused", "test"],
+        "author": "John Doe",
+        "versions": [
+          {
+            "version": "1.0.0",
+            "created": "0001-01-01",
+            "files": [
+              {
+                "filename": "Unused Script 1.cs",
+                "url": "https://github.com/vam-community/vam-party/raw/3640bf85a6bb76b6cac6454501525b9bb5505ee2/TestData/Saves/Scripts/Unused%20Script%202.cs",
+                "hash": {
+                  "type": "sha256",
+                  "value": "B890546C710C1EA434087F60C9E58792A0FC4004F305C02A9540C052D9CFC23A"
+                }
               }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "multi-plugin",
-      "description": "This plugin contains two independent scripts",
-      "tags": ["multi", "test"],
-      "author": "William Brown",
-      "versions": [
-        {
-          "version": "12.5.412",
-          "created": "0001-01-01",
-          "files": [
-            {
-              "filename": "Multi Script 1.cs",
-              "url": "https://github.com/vam-community/vam-party/raw/3640bf85a6bb76b6cac6454501525b9bb5505ee2/TestData/Saves/Scripts/Multi%20Plugin/Multi%20Script%201.cs",
-              "hash": {
-                "type": "sha256",
-                "value": "D09580C4F9060C444A970013FC228AD0F1052F38031701347B4BB629B24E0E74"
-              }
-            },
-            {
-              "filename": "Multi Script 2.cs",
-              "url": "https://github.com/vam-community/vam-party/raw/3640bf85a6bb76b6cac6454501525b9bb5505ee2/TestData/Saves/Scripts/Multi%20Plugin/Multi%20Script%202.cs",
-              "hash": {
-                "type": "sha256",
-                "value": "4AF3E406F92B9D4D075ABA37A626C4C28DAC5F91C5905CC3D2A02DE8C1FBA94C"
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "simple-script-1",
-      "description": "This is a simple package",
-      "tags": ["simple", "test"],
-      "author": "John Doe",
-      "versions": [
-        {
-          "version": "1.0.0",
-          "created": "0001-01-01",
-          "files": [
-            {
-              "filename": "Simple Script 1.cs",
-              "url": "https://github.com/vam-community/vam-party/raw/3640bf85a6bb76b6cac6454501525b9bb5505ee2/TestData/Saves/Scripts/Simple%20Script%201.cs",
-              "hash": {
-                "type": "sha256",
-                "value": "B249529FEFB64007FA361EA2374248A83CA275AB01AB19B03C34A45219FB2A20"
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "unused-script",
-      "description": "This plugin is not used in any scenes",
-      "tags": ["unused", "test"],
-      "author": "John Doe",
-      "versions": [
-        {
-          "version": "1.0.0",
-          "created": "0001-01-01",
-          "files": [
-            {
-              "filename": "Unused Script 1.cs",
-              "url": "https://github.com/vam-community/vam-party/raw/3640bf85a6bb76b6cac6454501525b9bb5505ee2/TestData/Saves/Scripts/Unused%20Script%202.cs",
-              "hash": {
-                "type": "sha256",
-                "value": "B890546C710C1EA434087F60C9E58792A0FC4004F305C02A9540C052D9CFC23A"
-              }
-            }
-          ]
-        }
-      ]
-    }
-  ]
+            ]
+          }
+        ]
+      }
+    ]
+  }
 }

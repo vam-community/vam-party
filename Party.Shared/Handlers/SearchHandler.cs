@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Party.Shared.Models;
+using Party.Shared.Models.Registries;
 
 namespace Party.Shared.Handlers
 {
@@ -19,7 +20,8 @@ namespace Party.Shared.Handlers
             if (registry is null) throw new ArgumentNullException(nameof(registry));
             if (registry?.Packages is null) throw new ArgumentException("registry does not have any scripts", nameof(registry));
 
-            foreach (var package in registry.Packages)
+            // TODO: Search in all package types
+            foreach (var package in registry.Packages.Scripts)
             {
                 if (!string.IsNullOrEmpty(query))
                 {

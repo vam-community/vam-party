@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Party.Shared.Models;
+using Party.Shared.Models.Registries;
 
 namespace Party.Shared
 {
@@ -11,7 +12,10 @@ namespace Party.Shared
         {
             return new Registry
             {
-                Packages = new SortedSet<RegistryPackage>(scripts)
+                Packages = new RegistryPackageGroups
+                {
+                    Scripts = new SortedSet<RegistryPackage>(scripts)
+                }
             };
         }
 

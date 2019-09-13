@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -6,6 +7,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Party.Shared.Exceptions;
 using Party.Shared.Models;
+using Party.Shared.Models.Registries;
 
 namespace Party.Shared.Handlers
 {
@@ -34,26 +36,36 @@ namespace Party.Shared.Handlers
             var registry = registries[0];
             foreach (var additional in registries.Skip(1))
             {
-                foreach (var additionalScript in additional.Packages)
+                Merge(registry.Packages.Scripts, additional.Packages.Scripts);
+                Merge(registry.Packages.Scenes, additional.Packages.Scenes);
+                Merge(registry.Packages.Morphs, additional.Packages.Morphs);
+                Merge(registry.Packages.Clothing, additional.Packages.Clothing);
+                Merge(registry.Packages.Assets, additional.Packages.Assets);
+                Merge(registry.Packages.Textures, additional.Packages.Textures);
+            }
+            return registry;
+        }
+
+        private void Merge(SortedSet<RegistryPackage> registryPackages, SortedSet<RegistryPackage> additionalPackages)
+        {
+            foreach (var additionalPackage in additionalPackages)
+            {
+                var script = registryPackages.FirstOrDefault(s => s.Name == additionalPackage.Name);
+                if (script == null)
                 {
-                    var script = registry.Packages.FirstOrDefault(s => s.Name == additionalScript.Name);
-                    if (script == null)
+                    registryPackages.Add(additionalPackage);
+                }
+                else
+                {
+                    foreach (var additionalVersion in additionalPackage.Versions)
                     {
-                        registry.Packages.Add(additionalScript);
-                    }
-                    else
-                    {
-                        foreach (var additionalVersion in additionalScript.Versions)
+                        if (!script.Versions.Any(v => v.Version.Equals(additionalVersion.Version)))
                         {
-                            if (!script.Versions.Any(v => v.Version.Equals(additionalVersion.Version)))
-                            {
-                                script.Versions.Add(additionalVersion);
-                            }
+                            script.Versions.Add(additionalVersion);
                         }
                     }
                 }
             }
-            return registry;
         }
 
         private async Task<Registry> AcquireOne(string url)
