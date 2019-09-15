@@ -1,12 +1,10 @@
 ﻿using System;
 using System.CommandLine;
 using System.CommandLine.Invocation;
-using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
 using Party.Shared.Exceptions;
 using Party.Shared.Models;
-using Party.Shared.Models.Registries;
 
 namespace Party.CLI.Commands
 {
@@ -19,9 +17,6 @@ namespace Party.CLI.Commands
             // TODO: Specify specific scenes and/or specific scripts and/or specific packages to upgrade
             command.AddArgument(new Argument<string>("filter"));
             command.AddOption(new Option("--all", "Upgrade everything"));
-            command.AddOption(new Option("--get", "Downloads registered scripts that were not already downloaded"));
-            command.AddOption(new Option("--fix", "Updates scenes referencing scripts that are not yet in the party folder"));
-            command.AddOption(new Option("--clean", "Deletes the source script after scenes have been updated"));
             command.AddOption(new Option("--warnings", "Show warnings such as broken scenes or missing scripts"));
             command.AddOption(new Option("--noop", "Prints what the script will do, but won't actually do anything"));
             command.AddOption(new Option("--verbose", "Prints every change that will be done on every scene"));
@@ -37,9 +32,6 @@ namespace Party.CLI.Commands
         {
             public string Filter { get; set; }
             public bool All { get; set; }
-            public bool Get { get; set; }
-            public bool Fix { get; set; }
-            public bool Clean { get; set; }
             public bool Warnings { get; set; }
             public bool Noop { get; set; }
             public bool Verbose { get; set; }
@@ -59,7 +51,6 @@ namespace Party.CLI.Commands
             else if (!args.All && args.Filter == null)
                 throw new UserInputException("You must specify what to upgrade (a .cs, .cslist, .json or package name), or pass --all to upgrade everything");
 
-            // TODO: If the item is a package (no extension), resolve it to a path (if the plugin was not downloaded, throw)
             var (saves, registry) = await GetSavesAndRegistryAsync(args.Filter);
 
             var matches = Controller.MatchSavesToRegistry(saves, registry);
@@ -77,12 +68,12 @@ namespace Party.CLI.Commands
             var latestVersion = match.Script.GetLatestVersion();
             var updateToVersion = latestVersion.Version.Equals(match.Version.Version) ? null : latestVersion;
 
-            if (match.Local.Scenes == null || (match.Local.Scenes.Count == 0 && updateToVersion == null))
+            if (updateToVersion == null)
             {
                 if (args.Verbose)
                 {
                     PrintScriptToPackage(match, null);
-                    Renderer.WriteLine($"  Skipping because no updates are available and no scenes are using it", ConsoleColor.Yellow);
+                    Renderer.WriteLine($"  Skipping because no updates are available", ConsoleColor.DarkGray);
                 }
                 return;
             }
@@ -91,134 +82,32 @@ namespace Party.CLI.Commands
 
             var info = await Controller.GetInstalledPackageInfoAsync(match.Script.Name, updateToVersion ?? match.Version);
 
-            var statuses = info.DistinctStatuses();
-
-            if (statuses.Length != 1)
+            if (info.Installed)
             {
-                PrintCorruptedInstallInfo(info);
-                if (!args.Force)
-                    return;
-            }
-
-            var status = statuses[0];
-
-            if (status == LocalPackageInfo.FileStatus.HashMismatch)
-            {
-                PrintCorruptedInstallInfo(info);
-                if (!args.Force)
-                    return;
-            }
-
-            if (status == LocalPackageInfo.FileStatus.NotInstalled)
-            {
-                if (args.Get)
-                {
-                    if (args.Noop)
-                    {
-                        Renderer.WriteLine("  Skipping install because the --noop option was specified", ConsoleColor.Yellow);
-                    }
-                    else if (!args.Force && latestVersion.Files.Where(f => f.Url == null && f.LocalPath != null).Any(f => !Controller.Exists(f.LocalPath)))
-                    {
-                        Renderer.WriteLine($"  Cannot upgrade automatically because some companion files must be downloaded. Get them from: {match.Script.Homepage ?? match.Script.Repository ?? "(no link provided)"}", ConsoleColor.Yellow);
-                        return;
-                    }
-                    else
-                    {
-                        Renderer.Write($"  Installing...");
-                        info = await Controller.InstallPackageAsync(info, args.Force);
-                        Renderer.WriteLine($"  Downloaded in {info.InstallFolder}:", ConsoleColor.Green);
-                        foreach (var file in info.Files)
-                        {
-                            Renderer.WriteLine($"  - {Controller.GetRelativePath(file.Path, info.InstallFolder)}");
-                        }
-                    }
-                }
-                else if (args.Verbose)
-                {
-                    Renderer.WriteLine($"  Skipping downloading to the party folder because this package is not installed (run again with --get to download it)", ConsoleColor.DarkYellow);
-                }
-            }
-            else if (status != LocalPackageInfo.FileStatus.Installed)
-            {
-                throw new NotImplementedException($"Status {status} is not implemented");
-            }
-
-            if (updateToVersion == null && !(args.Fix && !match.Local.FullPath.StartsWith(info.InstallFolder)))
+                Renderer.WriteLine("  Already installed");
                 return;
-
-            foreach (var scene in match.Local.Scenes)
-            {
-                string scenePath = Controller.GetDisplayPath(scene.FullPath);
-                if (args.Noop)
-                {
-                    Renderer.WriteLine($"  Skipping scene {scenePath} because --noop option was specified", ConsoleColor.Yellow);
-                    continue;
-                }
-                Renderer.Write($"  Updating scene ");
-                Renderer.Write(scenePath, ConsoleColor.Blue);
-                Renderer.Write($"...");
-
-                var changes = await Controller.UpdateScriptInSceneAsync(scene, match.Local, info);
-
-                if (changes.Length > 0)
-                    Renderer.WriteLine(" updated", ConsoleColor.Green);
-                else
-                    Renderer.WriteLine(" already up to date", ConsoleColor.DarkGray);
-
-                if (args.Verbose)
-                {
-                    using (Renderer.WithColor(ConsoleColor.DarkGray))
-                    {
-                        foreach (var (before, after) in changes)
-                        {
-                            Renderer.WriteLine($"    {before} > {after}");
-                        }
-                    }
-                }
-
-                if (args.Clean && changes.Length > 0)
-                {
-                    if (args.Noop)
-                    {
-                        Renderer.WriteLine("  Skipping cleanup because the --noop option was specified", ConsoleColor.Yellow);
-                    }
-                    else
-                    {
-                        Controller.Delete(match.Local.FullPath);
-                    }
-                }
             }
-        }
 
-        private void PrintScriptToPackage(RegistrySavesMatch match, RegistryPackageVersion updateToVersion)
-        {
-            Renderer.Write($"Script ");
-            Renderer.Write(Controller.GetDisplayPath(match.Local.FullPath), ConsoleColor.Blue);
-            Renderer.Write($" is ");
-            Renderer.Write($"{match.Script.Name} v{match.Version.Version}", ConsoleColor.Cyan);
-            Renderer.Write($" > ");
-            if (updateToVersion == null)
+            if (!args.Force && (info.Corrupted || !info.Installable))
             {
-                Renderer.Write($"already up to date", ConsoleColor.DarkGray);
-                Renderer.WriteLine();
+                Renderer.WriteLine("  Cannot upgrade because at least one file is either broken or not installable.");
+                Renderer.WriteLine($"  You can instead download it at {match.Script.Homepage ?? match.Script.Repository ?? "(no link provided)"}");
+                Renderer.WriteLine("  Files:");
+                PrintInstalledFiles(info, "  ");
+                if (!args.Force)
+                    return;
+            }
+
+            if (args.Noop)
+            {
+                Renderer.WriteLine("  Skipping install because the --noop option was specified", ConsoleColor.Yellow);
             }
             else
             {
-                Renderer.Write($"new version available: v{updateToVersion.Version}", ConsoleColor.Magenta);
-                Renderer.WriteLine();
-                Renderer.WriteLine($"  Released {updateToVersion.Created.ToLocalTime().ToString("D")}: {updateToVersion.Notes ?? "No release notes"}");
-            }
-        }
-
-        private void PrintCorruptedInstallInfo(LocalPackageInfo info)
-        {
-            using (Renderer.WithColor(ConsoleColor.Red))
-            {
-                Renderer.WriteLine($"  Installed version in {info.InstallFolder} is corrupted.");
-                foreach (var file in info.Files)
-                {
-                    Renderer.WriteLine($"  - {Controller.GetDisplayPath(file.Path)} is {file.Status}");
-                }
+                Renderer.Write($"  Downloading...");
+                info = await Controller.InstallPackageAsync(info, args.Force);
+                Renderer.WriteLine($"  installed in {info.InstallFolder}:", ConsoleColor.Green);
+                PrintInstalledFiles(info);
             }
         }
     }

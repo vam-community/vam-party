@@ -71,14 +71,6 @@ Since this can affect lots of files, you might want to make a dry run first, see
 
     > party get upgrade --noop
 
-If you want the script to download all packages that were found in the registry for you, you can use `--get`:
-
-    > party get upgrade --get
-
-If you want the script to fix all scenes that are referencing a script outside of the Party folder, `--fix`:
-
-    > party get upgrade --fix
-
 To avoid clutter, you can delete unused scripts after upgrading using `--clean`. So for an aggressive update:
 
     > party get upgrade --get --fix --clean
@@ -86,9 +78,6 @@ To avoid clutter, you can delete unused scripts after upgrading using `--clean`.
 Options:
 
 - `--all` upgrade everything
-- `--get` downloads registered scripts that were not already downloaded
-- `--fix` updates scenes referencing scripts that are not yet in the party folder
-- `--clean` deletes the source script after scenes have been updated
 - `--warnings` show warnings such as broken scenes or missing scripts
 - `--noop` prints what the script will do, but won't actually do anything
 - `--verbose` prints every change that will be done on every scene
@@ -163,6 +152,19 @@ Options:
 - `--package-version` the version of the package to publish, either in the format `0.0.0` or `0.0.0-suffix`.
 - `--saves` allows specifying another saves folder, e.g. when publishing scripts from the vam-packages folder
 - `--quiet` chooses defaults for every option (e.g. when you just want to get the json output)
+
+### `clean`
+
+Moves references to use the ones used when downloading using party.
+
+    > party clean scene/my-scene
+
+Options:
+
+- `--warnings` prints warnings found while scanning your saves folder
+- `--all` cleans everything
+- `--noop` prints what the script will do, but won't actually do anything
+- `--verbose` prints every change that will be done on every scene
 
 ## Configuration
 

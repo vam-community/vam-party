@@ -42,7 +42,6 @@ namespace Party.Shared.Models
         public PackageTypes Type { get; set; }
         public string Version { get; set; }
 
-
         public override string ToString()
         {
             return $"{Type}/{Name}";

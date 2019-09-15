@@ -24,7 +24,7 @@ namespace Party.Shared.Handlers
 
         public async Task<LocalPackageInfo> InstallPackageAsync(LocalPackageInfo info, bool force)
         {
-            var files = new List<LocalPackageInfo.InstalledFileInfo>();
+            var files = new List<InstalledFileInfo>();
             foreach (var file in info.Files.Where(f => !f.RegistryFile.Ignore))
             {
                 var directory = Path.GetDirectoryName(file.Path);
@@ -32,7 +32,7 @@ namespace Party.Shared.Handlers
                 {
                     Directory.CreateDirectory(directory);
                 }
-                var fileResult = new LocalPackageInfo.InstalledFileInfo
+                var fileResult = new InstalledFileInfo
                 {
                     Path = file.Path,
                     RegistryFile = file.RegistryFile
@@ -47,7 +47,7 @@ namespace Party.Shared.Handlers
                     throw new PackageInstallationException($"Hash mismatch between registry file '{file.RegistryFile.Filename}' ({file.RegistryFile.Hash.Value}) and downloaded file '{file.RegistryFile.Url}' ({hash})");
                 }
                 _fs.File.WriteAllText(file.Path, content);
-                fileResult.Status = LocalPackageInfo.FileStatus.Installed;
+                fileResult.Status = FileStatus.Installed;
                 files.Add(fileResult);
             }
             return new LocalPackageInfo

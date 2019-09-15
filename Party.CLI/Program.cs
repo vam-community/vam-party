@@ -73,6 +73,7 @@ namespace Party.CLI
                 StatusCommand.CreateCommand(_renderer, _config, _controller),
                 UpgradeCommand.CreateCommand(_renderer, _config, _controller),
                 PublishCommand.CreateCommand(_renderer, _config, _controller),
+                CleanCommand.CreateCommand(_renderer, _config, _controller),
             };
 
             // For CoreRT:

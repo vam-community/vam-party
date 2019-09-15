@@ -136,6 +136,53 @@ namespace Party.CLI.Commands
             }
         }
 
+        protected void PrintInstalledFiles(LocalPackageInfo installedStatus, string indent = "")
+        {
+            foreach (var file in installedStatus.Files)
+            {
+                Renderer.Write($"{indent}- {file.Path}");
+                switch (file.Status)
+                {
+                    case FileStatus.NotInstalled:
+                        Renderer.Write($" [not installed]", ConsoleColor.Blue);
+                        break;
+                    case FileStatus.Installed:
+                        Renderer.Write($" [installed]", ConsoleColor.Green);
+                        break;
+                    case FileStatus.HashMismatch:
+                        Renderer.Write($" [hash mismatch]", ConsoleColor.Red);
+                        break;
+                    case FileStatus.Ignored:
+                        Renderer.Write($" [ignored]", ConsoleColor.DarkGray);
+                        break;
+                    case FileStatus.NotInstallable:
+                        Renderer.Write($" [not downloadable]", ConsoleColor.Yellow);
+                        break;
+                }
+                Renderer.WriteLine();
+            }
+        }
+
+        protected void PrintScriptToPackage(RegistrySavesMatch match, RegistryPackageVersion updateToVersion)
+        {
+            Renderer.Write($"Script ");
+            Renderer.Write(Controller.GetDisplayPath(match.Local.FullPath), ConsoleColor.Blue);
+            Renderer.Write($" is ");
+            Renderer.Write($"{match.Script.Name} v{match.Version.Version}", ConsoleColor.Cyan);
+            Renderer.Write($" > ");
+            if (updateToVersion == null)
+            {
+                Renderer.Write($"already up to date", ConsoleColor.DarkGray);
+                Renderer.WriteLine();
+            }
+            else
+            {
+                Renderer.Write($"new version available: v{updateToVersion.Version}", ConsoleColor.Magenta);
+                Renderer.WriteLine();
+                Renderer.WriteLine($"  Released {updateToVersion.Created.ToLocalTime().ToString("D")}: {updateToVersion.Notes ?? "No release notes"}");
+            }
+        }
+
         protected string Pluralize(int count, string singular, string plural)
         {
             if (count == 1)

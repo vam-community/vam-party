@@ -31,7 +31,7 @@ namespace Party.Shared.Handlers
                 throw new UnauthorizedAccessException($"The packages folder must be within the saves directory: '{basePath}'");
             }
             var installPath = Path.Combine(basePath, name, version.Version);
-            var files = new List<LocalPackageInfo.InstalledFileInfo>();
+            var files = new List<InstalledFileInfo>();
 
             foreach (var file in version.Files.Where(f => !f.Ignore))
             {
@@ -45,27 +45,28 @@ namespace Party.Shared.Handlers
             {
                 InstallFolder = basePath,
                 Files = files.ToArray(),
-                Installed = files.All(f => f.Status == LocalPackageInfo.FileStatus.Installed),
-                Installable = files.All(f => f.Status != LocalPackageInfo.FileStatus.NotInstallable && f.Status != LocalPackageInfo.FileStatus.HashMismatch)
+                Corrupted = files.Any(f => f.Status == FileStatus.HashMismatch),
+                Installed = files.All(f => f.Status == FileStatus.Installed),
+                Installable = files.All(f => f.Status != FileStatus.NotInstallable && f.Status != FileStatus.HashMismatch)
             };
         }
 
-        private LocalPackageInfo.InstalledFileInfo GetLocalFileInfo(RegistryFile file)
+        private InstalledFileInfo GetLocalFileInfo(RegistryFile file)
         {
             // TODO: Replace this with a path manager
             var filePath = Path.Combine(_savesDirectory, "..", file.Filename);
-            return new LocalPackageInfo.InstalledFileInfo
+            return new InstalledFileInfo
             {
                 Path = filePath,
                 RegistryFile = file,
-                Status = _fs.File.Exists(filePath) ? LocalPackageInfo.FileStatus.Installed : LocalPackageInfo.FileStatus.NotInstallable
+                Status = _fs.File.Exists(filePath) ? FileStatus.Installed : FileStatus.NotInstallable
             };
         }
 
-        private async Task<LocalPackageInfo.InstalledFileInfo> GetPackageFileInfo(string installPath, RegistryFile file)
+        private async Task<InstalledFileInfo> GetPackageFileInfo(string installPath, RegistryFile file)
         {
             var filePath = Path.Combine(installPath, file.Filename);
-            var fileInfo = new LocalPackageInfo.InstalledFileInfo
+            var fileInfo = new InstalledFileInfo
             {
                 Path = filePath,
                 RegistryFile = file
@@ -80,20 +81,20 @@ namespace Party.Shared.Handlers
                 }
                 if (hash == file.Hash.Value)
                 {
-                    fileInfo.Status = LocalPackageInfo.FileStatus.Installed;
+                    fileInfo.Status = FileStatus.Installed;
                 }
                 else
                 {
-                    fileInfo.Status = LocalPackageInfo.FileStatus.HashMismatch;
+                    fileInfo.Status = FileStatus.HashMismatch;
                 }
             }
             else if (file.Ignore)
             {
-                fileInfo.Status = LocalPackageInfo.FileStatus.Ignored;
+                fileInfo.Status = FileStatus.Ignored;
             }
             else
             {
-                fileInfo.Status = LocalPackageInfo.FileStatus.NotInstalled;
+                fileInfo.Status = FileStatus.NotInstalled;
             }
             return fileInfo;
         }

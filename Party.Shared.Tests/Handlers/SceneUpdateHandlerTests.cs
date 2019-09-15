@@ -20,7 +20,7 @@ namespace Party.Shared
             {
                 Files = new[]
                 {
-                    new LocalPackageInfo.InstalledFileInfo
+                    new InstalledFileInfo
                     {
                         RegistryFile = new RegistryFile
                         {

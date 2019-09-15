@@ -69,12 +69,12 @@ namespace Party.CLI.Commands
 
                     Renderer.WriteLine($"Installed package {registryPackage.Name} v{registryPackageVersion.Version} by {registryPackage.Author ?? "?"}");
                     Renderer.WriteLine($"Files downloaded in {installedStatus.InstallFolder}:");
-                    PrintFiles(installResult);
+                    PrintInstalledFiles(installResult);
                 }
                 else
                 {
                     Renderer.WriteLine($"Noop has been used, skipping install. Files would have been downloaded in {installedStatus.InstallFolder}:");
-                    foreach (var file in installedStatus.Files.Where(f => f.Status == LocalPackageInfo.FileStatus.NotInstalled))
+                    foreach (var file in installedStatus.Files.Where(f => f.Status == FileStatus.NotInstalled))
                     {
                         Renderer.WriteLine($"- Path: {Controller.GetDisplayPath(file.Path)}");
                         Renderer.WriteLine($"  Hash: {file.RegistryFile.Hash.Value} ({file.RegistryFile.Hash.Type})");
@@ -85,35 +85,8 @@ namespace Party.CLI.Commands
             else
             {
                 Renderer.WriteLine($"Some files are not available for download or invalid, you can instead download it at {registryPackage.Homepage ?? registryPackage.Repository ?? "(no link provided)"}");
-                PrintFiles(installedStatus);
+                PrintInstalledFiles(installedStatus);
                 return;
-            }
-        }
-
-        private void PrintFiles(LocalPackageInfo installedStatus)
-        {
-            foreach (var file in installedStatus.Files)
-            {
-                Renderer.Write($"  - {file.Path}");
-                switch (file.Status)
-                {
-                    case LocalPackageInfo.FileStatus.NotInstalled:
-                        Renderer.Write($" [not installed]", ConsoleColor.Blue);
-                        break;
-                    case LocalPackageInfo.FileStatus.Installed:
-                        Renderer.Write($" [installed]", ConsoleColor.Green);
-                        break;
-                    case LocalPackageInfo.FileStatus.HashMismatch:
-                        Renderer.Write($" [hash mismatch]", ConsoleColor.Red);
-                        break;
-                    case LocalPackageInfo.FileStatus.Ignored:
-                        Renderer.Write($" [ignored]", ConsoleColor.DarkGray);
-                        break;
-                    case LocalPackageInfo.FileStatus.NotInstallable:
-                        Renderer.Write($" [not downloadable]", ConsoleColor.Yellow);
-                        break;
-                }
-                Renderer.WriteLine();
             }
         }
     }
