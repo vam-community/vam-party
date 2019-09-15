@@ -39,7 +39,7 @@ namespace Party.Shared.Handlers
             _vamDirectory = vamDirectory;
         }
 
-        public Task<SavesMap> AnalyzeSaves(string filter, IProgressReporter<GetSavesProgress> reporter)
+        public Task<SavesMap> AnalyzeSaves(string filter, IProgress<GetSavesProgress> reporter)
         {
             var filterExt = _fs.Path.GetExtension(filter) ?? string.Empty;
             if (filterExt == string.Empty)
@@ -52,7 +52,7 @@ namespace Party.Shared.Handlers
                 throw new NotSupportedException($"Filter '{filter}' is not supported");
         }
 
-        private async Task<SavesMap> AnalyzeSavesByScript(string scriptFile, IProgressReporter<GetSavesProgress> reporter)
+        private async Task<SavesMap> AnalyzeSavesByScript(string scriptFile, IProgress<GetSavesProgress> reporter)
         {
             var scripts = new ConcurrentDictionary<string, Script>();
             var errors = new ConcurrentBag<SavesError>();
@@ -60,7 +60,7 @@ namespace Party.Shared.Handlers
             int scenesCount = 0, scenesCompletedCount = 0;
             void ReportProgress()
             {
-                reporter.Notify(new GetSavesProgress
+                reporter.Report(new GetSavesProgress
                 {
                     Scenes = new Progress(scenesCount, scenesCompletedCount),
                     Scripts = new Progress(1, 0),
@@ -109,7 +109,7 @@ namespace Party.Shared.Handlers
             };
         }
 
-        private async Task<SavesMap> AnalyzeSavesByDirectory(string directory, IProgressReporter<GetSavesProgress> reporter)
+        private async Task<SavesMap> AnalyzeSavesByDirectory(string directory, IProgress<GetSavesProgress> reporter)
         {
             var sceneFiles = new Queue<string>();
             var scriptListFiles = new Queue<string>();
@@ -126,7 +126,7 @@ namespace Party.Shared.Handlers
             int scriptListsCount = 0, scriptListsCompletedCount = 0;
             void ReportProgress()
             {
-                reporter.Notify(new GetSavesProgress
+                reporter.Report(new GetSavesProgress
                 {
                     Scenes = new Progress(scenesCount, scenesCompletedCount),
                     Scripts = new Progress(scriptsCount + scriptListsCount, scriptsCompletedCount + scriptListsCompletedCount),

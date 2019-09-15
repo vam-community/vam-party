@@ -25,11 +25,11 @@ namespace Party.Shared.Utils
             }
             using (var reporter = new ProgressReporter<int>(Start, Progress, End))
             {
-                reporter.Notify(1);
+                reporter.Report(1);
                 Thread.Sleep(1);
-                reporter.Notify(2);
+                reporter.Report(2);
                 Thread.Sleep(1);
-                reporter.Notify(3);
+                reporter.Report(3);
                 Thread.Sleep(1);
             }
 

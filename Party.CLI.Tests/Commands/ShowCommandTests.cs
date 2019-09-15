@@ -47,7 +47,7 @@ namespace Party.CLI
                     })
                 }
             });
-            _controller.Setup(x => x.GetSavesAsync(null, It.IsAny<IProgressReporter<GetSavesProgress>>())).ReturnsAsync(new SavesMap());
+            _controller.Setup(x => x.GetSavesAsync(null, It.IsAny<IProgress<GetSavesProgress>>())).ReturnsAsync(new SavesMap());
 
             var result = await _program.Execute(new[] { "show", "scripts/cool-thing" });
 
@@ -112,7 +112,7 @@ namespace Party.CLI
                     })
                 }
             });
-            _controller.Setup(x => x.GetSavesAsync(null, It.IsAny<IProgressReporter<GetSavesProgress>>())).ReturnsAsync(new SavesMap());
+            _controller.Setup(x => x.GetSavesAsync(null, It.IsAny<IProgress<GetSavesProgress>>())).ReturnsAsync(new SavesMap());
 
             var result = await _program.Execute(new[] { "show", "scripts/cool-thing" });
 
