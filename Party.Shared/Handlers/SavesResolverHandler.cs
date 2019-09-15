@@ -39,7 +39,7 @@ namespace Party.Shared.Handlers
             _vamDirectory = vamDirectory;
         }
 
-        public Task<SavesMap> AnalyzeSaves(string filter, ProgressReporter<GetSavesProgress> reporter)
+        public Task<SavesMap> AnalyzeSaves(string filter, IProgressReporter<GetSavesProgress> reporter)
         {
             var filterExt = _fs.Path.GetExtension(filter) ?? string.Empty;
             if (filterExt == string.Empty)
@@ -52,7 +52,7 @@ namespace Party.Shared.Handlers
                 throw new NotSupportedException($"Filter '{filter}' is not supported");
         }
 
-        private async Task<SavesMap> AnalyzeSavesByScript(string scriptFile, ProgressReporter<GetSavesProgress> reporter)
+        private async Task<SavesMap> AnalyzeSavesByScript(string scriptFile, IProgressReporter<GetSavesProgress> reporter)
         {
             var scripts = new ConcurrentDictionary<string, Script>();
             var errors = new ConcurrentBag<SavesError>();
@@ -109,7 +109,7 @@ namespace Party.Shared.Handlers
             };
         }
 
-        private async Task<SavesMap> AnalyzeSavesByDirectory(string directory, ProgressReporter<GetSavesProgress> reporter)
+        private async Task<SavesMap> AnalyzeSavesByDirectory(string directory, IProgressReporter<GetSavesProgress> reporter)
         {
             var sceneFiles = new Queue<string>();
             var scriptListFiles = new Queue<string>();

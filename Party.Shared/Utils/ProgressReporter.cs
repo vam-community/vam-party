@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace Party.Shared
 {
-    public class ProgressReporter<T> : IDisposable
+    public class ProgressReporter<T> : IProgressReporter<T>, IDisposable
     {
         private readonly object _sync = new object();
         private readonly BlockingCollection<T> _queue = new BlockingCollection<T>(1);
@@ -47,5 +47,10 @@ namespace Party.Shared
                 }
             }
         }
+    }
+
+    public interface IProgressReporter<T>
+    {
+        void Notify(T item);
     }
 }

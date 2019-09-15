@@ -1,5 +1,6 @@
 ﻿using Moq;
 using NUnit.Framework;
+using Party.Shared;
 using Party.Shared.Models;
 using Party.Shared.Models.Registries;
 using System;
@@ -46,7 +47,7 @@ namespace Party.CLI
                     })
                 }
             });
-            _controller.Setup(x => x.GetSavesAsync(null)).ReturnsAsync(new SavesMap());
+            _controller.Setup(x => x.GetSavesAsync(null, It.IsAny<IProgressReporter<GetSavesProgress>>())).ReturnsAsync(new SavesMap());
 
             var result = await _program.Execute(new[] { "show", "scripts/cool-thing" });
 
@@ -111,7 +112,7 @@ namespace Party.CLI
                     })
                 }
             });
-            _controller.Setup(x => x.GetSavesAsync(null)).ReturnsAsync(new SavesMap());
+            _controller.Setup(x => x.GetSavesAsync(null, It.IsAny<IProgressReporter<GetSavesProgress>>())).ReturnsAsync(new SavesMap());
 
             var result = await _program.Execute(new[] { "show", "scripts/cool-thing" });
 

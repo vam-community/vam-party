@@ -3,10 +3,12 @@ using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using System.Threading.Tasks;
+using Moq;
 using NUnit.Framework;
 using Party.Shared.Handlers;
 using Party.Shared.Models;
 using Party.Shared.Serializers;
+using Party.Shared.Utils;
 
 namespace Party.Shared
 {
@@ -21,7 +23,7 @@ namespace Party.Shared
             });
             var handler = Create(fileSystem);
 
-            var result = await handler.AnalyzeSaves(null);
+            var result = await handler.AnalyzeSaves(null, new ProgressReporterMock<GetSavesProgress>());
 
             PartyAssertions.AreDeepEqual(
                 ResultFactory.SavesMap().Build(),
@@ -38,7 +40,7 @@ namespace Party.Shared
             });
             var handler = Create(fileSystem, new[] { @"C:\VaM\Saves\Ignored" });
 
-            var result = await handler.AnalyzeSaves(null);
+            var result = await handler.AnalyzeSaves(null, new ProgressReporterMock<GetSavesProgress>());
 
             PartyAssertions.AreDeepEqual(
                 ResultFactory.SavesMap().Build(),
@@ -55,7 +57,7 @@ namespace Party.Shared
             });
             var handler = Create(fileSystem);
 
-            var result = await handler.AnalyzeSaves(null);
+            var result = await handler.AnalyzeSaves(null, new ProgressReporterMock<GetSavesProgress>());
 
             PartyAssertions.AreDeepEqual(
                 ResultFactory.SavesMap()
@@ -74,7 +76,7 @@ namespace Party.Shared
             });
             var handler = Create(fileSystem);
 
-            var result = await handler.AnalyzeSaves(null);
+            var result = await handler.AnalyzeSaves(null, new ProgressReporterMock<GetSavesProgress>());
 
             PartyAssertions.AreDeepEqual(
                 ResultFactory.SavesMap()
@@ -94,7 +96,7 @@ namespace Party.Shared
             });
             var handler = Create(fileSystem);
 
-            var result = await handler.AnalyzeSaves(null);
+            var result = await handler.AnalyzeSaves(null, new ProgressReporterMock<GetSavesProgress>());
 
             Assert.That(result.Errors, Is.Empty);
             Assert.That(result.Scripts.Select(s => s.FullPath), Is.EquivalentTo(new[] { @"C:\VaM\Saves\Script 1.cs" }));
@@ -113,7 +115,7 @@ namespace Party.Shared
             });
             var handler = Create(fileSystem);
 
-            var result = await handler.AnalyzeSaves(null);
+            var result = await handler.AnalyzeSaves(null, new ProgressReporterMock<GetSavesProgress>());
 
             Assert.That(result.Errors, Is.Empty);
             Assert.That(result.Scripts.Select(s => s.FullPath), Is.EquivalentTo(new[] { @"C:\VaM\Saves\Downloads\Scene 1\Script 1.cs" }));
@@ -132,7 +134,7 @@ namespace Party.Shared
             });
             var handler = Create(fileSystem);
 
-            var result = await handler.AnalyzeSaves(null);
+            var result = await handler.AnalyzeSaves(null, new ProgressReporterMock<GetSavesProgress>());
 
             PartyAssertions.AreDeepEqual(
                 ResultFactory.SavesMap()
@@ -155,7 +157,7 @@ namespace Party.Shared
             });
             var handler = Create(fileSystem);
 
-            var result = await handler.AnalyzeSaves(null);
+            var result = await handler.AnalyzeSaves(null, new ProgressReporterMock<GetSavesProgress>());
 
             Assert.That(result.Errors, Is.Empty);
             Assert.That(result.Scripts.Select(s => s.FullPath), Is.EquivalentTo(new[] { @"C:\VaM\Saves\Downloads\Scene 1\Add Me.cslist" }));

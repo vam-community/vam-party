@@ -50,7 +50,7 @@ namespace Party.Shared
                 .AcquireAsync(registries);
         }
 
-        public Task<SavesMap> GetSavesAsync(string filter, ProgressReporter<GetSavesProgress> reporter)
+        public Task<SavesMap> GetSavesAsync(string filter, IProgressReporter<GetSavesProgress> reporter)
         {
             return new SavesResolverHandler(
                 _fs,
@@ -182,7 +182,7 @@ namespace Party.Shared
 
         void HealthCheck();
         Task<Registry> GetRegistryAsync(params string[] registries);
-        Task<SavesMap> GetSavesAsync(string filter, ProgressReporter<GetSavesProgress> reporter);
+        Task<SavesMap> GetSavesAsync(string filter, IProgressReporter<GetSavesProgress> reporter);
         Task<SortedSet<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string path, DirectoryInfo saves);
         Task<SortedSet<RegistryFile>> BuildRegistryFilesFromUrlAsync(Registry registry, Uri url);
         IEnumerable<SearchResult> Search(Registry registry, string query);

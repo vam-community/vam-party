@@ -20,7 +20,7 @@ namespace Party.Shared.Handlers
             var script1 = ResultFactory.RegScript("script1", ResultFactory.RegVer("1.0.0", ResultFactory.RegFile("My Script.cs", "12345", "https://example.org/scripts/MyScript.cs")));
             var registry = ResultFactory.Reg(script1);
 
-            var result = _handler.Search(registry, null, "");
+            var result = _handler.Search(registry, "");
 
             PartyAssertions.AreDeepEqual(new[]
             {
@@ -38,7 +38,7 @@ namespace Party.Shared.Handlers
             var script1 = ResultFactory.RegScript("script1", ResultFactory.RegVer("1.0.0", ResultFactory.RegFile("My Script.cs", "12345", "https://example.com/scripts/MyScript.cs")));
             var registry = ResultFactory.Reg(script1);
 
-            var result = _handler.Search(registry, null, "");
+            var result = _handler.Search(registry, "");
 
             PartyAssertions.AreDeepEqual(new[]
             {
@@ -63,39 +63,13 @@ namespace Party.Shared.Handlers
             script2.Description = "This is a script that makes stuff go boom!";
             var registry = ResultFactory.Reg(script1, script2);
 
-            var result = _handler.Search(registry, null, query);
+            var result = _handler.Search(registry, query);
 
             PartyAssertions.AreDeepEqual(new[]
             {
                 new SearchResult
                 {
                     Package = script2,
-                    Trusted = true
-                }
-            }, result);
-        }
-
-        [Test]
-        public void CanShowScenesUsage()
-        {
-            var regScript = ResultFactory.RegScript("script1", ResultFactory.RegVer("1.0.0", ResultFactory.RegFile("MyScript.cs", "12345", "https://example.org/scripts/MyScript.cs")));
-            var registry = ResultFactory.Reg(regScript);
-
-            var saves = ResultFactory.SavesMap()
-                .WithScript(new Script(@"C:\VaM\Saves\MyScript (Copy).cs", "12345"), out var saveScript)
-                .Referencing(new Scene(@"C:\VaM\Saves\My Scene 1.json"), out var saveScene1)
-                .WithScene(new Scene(@"C:\VaM\Saves\My Scene 2.json"))
-                .Build();
-
-            var result = _handler.Search(registry, saves, "");
-
-            PartyAssertions.AreDeepEqual(new[]
-            {
-                new SearchResult
-                {
-                    Package = regScript,
-                    Scripts = new[] { saveScript },
-                    Scenes = new[] { saveScene1 },
                     Trusted = true
                 }
             }, result);

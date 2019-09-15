@@ -46,7 +46,6 @@ If you want to take on an idea, please [create an issue](https://github.com/vam-
 - Happy paths in tests for all commands and controller methods
 - Ability to bundle morphs, clothing etc in packages (a "type" field on packages that limits available filetypes)
 - Ability to specify dependencies (browse the tree using a hash set to avoid infinite recursion, print in show)
-- Progress indicator (especially in the initial load)
 - Cache results (based on last modified date, i.e. a simple json file with the last results, remember to clear old entries on reload)
 - Catch-all when scanning saves folder so each failing scene gets a log even when an unexpected error happens; move scene logs into the scene itself
 - The saves/registry match should simply return a table with a match type field, not three lists
