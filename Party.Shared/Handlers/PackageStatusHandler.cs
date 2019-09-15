@@ -32,14 +32,33 @@ namespace Party.Shared.Handlers
             }
             var installPath = Path.Combine(basePath, name, version.Version);
             var files = new List<LocalPackageInfo.InstalledFileInfo>();
-            foreach (var file in version.Files.Where(f => !f.Ignore && f.Filename != null))
+
+            foreach (var file in version.Files.Where(f => !f.Ignore))
             {
-                files.Add(await GetPackageFileInfo(installPath, file).ConfigureAwait(false));
+                if (file.Filename != null)
+                    files.Add(await GetPackageFileInfo(installPath, file).ConfigureAwait(false));
+                else if (file.LocalPath != null)
+                    files.Add(GetLocalFileInfo(file));
             }
+
             return new LocalPackageInfo
             {
                 InstallFolder = basePath,
-                Files = files.ToArray()
+                Files = files.ToArray(),
+                Installed = files.All(f => f.Status == LocalPackageInfo.FileStatus.Installed),
+                Installable = files.All(f => f.Status != LocalPackageInfo.FileStatus.NotInstallable && f.Status != LocalPackageInfo.FileStatus.HashMismatch)
+            };
+        }
+
+        private LocalPackageInfo.InstalledFileInfo GetLocalFileInfo(RegistryFile file)
+        {
+            // TODO: Replace this with a path manager
+            var filePath = Path.Combine(_savesDirectory, "..", file.Filename);
+            return new LocalPackageInfo.InstalledFileInfo
+            {
+                Path = filePath,
+                RegistryFile = file,
+                Status = _fs.File.Exists(filePath) ? LocalPackageInfo.FileStatus.Installed : LocalPackageInfo.FileStatus.NotInstallable
             };
         }
 
@@ -51,6 +70,7 @@ namespace Party.Shared.Handlers
                 Path = filePath,
                 RegistryFile = file
             };
+
             if (_fs.File.Exists(filePath))
             {
                 var hash = await Hashing.GetHashAsync(_fs, filePath);

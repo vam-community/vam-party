@@ -1,33 +1,47 @@
 using System;
-using Party.Shared.Models.Registries;
+using System.Text.RegularExpressions;
 
 namespace Party.Shared.Models
 {
     public class PackageFullName
     {
+        private static readonly Regex _regex = new Regex(@"^(?<type>[a-z]+)/(?<name>[a-z0-9_\-]+)(@(?<version>[0-9\.\-]+))?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
         public static bool TryParsePackage(string name, out PackageFullName info)
         {
-            info = null;
-            var parts = name.Split('/');
-            if (parts.Length != 2)
+            if (name == null)
+            {
+                info = null;
                 return false;
+            }
 
-            if (!Enum.TryParse<PackageTypes>(parts[0], true, out var type))
-                return false;
+            var match = _regex.Match(name);
 
-            if (!RegistryPackage.ValidNameRegex.IsMatch(parts[1]))
+            if (!match.Success)
+            {
+                info = null;
                 return false;
+            }
+
+            if (!Enum.TryParse<PackageTypes>(match.Groups["type"].Value, true, out var type))
+            {
+                info = null;
+                return false;
+            }
 
             info = new PackageFullName
             {
                 Type = type,
-                Name = parts[1]
+                Name = match.Groups["name"].Value,
+                Version = match.Groups["version"].Success ? match.Groups["version"].Value : null
             };
             return true;
         }
 
         public string Name { get; set; }
         public PackageTypes Type { get; set; }
+        public string Version { get; set; }
+
 
         public override string ToString()
         {

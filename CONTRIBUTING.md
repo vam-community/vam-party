@@ -55,4 +55,3 @@ If you want to take on an idea, please [create an issue](https://github.com/vam-
 - Serializers should not run logic; instead, wrap the JObject and use an interface in Model for scenes, and use a model for scripts
 - Resources should be ScriptRef, SceneRef, etc. Not sure if the types are useful here.
 - Save scripts inside the Scripts folder, not inside a separate folder
-- Specify script type using namespaces (e.g. `party get scripts/improved-pov`)

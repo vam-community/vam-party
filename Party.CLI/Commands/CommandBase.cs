@@ -56,7 +56,7 @@ namespace Party.CLI.Commands
             Renderer.WriteLine("Analyzing the saves folder and gettings the packages list from the registry, please wait...");
 
             var isFilterPackage = PackageFullName.TryParsePackage(filter, out var filterPackage);
-            var filterPath = !isFilterPackage;
+            var filterPath = !isFilterPackage && filter != null;
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();

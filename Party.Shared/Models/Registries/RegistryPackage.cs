@@ -20,7 +20,12 @@ namespace Party.Shared.Models.Registries
 
         public RegistryPackageVersion GetLatestVersion()
         {
-            return Versions.FirstOrDefault();
+            return Versions?.FirstOrDefault();
+        }
+
+        public RegistryPackageVersion GetVersion(string version)
+        {
+            return Versions?.FirstOrDefault(p => p.Version.ToString().Equals(version));
         }
 
         public RegistryPackageVersion CreateVersion()

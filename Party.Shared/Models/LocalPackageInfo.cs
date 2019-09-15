@@ -7,6 +7,8 @@ namespace Party.Shared.Models
     {
         public InstalledFileInfo[] Files { get; set; }
         public string InstallFolder { get; set; }
+        public bool Installed { get; set; }
+        public bool Installable { get; set; }
 
         public FileStatus[] DistinctStatuses() => Files.Select(f => f.Status).Distinct().ToArray();
 
@@ -15,7 +17,8 @@ namespace Party.Shared.Models
             NotInstalled,
             Installed,
             HashMismatch,
-            Ignored
+            Ignored,
+            NotInstallable
         }
 
         public class InstalledFileInfo
