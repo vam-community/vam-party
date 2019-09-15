@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Party.Shared.Exceptions;
 using Party.Shared.Models;
@@ -38,29 +39,46 @@ namespace Party.Shared.Handlers
             _vamDirectory = vamDirectory;
         }
 
-        public Task<SavesMap> AnalyzeSaves(string filter)
+        public Task<SavesMap> AnalyzeSaves(string filter, ProgressReporter<GetSavesProgress> reporter)
         {
             var filterExt = _fs.Path.GetExtension(filter) ?? string.Empty;
             if (filterExt == string.Empty)
-                return AnalyzeSavesByDirectory(filter);
+                return AnalyzeSavesByDirectory(filter, reporter);
             else if (filterExt == ".json")
                 return AnalyzeSavesByScene(filter);
             else if (filterExt == ".cs" || filterExt == ".cslist")
-                return AnalyzeSavesByScript(filter);
+                return AnalyzeSavesByScript(filter, reporter);
             else
                 throw new NotSupportedException($"Filter '{filter}' is not supported");
         }
 
-        private async Task<SavesMap> AnalyzeSavesByScript(string scriptFile)
+        private async Task<SavesMap> AnalyzeSavesByScript(string scriptFile, ProgressReporter<GetSavesProgress> reporter)
         {
             var scripts = new ConcurrentDictionary<string, Script>();
             var errors = new ConcurrentBag<SavesError>();
             var sceneTasks = new Queue<Task<Scene>>();
+            int scenesCount = 0, scenesCompletedCount = 0;
+            void ReportProgress()
+            {
+                reporter.Notify(new GetSavesProgress
+                {
+                    Scenes = new Progress(scenesCount, scenesCompletedCount),
+                    Scripts = new Progress(1, 0),
+                });
+            }
+
             foreach (var file in _fs.Directory.EnumerateFiles(_savesDirectory, "*.json", SearchOption.AllDirectories))
             {
                 if (_ignoredPaths.Any(ignoredPath => file.StartsWith(ignoredPath))) continue;
 
-                sceneTasks.Enqueue(LoadScene(scripts, errors, file, true));
+                Interlocked.Increment(ref scenesCount);
+                sceneTasks.Enqueue(Task.Run(async () =>
+                {
+                    var result = await LoadScene(scripts, errors, file, true).ConfigureAwait(false);
+                    Interlocked.Increment(ref scenesCompletedCount);
+                    ReportProgress();
+                    return result;
+                }));
             }
             var scenes = await Task.WhenAll(sceneTasks);
 
@@ -91,7 +109,7 @@ namespace Party.Shared.Handlers
             };
         }
 
-        private async Task<SavesMap> AnalyzeSavesByDirectory(string directory)
+        private async Task<SavesMap> AnalyzeSavesByDirectory(string directory, ProgressReporter<GetSavesProgress> reporter)
         {
             var sceneFiles = new Queue<string>();
             var scriptListFiles = new Queue<string>();
@@ -103,6 +121,18 @@ namespace Party.Shared.Handlers
             }
             var shouldTryLoadingReferences = directory != null;
             var errors = new ConcurrentBag<SavesError>();
+            int scenesCount = 0, scenesCompletedCount = 0;
+            int scriptsCount = 0, scriptsCompletedCount = 0;
+            int scriptListsCount = 0, scriptListsCompletedCount = 0;
+            void ReportProgress()
+            {
+                reporter.Notify(new GetSavesProgress
+                {
+                    Scenes = new Progress(scenesCount, scenesCompletedCount),
+                    Scripts = new Progress(scriptsCount + scriptListsCount, scriptsCompletedCount + scriptListsCompletedCount),
+                });
+            }
+
             foreach (var file in _fs.Directory.EnumerateFiles(directory ?? _savesDirectory, "*.*", SearchOption.AllDirectories))
             {
                 if (_ignoredPaths.Any(ignoredPath => file.StartsWith(ignoredPath))) continue;
@@ -111,25 +141,42 @@ namespace Party.Shared.Handlers
                 switch (Path.GetExtension(file))
                 {
                     case ".json":
+                        Interlocked.Increment(ref scenesCount);
                         sceneFiles.Enqueue(file);
                         break;
                     case ".cs":
-                        scriptTasks.Add(Task.Run(async () => await LoadScript(file, errors).ConfigureAwait(false)));
+                        Interlocked.Increment(ref scriptsCount);
+                        scriptTasks.Add(Task.Run(async () =>
+                        {
+                            var result = await LoadScript(file, errors).ConfigureAwait(false);
+                            Interlocked.Increment(ref scriptsCompletedCount);
+                            ReportProgress();
+                            return result;
+                        }));
                         break;
                     case ".cslist":
+                        Interlocked.Increment(ref scriptListsCount);
                         scriptListFiles.Enqueue(file);
                         break;
                     default:
                         // Ignore anything else
                         break;
                 }
+
+                ReportProgress();
             }
 
             var scripts = new ConcurrentDictionary<string, Script>((await Task.WhenAll(scriptTasks).ConfigureAwait(false)).ToDictionary(x => x.FullPath, x => x));
 
             if (scriptListFiles != null)
             {
-                var scriptListTasks = scriptListFiles.Select(file => LoadScriptList(scripts, errors, file, shouldTryLoadingReferences));
+                var scriptListTasks = scriptListFiles.Select(async file =>
+                {
+                    var result = await LoadScriptList(scripts, errors, file, shouldTryLoadingReferences);
+                    Interlocked.Increment(ref scriptListsCompletedCount);
+                    ReportProgress();
+                    return result;
+                });
                 var scriptLists = await Task.WhenAll(scriptListTasks).ConfigureAwait(false);
                 foreach (var scriptList in scriptLists.Where(sl => sl != null))
                 {
@@ -137,7 +184,13 @@ namespace Party.Shared.Handlers
                 }
             }
 
-            var sceneTasks = sceneFiles.Select(file => Task.Run(async () => await LoadScene(scripts, errors, file, shouldTryLoadingReferences).ConfigureAwait(false)));
+            var sceneTasks = sceneFiles.Select(file => Task.Run(async () =>
+            {
+                var result = await LoadScene(scripts, errors, file, shouldTryLoadingReferences).ConfigureAwait(false);
+                Interlocked.Increment(ref scenesCompletedCount);
+                ReportProgress();
+                return result;
+            }));
             var scenes = await Task.WhenAll(sceneTasks).ConfigureAwait(false);
 
             return new SavesMap

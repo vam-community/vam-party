@@ -15,7 +15,7 @@ namespace Party.Shared.Handlers
             _trustedDomains = trustedDomains ?? throw new ArgumentNullException(nameof(trustedDomains));
         }
 
-        public IEnumerable<SearchResult> Search(Registry registry, SavesMap saves, string query)
+        public IEnumerable<SearchResult> Search(Registry registry, string query)
         {
             if (registry is null) throw new ArgumentNullException(nameof(registry));
             if (registry?.Packages is null) throw new ArgumentException("registry does not have any scripts", nameof(registry));
@@ -35,29 +35,10 @@ namespace Party.Shared.Handlers
                     .Where(f => f.Url != null && !f.Ignore)
                     .All(f => _trustedDomains.Any(t => f.Url.StartsWith(t)))
                     ?? false;
-                Script[] scripts = null;
-                Scene[] scenes = null;
-                if (saves != null && package.Versions != null)
-                {
-                    // TODO: We should consider all files from a specific version of plugin together
-                    var allFilesFromAllVersions = package.Versions
-                        .SelectMany(v => v.Files ?? new SortedSet<RegistryFile>());
-                    scripts = allFilesFromAllVersions
-                        .Where(regFile => regFile.Hash?.Value != null)
-                        .SelectMany(regFile => saves.Scripts.Where(localScript => localScript.Hash == regFile.Hash.Value))
-                        .Distinct()
-                        .ToArray();
-                    scenes = scripts
-                        .SelectMany(s => s.Scenes)
-                        .Distinct()
-                        .ToArray();
-                }
                 yield return new SearchResult
                 {
                     Package = package,
                     Trusted = trusted,
-                    Scripts = scripts,
-                    Scenes = scenes
                 };
             }
         }

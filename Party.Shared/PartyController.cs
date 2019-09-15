@@ -50,7 +50,7 @@ namespace Party.Shared
                 .AcquireAsync(registries);
         }
 
-        public Task<SavesMap> GetSavesAsync(string filter = null)
+        public Task<SavesMap> GetSavesAsync(string filter, ProgressReporter<GetSavesProgress> reporter)
         {
             return new SavesResolverHandler(
                 _fs,
@@ -59,7 +59,7 @@ namespace Party.Shared
                 _config.VirtAMate.VirtAMateInstallFolder,
                 SavesDirectory,
                 _config.VirtAMate.IgnoredFolders)
-                    .AnalyzeSaves(filter);
+                    .AnalyzeSaves(filter, reporter);
         }
 
         public Task<SortedSet<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string path, DirectoryInfo saves)
@@ -74,10 +74,10 @@ namespace Party.Shared
                 .BuildFiles(registry, url);
         }
 
-        public IEnumerable<SearchResult> Search(Registry registry, SavesMap saves, string query)
+        public IEnumerable<SearchResult> Search(Registry registry, string query)
         {
             return new SearchHandler(_config.Registry.TrustedDomains)
-                .Search(registry, saves, query);
+                .Search(registry, query);
         }
 
         public Task<LocalPackageInfo> GetInstalledPackageInfoAsync(string name, RegistryPackageVersion version)
@@ -182,10 +182,10 @@ namespace Party.Shared
 
         void HealthCheck();
         Task<Registry> GetRegistryAsync(params string[] registries);
-        Task<SavesMap> GetSavesAsync(string filter = null);
+        Task<SavesMap> GetSavesAsync(string filter, ProgressReporter<GetSavesProgress> reporter);
         Task<SortedSet<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string path, DirectoryInfo saves);
         Task<SortedSet<RegistryFile>> BuildRegistryFilesFromUrlAsync(Registry registry, Uri url);
-        IEnumerable<SearchResult> Search(Registry registry, SavesMap saves, string query);
+        IEnumerable<SearchResult> Search(Registry registry, string query);
         Task<LocalPackageInfo> GetInstalledPackageInfoAsync(string name, RegistryPackageVersion version);
         Task<LocalPackageInfo> InstallPackageAsync(LocalPackageInfo info, bool force);
         RegistrySavesMatches MatchSavesToRegistry(SavesMap saves, Registry registry);

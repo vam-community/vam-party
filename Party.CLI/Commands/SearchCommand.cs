@@ -14,8 +14,6 @@ namespace Party.CLI.Commands
             var command = new Command("search", "Search for packages in the registry");
             AddCommonOptions(command);
             command.AddArgument(new Argument<string>("query", null));
-            command.AddOption(new Option("--no-usage", "Do not show usage information from scenes (runs faster)"));
-            command.AddOption(new Option("--warnings", "Show warnings such as broken scenes or missing scripts"));
 
             command.Handler = CommandHandler.Create<SearchArguments>(async args =>
             {
@@ -40,15 +38,9 @@ namespace Party.CLI.Commands
         {
             Controller.HealthCheck();
 
-            var registryTask = Controller.GetRegistryAsync();
-            var savesTask = args.NoUsage ? Task.FromResult<SavesMap>(null) : Controller.GetSavesAsync();
-            await Task.WhenAll();
-            var registry = await registryTask;
-            var saves = await savesTask;
+            var registry = await Controller.GetRegistryAsync();
 
-            PrintWarnings(args.Warnings, saves?.Errors);
-
-            foreach (var result in Controller.Search(registry, saves, args.Query))
+            foreach (var result in Controller.Search(registry, args.Query))
             {
                 var package = result.Package;
                 var latestVersion = package.GetLatestVersion();
@@ -60,10 +52,6 @@ namespace Party.CLI.Commands
                 if (!result.Trusted)
                 {
                     Renderer.Write($" [NOT TRUSTED]", ConsoleColor.Red);
-                }
-                if (!args.NoUsage)
-                {
-                    Renderer.Write($" (used in {Pluralize(result.Scenes?.Length ?? 0, "scene", "scenes")})", ConsoleColor.DarkGray);
                 }
                 Renderer.WriteLine();
             }

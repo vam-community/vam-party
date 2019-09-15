@@ -56,23 +56,30 @@ namespace Party.CLI.Commands
             Renderer.WriteLine("Analyzing the saves folder and gettings the packages list from the registry, please wait...");
 
             var isFilterPackage = PackageFullName.TryParsePackage(filter, out var filterPackage);
-            var filterPath = !isFilterPackage && filter != null;
+            var pathFilter = !isFilterPackage && filter != null ? Path.GetFullPath(filter) : null;
 
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-            var registryTask = Metrics.Measure(() => Controller.GetRegistryAsync());
-            // TODO: If the item is a package (no extension), resolve it to a path (if the plugin was not downloaded, throw)
-            // TODO: When the filter is a scene, mark every script that was not referenced by that scene as not safe for cleanup; also remove them for display
-            var savesTask = Metrics.Measure(() => Controller.GetSavesAsync(filterPath ? Path.GetFullPath(filter) : null));
+            Task<(Registry, TimeSpan)> registryTask;
+            Task<(SavesMap, TimeSpan)> savesTask;
+            TimeSpan elapsed;
+            using (var reporter = new ProgressReporter<GetSavesProgress>(StartProgress, ReportProgress, CompleteProgress))
+            {
+                var stopwatch = new Stopwatch();
+                stopwatch.Start();
+                registryTask = Metrics.Measure(() => Controller.GetRegistryAsync());
+                // TODO: If the item is a package (no extension), resolve it to a path (if the plugin was not downloaded, throw)
+                // TODO: When the filter is a scene, mark every script that was not referenced by that scene as not safe for cleanup; also remove them for display
+                savesTask = Metrics.Measure(() => Controller.GetSavesAsync(pathFilter, reporter));
 
-            await Task.WhenAll();
+                await Task.WhenAll(registryTask, savesTask);
+
+                elapsed = stopwatch.Elapsed;
+                stopwatch.Stop();
+            }
 
             var (registry, registryTiming) = await registryTask;
             var (saves, savesTiming) = await savesTask;
 
-            stopwatch.Stop();
-
-            Renderer.WriteLine($"Scanned {saves.Scenes?.Length ?? 0} scenes and {saves.Scripts?.Length ?? 0} scripts in {savesTiming.TotalSeconds:0.00}s, and downloaded registry in {registryTiming.TotalSeconds:0.00}s. Total wait time: {stopwatch.Elapsed.TotalSeconds:0.00}s");
+            Renderer.WriteLine($"Scanned {saves.Scenes?.Length ?? 0} scenes and {saves.Scripts?.Length ?? 0} scripts in {savesTiming.TotalSeconds:0.00}s, and downloaded registry in {registryTiming.TotalSeconds:0.00}s. Total wait time: {elapsed.TotalSeconds:0.00}s");
 
             // TODO: Put in controller
             if (isFilterPackage)
@@ -193,6 +200,22 @@ namespace Party.CLI.Commands
             {
                 return $"{count} {plural}";
             }
+        }
+
+        private void StartProgress()
+        {
+            Console.CursorVisible = false;
+        }
+
+        private void ReportProgress(GetSavesProgress progress)
+        {
+            Renderer.Write($"{progress.Percentage()}% ({progress.Scenes.Analyzed}/{progress.Scenes.ToAnalyze} scenes, {progress.Scripts.Analyzed}/{progress.Scripts.ToAnalyze} scripts)");
+            Console.SetCursorPosition(0, Console.CursorTop);
+        }
+
+        private void CompleteProgress()
+        {
+            Console.CursorVisible = false;
         }
     }
 }
