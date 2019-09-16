@@ -14,23 +14,16 @@ namespace Party.Shared.Models.Registries
 
         public SortedSet<RegistryPackage> Get(PackageTypes type)
         {
-            switch (type)
+            return type switch
             {
-                case PackageTypes.Scripts:
-                    return Scripts;
-                case PackageTypes.Clothing:
-                    return Clothing;
-                case PackageTypes.Scenes:
-                    return Scenes;
-                case PackageTypes.Textures:
-                    return Textures;
-                case PackageTypes.Assets:
-                    return Assets;
-                case PackageTypes.Morphs:
-                    return Morphs;
-                default:
-                    throw new NotImplementedException($"Unknown package type: {type}");
-            }
+                PackageTypes.Scripts => Scripts,
+                PackageTypes.Clothing => Clothing,
+                PackageTypes.Scenes => Scenes,
+                PackageTypes.Textures => Textures,
+                PackageTypes.Assets => Assets,
+                PackageTypes.Morphs => Morphs,
+                _ => throw new NotImplementedException($"Unknown package type: {type}"),
+            };
         }
     }
 }

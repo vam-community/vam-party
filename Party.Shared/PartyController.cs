@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using Party.Shared.Exceptions;
 using Party.Shared.Handlers;
 using Party.Shared.Models;
+using Party.Shared.Models.Local;
 using Party.Shared.Models.Registries;
 using Party.Shared.Serializers;
 
@@ -97,7 +98,7 @@ namespace Party.Shared
                 .Match(saves, registry);
         }
 
-        public Task<(string before, string after)[]> UpdateScriptInSceneAsync(Scene scene, Script local, LocalPackageInfo info)
+        public Task<(string before, string after)[]> UpdateScriptInSceneAsync(LocalSceneFile scene, LocalScriptFile local, LocalPackageInfo info)
         {
             return new SceneUpdateHandler(new SceneSerializer(_fs), SavesDirectory)
                 .UpdateScripts(scene, local, info);
@@ -189,7 +190,7 @@ namespace Party.Shared
         Task<LocalPackageInfo> GetInstalledPackageInfoAsync(string name, RegistryPackageVersion version);
         Task<LocalPackageInfo> InstallPackageAsync(LocalPackageInfo info, bool force);
         RegistrySavesMatches MatchSavesToRegistry(SavesMap saves, Registry registry);
-        Task<(string before, string after)[]> UpdateScriptInSceneAsync(Scene scene, Script local, LocalPackageInfo info);
+        Task<(string before, string after)[]> UpdateScriptInSceneAsync(LocalSceneFile scene, LocalScriptFile local, LocalPackageInfo info);
         Task<string> GetPartyUpdatesAvailable();
         string GetDisplayPath(string path);
         string GetRelativePath(string path, string parentPath);

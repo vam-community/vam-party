@@ -1,3 +1,4 @@
+using Party.Shared.Models.Local;
 using Party.Shared.Models.Registries;
 
 namespace Party.Shared.Models
@@ -6,7 +7,7 @@ namespace Party.Shared.Models
     {
         public RegistrySavesMatch[] HashMatches { get; set; }
         public RegistrySavesMatch[] FilenameMatches { get; set; }
-        public Script[] NoMatches { get; set; }
+        public LocalScriptFile[] NoMatches { get; set; }
     }
 
     public class RegistrySavesMatch
@@ -14,13 +15,13 @@ namespace Party.Shared.Models
         public RegistryPackage Script { get; set; }
         public RegistryPackageVersion Version { get; set; }
         public RegistryFile File { get; set; }
-        public Script Local { get; set; }
+        public LocalScriptFile Local { get; set; }
 
         public RegistrySavesMatch()
         {
         }
 
-        public RegistrySavesMatch((RegistryPackage script, RegistryPackageVersion version, RegistryFile file) svf, Script local)
+        public RegistrySavesMatch((RegistryPackage script, RegistryPackageVersion version, RegistryFile file) svf, LocalScriptFile local)
         {
             Script = svf.script;
             Version = svf.version;

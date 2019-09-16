@@ -4,6 +4,7 @@ using Moq;
 using NUnit.Framework;
 using Party.Shared.Handlers;
 using Party.Shared.Models;
+using Party.Shared.Models.Local;
 using Party.Shared.Models.Registries;
 using Party.Shared.Serializers;
 
@@ -14,8 +15,8 @@ namespace Party.Shared
         [Test]
         public async Task CanFindAndReplaceAScript()
         {
-            var scene = new Scene(@"C:\VaM\Saves\My Scene.json");
-            var script = new Script(@"C:\VaM\Saves\My Script.cs", "SOMEHASH");
+            var scene = new LocalSceneFile(@"C:\VaM\Saves\My Scene.json");
+            var script = new LocalScriptFile(@"C:\VaM\Saves\My Script.cs", "SOMEHASH");
             var info = new LocalPackageInfo
             {
                 Files = new[]

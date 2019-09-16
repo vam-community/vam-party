@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
 using Party.Shared.Models;
+using Party.Shared.Models.Local;
 using Party.Shared.Models.Registries;
 using Party.Shared.Utils;
 
@@ -88,7 +89,7 @@ namespace Party.CLI.Commands
                 var packageHashes = new HashSet<string>(registry.Packages.Get(filterPackage.Type).Where(s => filterPackage.Name.Equals(s.Name, StringComparison.InvariantCultureIgnoreCase)).SelectMany(s => s.Versions).SelectMany(v => v.Files).Select(f => f.Hash.Value).Distinct());
                 saves.Scripts = saves.Scripts.Where(s =>
                 {
-                    if (s is ScriptList scriptList)
+                    if (s is LocalScriptListFile scriptList)
                         return new[] { scriptList.Hash }.Concat(scriptList.Scripts.Select(c => c.Hash)).All(h => packageHashes.Contains(h));
                     else
                         return packageHashes.Contains(s.Hash);

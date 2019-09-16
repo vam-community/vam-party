@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Party.Shared.Models;
+using Party.Shared.Models.Local;
 using Party.Shared.Models.Registries;
 
 namespace Party.Shared
@@ -59,18 +60,18 @@ namespace Party.Shared
 
         internal class SavesMapBuilder
         {
-            private readonly List<Script> _scripts = new List<Script>();
-            private readonly List<Scene> _scenes = new List<Scene>();
+            private readonly List<LocalScriptFile> _scripts = new List<LocalScriptFile>();
+            private readonly List<LocalSceneFile> _scenes = new List<LocalSceneFile>();
             private readonly List<SavesError> _errors = new List<SavesError>();
 
-            internal SavesMapBuilder WithScript(Script script, out Script outScript)
+            internal SavesMapBuilder WithScript(LocalScriptFile script, out LocalScriptFile outScript)
             {
                 _scripts.Add(script);
                 outScript = script;
                 return this;
             }
 
-            internal SavesMapBuilder Referencing(Scene scene, out Scene outScene)
+            internal SavesMapBuilder Referencing(LocalSceneFile scene, out LocalSceneFile outScene)
             {
                 _scripts.Last().Scenes.Add(scene);
                 _scenes.Add(scene);
@@ -78,7 +79,7 @@ namespace Party.Shared
                 return this;
             }
 
-            internal SavesMapBuilder WithScene(Scene scene)
+            internal SavesMapBuilder WithScene(LocalSceneFile scene)
             {
                 _scenes.Add(scene);
                 return this;

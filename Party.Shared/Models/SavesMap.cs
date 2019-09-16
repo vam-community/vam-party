@@ -1,9 +1,11 @@
+using Party.Shared.Models.Local;
+
 namespace Party.Shared.Models
 {
     public class SavesMap
     {
-        public Script[] Scripts { get; set; }
-        public Scene[] Scenes { get; set; }
+        public LocalScriptFile[] Scripts { get; set; }
+        public LocalSceneFile[] Scenes { get; set; }
         public SavesError[] Errors { get; set; }
     }
 

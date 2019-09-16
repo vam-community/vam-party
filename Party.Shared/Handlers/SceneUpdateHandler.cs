@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared.Models;
+using Party.Shared.Models.Local;
 using Party.Shared.Serializers;
 
 namespace Party.Shared.Handlers
@@ -19,13 +20,13 @@ namespace Party.Shared.Handlers
             _serializer = serializer;
         }
 
-        public async Task<(string before, string after)[]> UpdateScripts(Scene scene, Script local, LocalPackageInfo info)
+        public async Task<(string before, string after)[]> UpdateScripts(LocalSceneFile scene, LocalScriptFile local, LocalPackageInfo info)
         {
             var changes = new List<(string before, string after)>();
 
             changes.AddRange(GetTransform(local, info));
 
-            if (local is ScriptList scriptList)
+            if (local is LocalScriptListFile scriptList)
             {
                 changes.AddRange(scriptList.Scripts.SelectMany(script => GetTransform(script, info)));
             }
@@ -46,7 +47,7 @@ namespace Party.Shared.Handlers
             return affected.ToArray();
         }
 
-        private IEnumerable<(string before, string after)> GetTransform(Script local, LocalPackageInfo info)
+        private IEnumerable<(string before, string after)> GetTransform(LocalScriptFile local, LocalPackageInfo info)
         {
             var after = ToRelative(info.Files.First(f => f.RegistryFile.Hash.Value == local.Hash).Path);
             yield return (before: ToRelative(local.FullPath), after);

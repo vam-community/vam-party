@@ -3,10 +3,10 @@ using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using System.Threading.Tasks;
-using Moq;
 using NUnit.Framework;
 using Party.Shared.Handlers;
 using Party.Shared.Models;
+using Party.Shared.Models.Local;
 using Party.Shared.Serializers;
 using Party.Shared.Utils;
 
@@ -61,7 +61,7 @@ namespace Party.Shared
 
             PartyAssertions.AreDeepEqual(
                 ResultFactory.SavesMap()
-                    .WithScene(new Scene(@"C:\VaM\Saves\Scene 1.json"))
+                    .WithScene(new LocalSceneFile(@"C:\VaM\Saves\Scene 1.json"))
                     .Build(),
                 result
             );
@@ -80,7 +80,7 @@ namespace Party.Shared
 
             PartyAssertions.AreDeepEqual(
                 ResultFactory.SavesMap()
-                    .WithScript(new Script(@"C:\VaM\Saves\Script 1.cs", "90A449A3FC7A01DCF27C92090C05804BFF1EC887006A77F71E984D21F7B38CD4"), out var _)
+                    .WithScript(new LocalScriptFile(@"C:\VaM\Saves\Script 1.cs", "90A449A3FC7A01DCF27C92090C05804BFF1EC887006A77F71E984D21F7B38CD4"), out var _)
                     .Build(),
                 result
             );
@@ -138,8 +138,8 @@ namespace Party.Shared
 
             PartyAssertions.AreDeepEqual(
                 ResultFactory.SavesMap()
-                    .WithScript(new ScriptList(@"C:\VaM\Saves\My Script\Add Me.cslist", "3258C0B1D41C29CBC98B475EEEB5BF7609C9B4F290168A0E2158253DF044F325", new[] {
-                        new Script(@"C:\VaM\Saves\My Script\Script 1.cs", "90A449A3FC7A01DCF27C92090C05804BFF1EC887006A77F71E984D21F7B38CD4")
+                    .WithScript(new LocalScriptListFile(@"C:\VaM\Saves\My Script\Add Me.cslist", "3258C0B1D41C29CBC98B475EEEB5BF7609C9B4F290168A0E2158253DF044F325", new[] {
+                        new LocalScriptFile(@"C:\VaM\Saves\My Script\Script 1.cs", "90A449A3FC7A01DCF27C92090C05804BFF1EC887006A77F71E984D21F7B38CD4")
                     }), out var _)
                     .Build(),
                 result

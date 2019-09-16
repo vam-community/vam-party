@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using Party.Shared.Handlers;
 using Party.Shared.Models;
+using Party.Shared.Models.Local;
 
 namespace Party.Shared
 {
@@ -19,7 +20,7 @@ namespace Party.Shared
         public void CanMatchNothing()
         {
             var saves = ResultFactory.SavesMap()
-                .WithScript(new Script($"{_vam}1.cs", "1"), out var script1)
+                .WithScript(new LocalScriptFile($"{_vam}1.cs", "1"), out var script1)
                 .Build();
             var registry = ResultFactory.Reg(
                 ResultFactory.RegScript("my-script", ResultFactory.RegVer("1.0.0", ResultFactory.RegFile("2.cs", "2"))));
@@ -38,7 +39,7 @@ namespace Party.Shared
         public void CanMatchByHash()
         {
             var saves = ResultFactory.SavesMap()
-                .WithScript(new Script($"{_vam}1.cs", "1"), out var local1)
+                .WithScript(new LocalScriptFile($"{_vam}1.cs", "1"), out var local1)
                 .Build();
             var file = ResultFactory.RegFile("2.cs", "1");
             var version = ResultFactory.RegVer("1.0.0", file);
@@ -51,7 +52,7 @@ namespace Party.Shared
             {
                 HashMatches = new[] { new RegistrySavesMatch { Script = script, Version = version, File = file, Local = local1 } },
                 FilenameMatches = new RegistrySavesMatch[0],
-                NoMatches = new Script[0]
+                NoMatches = new LocalScriptFile[0]
             }, result);
         }
 
@@ -59,7 +60,7 @@ namespace Party.Shared
         public void CanMatchByFilename()
         {
             var saves = ResultFactory.SavesMap()
-                .WithScript(new Script($"{_vam}1.cs", "1"), out var local1)
+                .WithScript(new LocalScriptFile($"{_vam}1.cs", "1"), out var local1)
                 .Build();
             var file = ResultFactory.RegFile("1.cs", "2");
             var version = ResultFactory.RegVer("1.0.0", file);
@@ -72,7 +73,7 @@ namespace Party.Shared
             {
                 HashMatches = new RegistrySavesMatch[0],
                 FilenameMatches = new[] { new RegistrySavesMatch { Script = script, Version = version, File = file, Local = local1 } },
-                NoMatches = new Script[0]
+                NoMatches = new LocalScriptFile[0]
             }, result);
         }
 
@@ -80,7 +81,7 @@ namespace Party.Shared
         public void DoesNotMatchByFilenameWhenMatchedByHash()
         {
             var saves = ResultFactory.SavesMap()
-                .WithScript(new Script($"{_vam}1.cs", "1"), out var local1)
+                .WithScript(new LocalScriptFile($"{_vam}1.cs", "1"), out var local1)
                 .Build();
             var file = ResultFactory.RegFile("1.cs", "1");
             var version = ResultFactory.RegVer("1.0.0", file);
@@ -93,7 +94,7 @@ namespace Party.Shared
             {
                 HashMatches = new[] { new RegistrySavesMatch { Script = script, Version = version, File = file, Local = local1 } },
                 FilenameMatches = new RegistrySavesMatch[0],
-                NoMatches = new Script[0]
+                NoMatches = new LocalScriptFile[0]
             }, result);
         }
     }

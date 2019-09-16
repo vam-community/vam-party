@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
 using Party.Shared.Models;
+using Party.Shared.Models.Local;
 using Party.Shared.Models.Registries;
 
 namespace Party.CLI.Commands
@@ -100,7 +101,7 @@ namespace Party.CLI.Commands
             }
         }
 
-        private void PrintScript(RegistryPackage script, RegistryPackageVersion version, IReadOnlyCollection<Script> localFiles)
+        private void PrintScript(RegistryPackage script, RegistryPackageVersion version, IReadOnlyCollection<LocalScriptFile> localFiles)
         {
             Renderer.Write(script.Name, ConsoleColor.Green);
             Renderer.Write(" ");
@@ -129,7 +130,7 @@ namespace Party.CLI.Commands
             Renderer.WriteLine();
         }
 
-        private void PrintScenes(string indent, List<Scene> scenes)
+        private void PrintScenes(string indent, List<LocalSceneFile> scenes)
         {
             if (scenes == null) return;
             foreach (var scene in scenes)
