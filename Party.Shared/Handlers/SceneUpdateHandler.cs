@@ -30,9 +30,20 @@ namespace Party.Shared.Handlers
                 changes.AddRange(scriptList.Scripts.SelectMany(script => GetTransform(script, info)));
             }
 
-            var result = await _serializer.UpdateScriptAsync(scene.FullPath, changes);
+            var json = await _serializer.Deserialize(scene.FullPath).ConfigureAwait(false);
+            var affected = new List<(string before, string after)>();
+            foreach (var change in changes)
+            {
+                foreach (var script in json.Atoms.SelectMany(a => a.Plugins).Where(p => p.Path == change.before))
+                {
+                    script.Path = change.after;
+                    affected.Add(change);
+                }
+            }
+            if (affected.Count > 0)
+                await _serializer.Serialize(json, scene.FullPath).ConfigureAwait(false);
 
-            return result.ToArray();
+            return affected.ToArray();
         }
 
         private IEnumerable<(string before, string after)> GetTransform(Script local, LocalPackageInfo info)

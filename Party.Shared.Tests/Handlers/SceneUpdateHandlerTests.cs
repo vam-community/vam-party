@@ -41,9 +41,13 @@ namespace Party.Shared
             var effectiveUpdates = new List<(string before, string after)>{
                 (@"Saves/My Script.cs", @"Saves/party/some-package/1.0.0/My Script.cs")
             };
+            var json = new SceneJsonMock(new AtomJsonMock(new PluginJsonMock(@"Saves/My Script.cs")));
             serializer
-                .Setup(s => s.UpdateScriptAsync(@"C:\VaM\Saves\My Scene.json", updates))
-                .ReturnsAsync(effectiveUpdates);
+                .Setup(s => s.Deserialize(@"C:\VaM\Saves\My Scene.json"))
+                .ReturnsAsync(json);
+            serializer
+                .Setup(s => s.Serialize(json, @"C:\VaM\Saves\My Scene.json"))
+                .Returns(Task.CompletedTask);
             var handler = new SceneUpdateHandler(serializer.Object, @"C:\VaM\Saves");
 
             var result = await handler.UpdateScripts(scene, script, info);

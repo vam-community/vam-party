@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.IO.Abstractions;
-using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -18,18 +16,14 @@ namespace Party.Shared.Serializers
             _fs = fs ?? throw new ArgumentNullException(nameof(fs));
         }
 
-        public async Task<string[]> GetScriptsAsync(string path)
+        public async Task<ISceneJson> Deserialize(string path)
         {
             try
             {
-                var json = await LoadJson(path).ConfigureAwait(false);
-                var scripts = new List<string>();
-                ProcessScripts(json, script =>
-                {
-                    scripts.Add(script);
-                    return null;
-                });
-                return scripts.ToArray();
+                using var file = _fs.File.OpenText(path);
+                using var reader = new JsonTextReader(file);
+                var json = (JObject)await JToken.ReadFromAsync(reader).ConfigureAwait(false);
+                return new SceneJson(json);
             }
             catch (JsonReaderException exc)
             {
@@ -37,68 +31,20 @@ namespace Party.Shared.Serializers
             }
         }
 
-        public async Task<List<(string before, string after)>> UpdateScriptAsync(string path, List<(string before, string after)> updates)
+        public async Task Serialize(ISceneJson scene, string path)
         {
-            try
-            {
-                var result = new List<(string before, string after)>();
-                var json = await LoadJson(path).ConfigureAwait(false);
-                ProcessScripts(json, script => updates
-                    .Where(u => u.before == script)
-                    .Select(u =>
-                    {
-                        result.Add(u);
-                        return u.after;
-                    })
-                    .FirstOrDefault());
-                if (result.Count == 0) return result;
-                using var file = _fs.File.CreateText(@path);
-                using var writer = new SceneJsonTextWriter(file);
-                json.WriteTo(writer);
-                return result;
-            }
-            catch (JsonReaderException exc)
-            {
-                throw new SavesException(exc.Message, exc);
-            }
-        }
+            if (!(scene is SceneJson json))
+                throw new InvalidCastException("SceneSerializer expects a SceneJson");
 
-        private void ProcessScripts(JObject json, Func<string, string> transform)
-        {
-            if (!(json["atoms"] is JArray atoms)) { return; }
-            foreach (var atom in atoms)
-            {
-                if (!(atom["storables"] is JArray storables)) { continue; }
-                foreach (var storable in storables)
-                {
-                    if ((string)storable["id"] == "PluginManager")
-                    {
-                        if (!(storable["plugins"] is JObject plugins)) { continue; }
-                        foreach (var plugin in plugins.Properties())
-                        {
-                            var relativePath = (string)plugin.Value;
-                            var newValue = transform(relativePath);
-                            if (newValue != null && relativePath != newValue)
-                            {
-                                plugin.Value = newValue;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        private async Task<JObject> LoadJson(string path)
-        {
-            using var file = _fs.File.OpenText(path);
-            using var reader = new JsonTextReader(file);
-            return (JObject)await JToken.ReadFromAsync(reader).ConfigureAwait(false);
+            using var file = _fs.File.CreateText(path);
+            using var writer = new SceneJsonTextWriter(file);
+            await json.Json.WriteToAsync(writer);
         }
     }
 
     public interface ISceneSerializer
     {
-        Task<string[]> GetScriptsAsync(string path);
-        Task<List<(string before, string after)>> UpdateScriptAsync(string path, List<(string before, string after)> updates);
+        Task<ISceneJson> Deserialize(string path);
+        Task Serialize(ISceneJson scene, string path);
     }
 }

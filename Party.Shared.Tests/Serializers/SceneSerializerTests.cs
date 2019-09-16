@@ -10,7 +10,7 @@ namespace Party.Shared
     public class SceneSerializerTests
     {
         [Test]
-        public async Task CanGetScriptsFromScene()
+        public async Task CanDeserialize()
         {
             var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
             {
@@ -36,9 +36,9 @@ namespace Party.Shared
                 ))},
             });
 
-            var scripts = await new SceneSerializer(fileSystem).GetScriptsAsync(@"C:\VaM\Saves\Scene 1.json");
+            var scene = await new SceneSerializer(fileSystem).Deserialize(@"C:\VaM\Saves\Scene 1.json");
 
-            Assert.That(scripts, Is.EqualTo(new[] { "Saves/Script 1.cs" }));
+            Assert.That(scene.Atoms.SelectMany(a => a.Plugins).Select(p => p.Path), Is.EqualTo(new[] { "Saves/Script 1.cs" }));
         }
     }
 }
