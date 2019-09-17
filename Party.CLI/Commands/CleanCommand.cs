@@ -16,7 +16,7 @@ namespace Party.CLI.Commands
         {
             var command = new Command("clean", "Updates scenes to reference scripts from their expected folder. You can specify a specific script or scene to clean.");
             AddCommonOptions(command);
-            command.AddArgument(new Argument<string>("filter") { Description = "Optional package name or file to clean" });
+            command.AddArgument(new Argument<string>("filter") { Arity = ArgumentArity.ZeroOrOne, Description = "Optional package name or file to clean" });
             command.AddOption(new Option("--all", "Upgrade everything"));
             command.AddOption(new Option("--warnings", "Show warnings such as broken scenes or missing scripts"));
             command.AddOption(new Option("--noop", "Prints what the script will do, but won't actually do anything"));
@@ -86,6 +86,15 @@ namespace Party.CLI.Commands
                 Renderer.WriteLine("  Already in the correct location");
                 return;
             }
+            else if (!info.Installable)
+            {
+                Renderer.WriteLine("  Skipped because the plugin is not installable.");
+                return;
+            }
+
+            Renderer.Write("  Script should bet at ", ConsoleColor.DarkGray);
+            Renderer.Write(info.InstallFolder, ConsoleColor.DarkBlue);
+            Renderer.WriteLine();
 
             foreach (var scene in match.Local.Scenes)
             {
