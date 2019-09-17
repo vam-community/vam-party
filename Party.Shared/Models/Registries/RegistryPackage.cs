@@ -7,7 +7,7 @@ namespace Party.Shared.Models.Registries
 {
     public class RegistryPackage : IComparable<RegistryPackage>, IComparable
     {
-        public static readonly Regex ValidNameRegex = new Regex(@"^[a-z][a-z0-9\-_]{2,127}$");
+        public static readonly Regex ValidNameRegex = new Regex(@"^[a-zA-Z][a-zA-Z0-9\-_ ]{2,127}$");
 
         public RegistryPackageType Type { get; set; }
         public string Name { get; set; }

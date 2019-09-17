@@ -5,7 +5,7 @@ namespace Party.Shared.Models.Registries
 {
     public class PackageFullName
     {
-        private static readonly Regex _regex = new Regex(@"^(?<type>[a-z]+)/(?<name>[a-z0-9_\-]+)(@(?<version>[0-9\.\-]+))?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex _regex = new Regex(@"^(?<type>[a-zA-Z]+)/(?<name>[a-zA-Z0-9_\- ]+)(@(?<version>[0-9\.\-]+))?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public static bool TryParsePackage(string name, out PackageFullName info)
         {
