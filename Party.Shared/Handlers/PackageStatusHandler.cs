@@ -37,7 +37,7 @@ namespace Party.Shared.Handlers
 
             return new LocalPackageInfo
             {
-                InstallFolder = basePath,
+                InstallFolder = installPath,
                 Files = files.ToArray(),
                 Corrupted = files.Any(f => f.Status == FileStatus.HashMismatch),
                 Installed = files.All(f => f.Status == FileStatus.Installed),

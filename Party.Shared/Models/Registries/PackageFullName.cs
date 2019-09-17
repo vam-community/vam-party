@@ -50,7 +50,7 @@ namespace Party.Shared.Models.Registries
 
         public override string ToString()
         {
-            return $"{Type}/{Name}";
+            return $"{Type.ToString().ToLowerInvariant()}/{Name}";
         }
     }
 }

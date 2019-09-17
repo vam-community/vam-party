@@ -59,7 +59,7 @@ namespace Party.CLI.Commands
 
             if (installedStatus.Installed && !args.Force)
             {
-                throw new UserInputException("Plugin already installed");
+                throw new UserInputException($"Plugin already installed at {installedStatus.InstallFolder}");
             }
             if (installedStatus.Installable || args.Force)
             {
