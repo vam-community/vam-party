@@ -36,7 +36,7 @@ namespace Party.Shared.Models.Registries
             var script = Get(type).FirstOrDefault(s => s.Name == name);
             if (script != null) return script;
 
-            script = new RegistryPackage { Name = name, Versions = new SortedSet<RegistryPackageVersion>() };
+            script = new RegistryPackage { Type = RegistryPackageType.Scripts, Name = name, Versions = new SortedSet<RegistryPackageVersion>() };
             Packages.Add(script);
             _groupedByType = null;
             return script;
