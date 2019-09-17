@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
@@ -98,7 +99,7 @@ namespace Party.Shared
 
             var result = await handler.AnalyzeSaves(null, new ProgressMock<GetSavesProgress>());
 
-            Assert.That(result.Errors, Is.Empty);
+            AssertNoErrors(result);
             Assert.That(result.Scripts.Select(s => s.FullPath), Is.EquivalentTo(new[] { @"C:\VaM\Saves\Script 1.cs" }));
             Assert.That(result.Scenes.Select(s => s.FullPath), Is.EquivalentTo(new[] { @"C:\VaM\Saves\Scene 1.json" }));
             Assert.That(result.Scripts.First().Scenes.Select(s => s.FullPath), Is.EquivalentTo(new[] { @"C:\VaM\Saves\Scene 1.json" }));
@@ -117,7 +118,7 @@ namespace Party.Shared
 
             var result = await handler.AnalyzeSaves(null, new ProgressMock<GetSavesProgress>());
 
-            Assert.That(result.Errors, Is.Empty);
+            AssertNoErrors(result);
             Assert.That(result.Scripts.Select(s => s.FullPath), Is.EquivalentTo(new[] { @"C:\VaM\Saves\Downloads\Scene 1\Script 1.cs" }));
             Assert.That(result.Scenes.Select(s => s.FullPath), Is.EquivalentTo(new[] { @"C:\VaM\Saves\Downloads\Scene 1\Scene 1.json" }));
             Assert.That(result.Scripts.First().Scenes.Select(s => s.FullPath), Is.EquivalentTo(new[] { @"C:\VaM\Saves\Downloads\Scene 1\Scene 1.json" }));
@@ -159,7 +160,7 @@ namespace Party.Shared
 
             var result = await handler.AnalyzeSaves(null, new ProgressMock<GetSavesProgress>());
 
-            Assert.That(result.Errors, Is.Empty);
+            AssertNoErrors(result);
             Assert.That(result.Scripts.Select(s => s.FullPath), Is.EquivalentTo(new[] { @"C:\VaM\Saves\Downloads\Scene 1\Add Me.cslist" }));
             Assert.That(result.Scenes.Select(s => s.FullPath), Is.EquivalentTo(new[] { @"C:\VaM\Saves\Downloads\Scene 1\Scene 1.json" }));
             Assert.That(result.Scripts.First().Scenes.Select(s => s.FullPath), Is.EquivalentTo(new[] { @"C:\VaM\Saves\Downloads\Scene 1\Scene 1.json" }));
@@ -175,6 +176,12 @@ namespace Party.Shared
                 @"C:\VaM",
                 @"C:\VaM\Saves",
                 ignoredPaths ?? new string[0]);
+        }
+
+        private void AssertNoErrors(SavesMap result)
+        {
+            Assert.That(result.Scenes.SelectMany(s => s.Errors ?? new List<LocalFileError>()), Is.Empty);
+            Assert.That(result.Scripts.SelectMany(s => s.Errors ?? new List<LocalFileError>()), Is.Empty);
         }
     }
 }

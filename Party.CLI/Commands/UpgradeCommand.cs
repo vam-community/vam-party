@@ -1,10 +1,12 @@
 ﻿using System;
 using System.CommandLine;
 using System.CommandLine.Invocation;
+using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
 using Party.Shared.Exceptions;
 using Party.Shared.Models;
+using Party.Shared.Models.Local;
 
 namespace Party.CLI.Commands
 {
@@ -55,7 +57,7 @@ namespace Party.CLI.Commands
 
             var matches = Controller.MatchSavesToRegistry(saves, registry);
 
-            PrintWarnings(args.Warnings, saves.Errors);
+            PrintWarnings(args.Warnings, saves);
 
             foreach (var match in matches.HashMatches)
             {
@@ -73,12 +75,14 @@ namespace Party.CLI.Commands
                 if (args.Verbose)
                 {
                     PrintScriptToPackage(match, null);
+                    PrintWarnings(args.Warnings, match.Local);
                     Renderer.WriteLine($"  Skipping because no updates are available", ConsoleColor.DarkGray);
                 }
                 return;
             }
 
             PrintScriptToPackage(match, updateToVersion);
+            PrintWarnings(args.Warnings, match.Local);
 
             var info = await Controller.GetInstalledPackageInfoAsync(match.Package, updateToVersion ?? match.Version);
 

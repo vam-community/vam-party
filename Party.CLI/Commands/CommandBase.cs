@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
+using Party.Shared.Exceptions;
 using Party.Shared.Models;
 using Party.Shared.Models.Local;
 using Party.Shared.Models.Registries;
@@ -85,7 +86,10 @@ namespace Party.CLI.Commands
             // TODO: Put in controller
             if (isFilterPackage)
             {
-                var packageHashes = new HashSet<string>(registry.GetPackage(filterPackage).Versions.SelectMany(v => v.Files).Select(f => f.Hash.Value).Distinct());
+                var registryPackage = registry.GetPackage(filterPackage);
+                if (registryPackage == null)
+                    throw new RegistryException($"Could not find package '{registryPackage}'");
+                var packageHashes = new HashSet<string>(registryPackage.Versions.SelectMany(v => v.Files).Select(f => f.Hash?.Value).Where(h => h != null).Distinct());
                 saves.Scripts = saves.Scripts.Where(s =>
                 {
                     if (s is LocalScriptListFile scriptList)
@@ -98,13 +102,18 @@ namespace Party.CLI.Commands
             return (saves, registry);
         }
 
-        protected void PrintWarnings(bool details, SavesError[] logs)
+        protected void PrintWarnings(bool details, SavesMap map)
         {
-            if (logs == null || logs.Length == 0) return;
+            PrintWarnings(details, map.Scripts.Cast<LocalFile>().Concat(map.Scenes).ToArray());
+        }
+        protected void PrintWarnings(bool details, params LocalFile[] files)
+        {
+            var logs = files?.Where(f => f.Errors != null && f.Errors.Count > 0).SelectMany(f => f.Errors?.Select(e => (f, e))).ToList();
+            if (logs == null || logs.Count == 0) return;
 
-            var grouped = logs.GroupBy(l => l.Level).ToDictionary(g => g.Key, g => g.ToArray());
-            grouped.TryGetValue(SavesErrorLevel.Error, out var errors);
-            grouped.TryGetValue(SavesErrorLevel.Warning, out var warnings);
+            var grouped = logs.GroupBy(fe => fe.e.Level).ToDictionary(g => g.Key, g => g.ToArray());
+            grouped.TryGetValue(LocalFileErrorLevel.Error, out var errors);
+            grouped.TryGetValue(LocalFileErrorLevel.Warning, out var warnings);
 
             if (details)
             {
@@ -113,9 +122,9 @@ namespace Party.CLI.Commands
                     using (Renderer.WithColor(ConsoleColor.Red))
                     {
                         Renderer.WriteLine("Errors:");
-                        foreach (var error in errors)
+                        foreach (var (f, e) in errors)
                         {
-                            Renderer.Error.WriteLine($"  {Controller.GetDisplayPath(error.File)}: {error.Error}");
+                            Renderer.Error.WriteLine($"  {Controller.GetDisplayPath(f.FullPath)}: {e.Error}");
                         }
                     }
                     Renderer.WriteLine();
@@ -126,9 +135,9 @@ namespace Party.CLI.Commands
                     using (Renderer.WithColor(ConsoleColor.Yellow))
                     {
                         Renderer.WriteLine("Warnings:");
-                        foreach (var error in warnings)
+                        foreach (var (f, e) in warnings)
                         {
-                            Renderer.Error.WriteLine($"  {Controller.GetDisplayPath(error.File)}: {error.Error}");
+                            Renderer.Error.WriteLine($"  {Controller.GetDisplayPath(f.FullPath)}: {e.Error}");
                         }
                     }
                 }
@@ -136,9 +145,9 @@ namespace Party.CLI.Commands
             }
             else
             {
-                using (Renderer.WithColor(ConsoleColor.Yellow))
+                using (Renderer.WithColor(errors.Length > 0 ? ConsoleColor.Red : ConsoleColor.Yellow))
                 {
-                    Renderer.Error.WriteLine($"There were {warnings?.Length ?? 0} warnings and {errors?.Length ?? 0} errors in the saves folder. Run with --warnings to print them.");
+                    Renderer.Error.WriteLine($"Found {Pluralize(warnings?.Length ?? 0, "warning", "warnings")} and {Pluralize(errors?.Length ?? 0, "error", "errors")} while scanning. Run with --warnings to print them.");
                 }
             }
         }

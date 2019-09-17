@@ -60,7 +60,6 @@ namespace Party.Shared
         {
             private readonly List<LocalScriptFile> _scripts = new List<LocalScriptFile>();
             private readonly List<LocalSceneFile> _scenes = new List<LocalSceneFile>();
-            private readonly List<SavesError> _errors = new List<SavesError>();
 
             internal SavesMapBuilder WithScript(LocalScriptFile script, out LocalScriptFile outScript)
             {
@@ -88,8 +87,7 @@ namespace Party.Shared
                 return new SavesMap
                 {
                     Scripts = _scripts.ToArray(),
-                    Scenes = _scenes.ToArray(),
-                    Errors = _errors.ToArray()
+                    Scenes = _scenes.ToArray()
                 };
             }
         }

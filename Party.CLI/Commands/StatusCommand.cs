@@ -5,7 +5,6 @@ using System.CommandLine.Invocation;
 using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
-using Party.Shared.Models;
 using Party.Shared.Models.Local;
 using Party.Shared.Models.Registries;
 
@@ -50,7 +49,7 @@ namespace Party.CLI.Commands
 
             var matches = Controller.MatchSavesToRegistry(saves, registry);
 
-            PrintWarnings(args.Warnings, saves.Errors);
+            PrintWarnings(args.Warnings, saves);
 
             if (matches.HashMatches.Length == 0)
             {
@@ -64,6 +63,7 @@ namespace Party.CLI.Commands
                     {
                         var localFiles = matchVersion.Select(v => v.Local).ToList();
                         PrintScript(matchScript.Key, matchVersion.Key, localFiles);
+                        PrintWarnings(args.Warnings, localFiles.ToArray<LocalFile>());
                         if (args.Breakdown)
                         {
                             foreach (var localFile in localFiles.OrderBy(p => p.FullPath))
@@ -83,6 +83,7 @@ namespace Party.CLI.Commands
                     var files = match.ToArray();
                     var first = files.First();
                     PrintScript(first.Package, first.Version, files.Select(f => f.Local).ToArray());
+                    PrintWarnings(args.Warnings, files.Select(f => f.Local).ToArray<LocalFile>());
                     if (args.Breakdown)
                         PrintScenes("- ", files.SelectMany(f => f.Local.Scenes).Distinct().ToList());
                 }
@@ -104,8 +105,10 @@ namespace Party.CLI.Commands
         private void PrintScript(RegistryPackage script, RegistryPackageVersion version, IReadOnlyCollection<LocalScriptFile> localFiles)
         {
             Renderer.Write(script.Name, ConsoleColor.Green);
+
             Renderer.Write(" ");
             Renderer.Write($"v{version.Version}", ConsoleColor.Gray);
+
             if (localFiles.Count > 0)
             {
                 var filesSummary = localFiles.Select(l => l.FullPath).Select(Controller.GetDisplayPath).OrderBy(p => p.Length).ToList();
@@ -119,13 +122,22 @@ namespace Party.CLI.Commands
                     Renderer.Write($"\"{filesSummary.FirstOrDefault()}\" and {filesSummary.Count - 1} others...", ConsoleColor.DarkGray);
                 }
             }
+
             Renderer.Write(" ");
             Renderer.Write($"referenced by {Pluralize(localFiles.Sum(l => l.Scenes?.Count() ?? 0), "scene", "scenes")}", ConsoleColor.DarkCyan);
+
             var latestVersion = script.GetLatestVersion();
             if (version != latestVersion)
                 Renderer.Write($" [update available: v{latestVersion.Version}]", ConsoleColor.Yellow);
             else
                 Renderer.Write($" [up to date]", ConsoleColor.Cyan);
+
+            var errors = localFiles.Max(l => l.Status);
+            if (errors == LocalFileErrorLevel.Warning)
+                Renderer.Write(" [warnings]", ConsoleColor.Yellow);
+            else if (errors >= LocalFileErrorLevel.Error)
+                Renderer.Write(" [errors]", ConsoleColor.Red);
+
             Renderer.WriteLine();
         }
 

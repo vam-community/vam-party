@@ -1,11 +1,8 @@
 ﻿using Moq;
 using NUnit.Framework;
-using Party.Shared;
-using Party.Shared.Models;
 using Party.Shared.Models.Registries;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Party.CLI
@@ -45,17 +42,16 @@ namespace Party.CLI
                     }
                 })
             });
-            _controller.Setup(x => x.GetSavesAsync(null, It.IsAny<IProgress<GetSavesProgress>>())).ReturnsAsync(new SavesMap());
 
             var result = await _program.Execute(new[] { "show", "scripts/cool-thing" });
 
-            Assert.That(GetOutput().Skip(2), Is.EqualTo(new[]{
+            Assert.That(GetOutput(), Is.EqualTo(new[]{
                 "Package scripts/cool-thing",
                 $"Last version v1.2.3, published {created.ToLocalTime().ToString("D")}",
                 "Versions:",
                 $"- v1.2.3, published {created.ToLocalTime().ToString("D")}: (no release notes)",
                 "Author: some dude",
-                "Files:",
+                "Files in v1.2.3:",
                 "- File 1.cs: not available in registry"
             }));
             Assert.That(result, Is.EqualTo(0));
@@ -108,11 +104,10 @@ namespace Party.CLI
                     }
                 })
             });
-            _controller.Setup(x => x.GetSavesAsync(null, It.IsAny<IProgress<GetSavesProgress>>())).ReturnsAsync(new SavesMap());
 
             var result = await _program.Execute(new[] { "show", "scripts/cool-thing" });
 
-            Assert.That(GetOutput().Skip(2), Is.EqualTo(new[]{
+            Assert.That(GetOutput(), Is.EqualTo(new[]{
                 "Package scripts/cool-thing",
                 $"Last version v1.2.3, published {created.ToLocalTime().ToString("D")}",
                 "Versions:",
@@ -124,7 +119,7 @@ namespace Party.CLI
                 "Author: some dude",
                 "- Github: https://github.com/...profile",
                 "- Reddit: https://reddit.com/...profile",
-                "Files:",
+                "Files in v1.2.3:",
                 "- File 1.cs: https://example.org/File%201.cs"
             }));
             Assert.That(result, Is.EqualTo(0));

@@ -56,7 +56,6 @@ namespace Party.Shared.Handlers
         private async Task<SavesMap> AnalyzeSavesByScript(string scriptFile, IProgress<GetSavesProgress> reporter)
         {
             var scripts = new ConcurrentDictionary<string, LocalScriptFile>();
-            var errors = new ConcurrentBag<SavesError>();
             var sceneTasks = new Queue<Task<LocalSceneFile>>();
             int scenesCount = 0, scenesCompletedCount = 0;
             void ReportProgress()
@@ -75,7 +74,7 @@ namespace Party.Shared.Handlers
                 Interlocked.Increment(ref scenesCount);
                 sceneTasks.Enqueue(Task.Run(async () =>
                 {
-                    var result = await LoadScene(scripts, errors, file, true).ConfigureAwait(false);
+                    var result = await LoadScene(scripts, file, true).ConfigureAwait(false);
                     Interlocked.Increment(ref scenesCompletedCount);
                     ReportProgress();
                     return result;
@@ -85,28 +84,25 @@ namespace Party.Shared.Handlers
 
             if (!scripts.TryGetValue(scriptFile, out var script))
             {
-                script = await LoadScript(scriptFile, errors);
+                script = await LoadScript(scriptFile);
             }
 
             return new SavesMap
             {
                 Scripts = new[] { script },
-                Scenes = scenes.Where(s => s.Scripts.Contains(script)).ToArray(),
-                Errors = errors.ToArray()
+                Scenes = scenes.Where(s => s.Scripts.Contains(script)).ToArray()
             };
         }
 
         private async Task<SavesMap> AnalyzeSavesByScene(string sceneFile)
         {
             var scripts = new ConcurrentDictionary<string, LocalScriptFile>();
-            var errors = new ConcurrentBag<SavesError>();
             // TODO: ScriptList handling
-            var scene = await LoadScene(scripts, errors, sceneFile, true);
+            var scene = await LoadScene(scripts, sceneFile, true);
             return new SavesMap
             {
                 Scenes = new[] { scene },
-                Scripts = scripts.Values.ToArray(),
-                Errors = errors.ToArray()
+                Scripts = scripts.Values.ToArray()
             };
         }
 
@@ -121,7 +117,6 @@ namespace Party.Shared.Handlers
                 if (directory == null) throw new UserInputException("There was no files in the specified directory");
             }
             var shouldTryLoadingReferences = directory != null;
-            var errors = new ConcurrentBag<SavesError>();
             int scenesCount = 0, scenesCompletedCount = 0;
             int scriptsCount = 0, scriptsCompletedCount = 0;
             int scriptListsCount = 0, scriptListsCompletedCount = 0;
@@ -149,7 +144,7 @@ namespace Party.Shared.Handlers
                         Interlocked.Increment(ref scriptsCount);
                         scriptTasks.Add(Task.Run(async () =>
                         {
-                            var result = await LoadScript(file, errors).ConfigureAwait(false);
+                            var result = await LoadScript(file).ConfigureAwait(false);
                             Interlocked.Increment(ref scriptsCompletedCount);
                             ReportProgress();
                             return result;
@@ -173,7 +168,7 @@ namespace Party.Shared.Handlers
             {
                 var scriptListTasks = scriptListFiles.Select(async file =>
                 {
-                    var result = await LoadScriptList(scripts, errors, file, shouldTryLoadingReferences);
+                    var result = await LoadScriptList(scripts, file, shouldTryLoadingReferences);
                     Interlocked.Increment(ref scriptListsCompletedCount);
                     ReportProgress();
                     return result;
@@ -187,7 +182,7 @@ namespace Party.Shared.Handlers
 
             var sceneTasks = sceneFiles.Select(file => Task.Run(async () =>
             {
-                var result = await LoadScene(scripts, errors, file, shouldTryLoadingReferences).ConfigureAwait(false);
+                var result = await LoadScene(scripts, file, shouldTryLoadingReferences).ConfigureAwait(false);
                 Interlocked.Increment(ref scenesCompletedCount);
                 ReportProgress();
                 return result;
@@ -196,13 +191,12 @@ namespace Party.Shared.Handlers
 
             return new SavesMap
             {
-                Errors = errors.ToArray(),
                 Scripts = scripts.Values.Distinct().ToArray(),
                 Scenes = scenes.ToArray()
             };
         }
 
-        private async Task<LocalSceneFile> LoadScene(ConcurrentDictionary<string, LocalScriptFile> scripts, ConcurrentBag<SavesError> errors, string sceneFile, bool shouldTryLoadingReferences)
+        private async Task<LocalSceneFile> LoadScene(ConcurrentDictionary<string, LocalScriptFile> scripts, string sceneFile, bool shouldTryLoadingReferences)
         {
             var scene = new LocalSceneFile(sceneFile);
             try
@@ -221,29 +215,32 @@ namespace Party.Shared.Handlers
                     else if (shouldTryLoadingReferences)
                     {
                         // TODO: This has possible race conditions, but only if more than one scene in filters
-                        scriptRef = await LoadScript(fullPath, errors).ConfigureAwait(false);
-                        scripts.TryAdd(fullPath, scriptRef);
-                        scene.References(scriptRef);
-                        scriptRef.ReferencedBy(scene);
+                        scriptRef = await LoadScript(fullPath).ConfigureAwait(false);
+                        if (scriptRef.Status > LocalFileErrorLevel.None)
+                        {
+                            scene.AddError($"Script does not exist or is invalid: '{fullPath}'", LocalFileErrorLevel.Warning);
+                        }
+                        else
+                        {
+                            scripts.TryAdd(fullPath, scriptRef);
+                            scene.References(scriptRef);
+                            scriptRef.ReferencedBy(scene);
+                        }
                     }
                     else
                     {
-                        errors.Add(new SavesError(sceneFile, $"Script does not exist: '{fullPath}'", SavesErrorLevel.Warning));
+                        scene.AddError($"Script does not exist: '{fullPath}'", LocalFileErrorLevel.Warning);
                     }
                 }
             }
-            catch (SavesException exc)
-            {
-                errors.Add(new SavesError(sceneFile, exc.Message, SavesErrorLevel.Warning));
-            }
             catch (Exception exc)
             {
-                errors.Add(new SavesError(sceneFile, exc.Message, SavesErrorLevel.Error));
+                scene.AddError(exc.Message, LocalFileErrorLevel.Error);
             }
             return scene;
         }
 
-        private async Task<LocalScriptListFile> LoadScriptList(IDictionary<string, LocalScriptFile> scripts, ConcurrentBag<SavesError> errors, string scriptListFile, bool shouldTryLoadingReferences)
+        private async Task<LocalScriptListFile> LoadScriptList(IDictionary<string, LocalScriptFile> scripts, string scriptListFile, bool shouldTryLoadingReferences)
         {
             var scriptRefs = new List<LocalScriptFile>();
             try
@@ -259,30 +256,38 @@ namespace Party.Shared.Handlers
                     }
                     else if (shouldTryLoadingReferences)
                     {
-                        var script = await LoadScript(fullPath, errors);
+                        var script = await LoadScript(fullPath);
                         scriptRefs.Add(script);
                     }
                     else
                     {
-                        errors.Add(new SavesError(scriptListFile, $"Script that does not exist: '{fullPath}'", SavesErrorLevel.Warning));
-                        scriptRefs = null;
-                        break;
+                        var script = new LocalScriptFile(fullPath, null);
+                        script.AddError($"Script that does not exist: '{fullPath}'", LocalFileErrorLevel.Error);
+                        scriptRefs.Add(script);
                     }
                 }
 
                 if (scriptRefs == null || scriptRefs.Count <= 0)
                     return null;
 
-                return new LocalScriptListFile(scriptListFile, Hashing.GetHash(scriptRefPaths), scriptRefs.ToArray());
+                var scriptsWithErrors = scriptRefs.Where(s => s.Status > LocalFileErrorLevel.None).ToList();
+                var scriptList = new LocalScriptListFile(scriptListFile, Hashing.GetHash(scriptRefPaths), scriptRefs.ToArray());
+                if (scriptsWithErrors.Count == 1)
+                    scriptList.AddError($"Script {scriptsWithErrors[0].FullPath} has an issue: {scriptsWithErrors[0].Errors[0].Error}", scriptsWithErrors[0].Status);
+                else if (scriptsWithErrors.Count > 1)
+                    scriptList.AddError($"{scriptsWithErrors.Count} scripts have issues. First issue: {scriptsWithErrors[0].Errors[0].Error}", scriptsWithErrors[0].Status);
+
+                return scriptList;
             }
             catch (Exception exc)
             {
-                errors.Add(new SavesError(scriptListFile, exc.Message, SavesErrorLevel.Error));
-                return new LocalScriptListFile(scriptListFile, null, scriptRefs.ToArray());
+                var scriptList = new LocalScriptListFile(scriptListFile, null, scriptRefs.ToArray());
+                scriptList.AddError(exc.Message, LocalFileErrorLevel.Error);
+                return scriptList;
             }
         }
 
-        private async Task<LocalScriptFile> LoadScript(string scriptFile, ConcurrentBag<SavesError> errors)
+        private async Task<LocalScriptFile> LoadScript(string scriptFile)
         {
             try
             {
@@ -290,8 +295,9 @@ namespace Party.Shared.Handlers
             }
             catch (Exception exc)
             {
-                errors.Add(new SavesError(scriptFile, exc.Message, SavesErrorLevel.Error));
-                return null;
+                var script = new LocalScriptFile(scriptFile, await Hashing.GetHashAsync(_fs, scriptFile).ConfigureAwait(false));
+                script.AddError(exc.Message, LocalFileErrorLevel.Error);
+                return script;
             }
         }
 

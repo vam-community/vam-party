@@ -57,8 +57,6 @@ namespace Party.CLI.Commands
 
             var matches = Controller.MatchSavesToRegistry(saves, registry);
 
-            PrintWarnings(args.Warnings, saves.Errors);
-
             foreach (var match in matches.HashMatches)
             {
                 await HandleOne(match, args);
@@ -72,12 +70,14 @@ namespace Party.CLI.Commands
                 if (args.Verbose)
                 {
                     PrintScriptToPackage(match, null);
+                    PrintWarnings(args.Warnings, match.Local);
                     Renderer.WriteLine($"  Skipping because no scenes are using it", ConsoleColor.DarkGray);
                 }
                 return;
             }
 
             PrintScriptToPackage(match, null);
+            PrintWarnings(args.Warnings, match.Local);
 
             var info = await Controller.GetInstalledPackageInfoAsync(match.Package, match.Version);
 

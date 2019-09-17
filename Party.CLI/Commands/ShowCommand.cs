@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
 using Party.Shared.Exceptions;
-using Party.Shared.Models;
 using Party.Shared.Models.Registries;
 
 namespace Party.CLI.Commands
@@ -17,7 +16,6 @@ namespace Party.CLI.Commands
             var command = new Command("show", "Show information about a package");
             AddCommonOptions(command);
             command.AddArgument(new Argument<string>("package", null));
-            command.AddOption(new Option("--warnings", "Show warnings such as broken scenes or missing scripts"));
 
             command.Handler = CommandHandler.Create<ShowArguments>(async args =>
             {
@@ -29,7 +27,6 @@ namespace Party.CLI.Commands
         public class ShowArguments : CommonArguments
         {
             public string Package { get; set; }
-            public bool Warnings { get; set; }
         }
 
         public ShowCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller, CommonArguments args)
@@ -44,7 +41,7 @@ namespace Party.CLI.Commands
             if (!PackageFullName.TryParsePackage(args.Package, out var packageName))
                 throw new UserInputException("Invalid package name. Example: 'scripts/my-script'");
 
-            var (saves, registry) = await GetSavesAndRegistryAsync();
+            var registry = await Controller.GetRegistryAsync().ConfigureAwait(false);
 
             // TODO: Should handle other types, and and be handled in the controller
             var package = registry.Get(packageName.Type)?.FirstOrDefault(p => p.Name.Equals(packageName.Name, StringComparison.InvariantCultureIgnoreCase));
@@ -60,8 +57,6 @@ namespace Party.CLI.Commands
             {
                 throw new RegistryException("Package does not have any versions");
             }
-
-            PrintWarnings(args.Warnings, saves.Errors);
 
             Renderer.WriteLine($"Package {package.Type.ToString().ToLowerInvariant()}/{package.Name}");
 
@@ -109,7 +104,7 @@ namespace Party.CLI.Commands
                 }
             }
 
-            Renderer.WriteLine("Files:");
+            Renderer.WriteLine($"Files in v{latestVersion.Version}:");
             foreach (var file in latestVersion.Files.Where(f => !f.Ignore && f.Filename != null))
             {
                 Renderer.WriteLine($"- {file.Filename}: {file.Url ?? "not available in registry"}");
