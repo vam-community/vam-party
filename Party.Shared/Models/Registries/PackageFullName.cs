@@ -5,7 +5,7 @@ namespace Party.Shared.Models.Registries
 {
     public class PackageFullName
     {
-        private static readonly Regex _regex = new Regex(@"^(?<type>[a-zA-Z]+)/(?<name>[a-zA-Z0-9_\- ]+)(@(?<version>[0-9\.\-]+))?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex _regex = new Regex(@"^((?<type>[a-zA-Z]+)/)?(?<name>[a-zA-Z0-9_\- ]+)(@(?<version>[0-9\.\-]+))?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public static bool TryParsePackage(string name, out PackageFullName info)
         {
@@ -23,7 +23,13 @@ namespace Party.Shared.Models.Registries
                 return false;
             }
 
-            if (!Enum.TryParse<RegistryPackageType>(match.Groups["type"].Value, true, out var type) || type == RegistryPackageType.Unknown)
+            var typeMatch = match.Groups["type"];
+            RegistryPackageType type;
+            if (!typeMatch.Success)
+            {
+                type = RegistryPackageType.Scripts;
+            }
+            else if (!Enum.TryParse<RegistryPackageType>(typeMatch.Value, true, out type) || type == RegistryPackageType.Unknown)
             {
                 info = null;
                 return false;
