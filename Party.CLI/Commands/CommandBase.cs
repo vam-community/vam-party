@@ -175,7 +175,7 @@ namespace Party.CLI.Commands
             Renderer.Write($"Script ");
             Renderer.Write(Controller.GetDisplayPath(match.Local.FullPath), ConsoleColor.Blue);
             Renderer.Write($" is ");
-            Renderer.Write($"{match.Script.Name} v{match.Version.Version}", ConsoleColor.Cyan);
+            Renderer.Write($"{match.Package.Name} v{match.Version.Version}", ConsoleColor.Cyan);
             Renderer.Write($" > ");
             if (updateToVersion == null)
             {

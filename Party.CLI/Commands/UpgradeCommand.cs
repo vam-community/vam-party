@@ -65,7 +65,7 @@ namespace Party.CLI.Commands
 
         private async Task HandleOne(RegistrySavesMatch match, UpgradeArguments args)
         {
-            var latestVersion = match.Script.GetLatestVersion();
+            var latestVersion = match.Package.GetLatestVersion();
             var updateToVersion = latestVersion.Version.Equals(match.Version.Version) ? null : latestVersion;
 
             if (updateToVersion == null)
@@ -80,7 +80,7 @@ namespace Party.CLI.Commands
 
             PrintScriptToPackage(match, updateToVersion);
 
-            var info = await Controller.GetInstalledPackageInfoAsync(match.Script.Name, updateToVersion ?? match.Version);
+            var info = await Controller.GetInstalledPackageInfoAsync(match.Package, updateToVersion ?? match.Version);
 
             if (info.Installed)
             {
@@ -91,7 +91,7 @@ namespace Party.CLI.Commands
             if (!args.Force && (info.Corrupted || !info.Installable))
             {
                 Renderer.WriteLine("  Cannot upgrade because at least one file is either broken or not installable.");
-                Renderer.WriteLine($"  You can instead download it at {match.Script.Homepage ?? match.Script.Repository ?? "(no link provided)"}");
+                Renderer.WriteLine($"  You can instead download it at {match.Package.Homepage ?? match.Package.Repository ?? "(no link provided)"}");
                 Renderer.WriteLine("  Files:");
                 PrintInstalledFiles(info, "  ");
                 if (!args.Force)

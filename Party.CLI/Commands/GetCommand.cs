@@ -55,7 +55,7 @@ namespace Party.CLI.Commands
             if (registryPackageVersion == null)
                 throw new RegistryException($"Package version not found: '{packageName}'");
 
-            var installedStatus = await Controller.GetInstalledPackageInfoAsync(registryPackage.Name, registryPackageVersion);
+            var installedStatus = await Controller.GetInstalledPackageInfoAsync(registryPackage, registryPackageVersion);
 
             if (installedStatus.Installed && !args.Force)
             {

@@ -12,7 +12,7 @@ namespace Party.Shared.Models
 
     public class RegistrySavesMatch
     {
-        public RegistryPackage Script { get; set; }
+        public RegistryPackage Package { get; set; }
         public RegistryPackageVersion Version { get; set; }
         public RegistryFile File { get; set; }
         public LocalScriptFile Local { get; set; }
@@ -23,7 +23,7 @@ namespace Party.Shared.Models
 
         public RegistrySavesMatch((RegistryPackage script, RegistryPackageVersion version, RegistryFile file) svf, LocalScriptFile local)
         {
-            Script = svf.script;
+            Package = svf.script;
             Version = svf.version;
             File = svf.file;
             Local = local;

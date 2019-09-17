@@ -58,7 +58,7 @@ namespace Party.CLI.Commands
             }
             else
             {
-                foreach (var matchScript in matches.HashMatches.GroupBy(m => m.Script).OrderBy(g => g.Key.Name))
+                foreach (var matchScript in matches.HashMatches.GroupBy(m => m.Package).OrderBy(g => g.Key.Name))
                 {
                     foreach (var matchVersion in matchScript.GroupBy(s => s.Version).OrderBy(g => g.Key.Version))
                     {
@@ -82,7 +82,7 @@ namespace Party.CLI.Commands
                 {
                     var files = match.ToArray();
                     var first = files.First();
-                    PrintScript(first.Script, first.Version, files.Select(f => f.Local).ToArray());
+                    PrintScript(first.Package, first.Version, files.Select(f => f.Local).ToArray());
                     if (args.Breakdown)
                         PrintScenes("- ", files.SelectMany(f => f.Local.Scenes).Distinct().ToList());
                 }
@@ -106,10 +106,9 @@ namespace Party.CLI.Commands
             Renderer.Write(script.Name, ConsoleColor.Green);
             Renderer.Write(" ");
             Renderer.Write($"v{version.Version}", ConsoleColor.Gray);
-            var nonInstalledLocalFiles = localFiles.Where(l => !l.FullPath.StartsWith(Config.VirtAMate.PackagesFolder)).ToList();
-            if (nonInstalledLocalFiles.Count > 0)
+            if (localFiles.Count > 0)
             {
-                var filesSummary = nonInstalledLocalFiles.Select(l => l.FullPath).Select(Controller.GetDisplayPath).OrderBy(p => p.Length).ToList();
+                var filesSummary = localFiles.Select(l => l.FullPath).Select(Controller.GetDisplayPath).OrderBy(p => p.Length).ToList();
                 Renderer.Write(" ");
                 if (filesSummary.Count == 1)
                 {

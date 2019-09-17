@@ -79,7 +79,7 @@ namespace Party.CLI.Commands
 
             PrintScriptToPackage(match, null);
 
-            var info = await Controller.GetInstalledPackageInfoAsync(match.Script.Name, match.Version);
+            var info = await Controller.GetInstalledPackageInfoAsync(match.Package, match.Version);
 
             if (info.Installed)
             {

@@ -26,7 +26,6 @@ namespace Party.Shared
 
         public string[] AllowedSubfolders { get; set; }
         public string[] IgnoredFolders { get; set; }
-        public string PackagesFolder { get; set; }
     }
 
     public class PartyConfigurationRegistry

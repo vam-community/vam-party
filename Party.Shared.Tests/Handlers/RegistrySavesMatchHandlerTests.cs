@@ -50,7 +50,7 @@ namespace Party.Shared
 
             PartyAssertions.AreDeepEqual(new RegistrySavesMatches
             {
-                HashMatches = new[] { new RegistrySavesMatch { Script = script, Version = version, File = file, Local = local1 } },
+                HashMatches = new[] { new RegistrySavesMatch { Package = script, Version = version, File = file, Local = local1 } },
                 FilenameMatches = new RegistrySavesMatch[0],
                 NoMatches = new LocalScriptFile[0]
             }, result);
@@ -72,7 +72,7 @@ namespace Party.Shared
             PartyAssertions.AreDeepEqual(new RegistrySavesMatches
             {
                 HashMatches = new RegistrySavesMatch[0],
-                FilenameMatches = new[] { new RegistrySavesMatch { Script = script, Version = version, File = file, Local = local1 } },
+                FilenameMatches = new[] { new RegistrySavesMatch { Package = script, Version = version, File = file, Local = local1 } },
                 NoMatches = new LocalScriptFile[0]
             }, result);
         }
@@ -92,7 +92,7 @@ namespace Party.Shared
 
             PartyAssertions.AreDeepEqual(new RegistrySavesMatches
             {
-                HashMatches = new[] { new RegistrySavesMatch { Script = script, Version = version, File = file, Local = local1 } },
+                HashMatches = new[] { new RegistrySavesMatch { Package = script, Version = version, File = file, Local = local1 } },
                 FilenameMatches = new RegistrySavesMatch[0],
                 NoMatches = new LocalScriptFile[0]
             }, result);

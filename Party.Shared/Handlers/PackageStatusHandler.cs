@@ -13,24 +13,18 @@ namespace Party.Shared.Handlers
     public class PackageStatusHandler
     {
         private readonly IFileSystem _fs;
-        private readonly string _savesDirectory;
-        private readonly string _packagesFolder;
+        private readonly IFoldersHelper _folders;
 
-        public PackageStatusHandler(IFileSystem fs, string savesDirectory, string packagesFolder)
+        public PackageStatusHandler(IFileSystem fs, IFoldersHelper folders)
         {
             _fs = fs ?? throw new ArgumentNullException(nameof(fs));
-            _savesDirectory = savesDirectory ?? throw new ArgumentNullException(nameof(savesDirectory));
-            _packagesFolder = packagesFolder ?? throw new ArgumentNullException(nameof(packagesFolder));
+            _folders = folders ?? throw new ArgumentNullException(nameof(folders));
         }
 
-        public async Task<LocalPackageInfo> GetInstalledPackageInfoAsync(string name, RegistryPackageVersion version)
+        public async Task<LocalPackageInfo> GetInstalledPackageInfoAsync(RegistryPackage package, RegistryPackageVersion version)
         {
-            var basePath = _fs.Path.GetFullPath(_packagesFolder, _savesDirectory);
-            if (!basePath.StartsWith(_savesDirectory))
-            {
-                throw new UnauthorizedAccessException($"The packages folder must be within the saves directory: '{basePath}'");
-            }
-            var installPath = Path.Combine(basePath, name, version.Version);
+            var basePath = _folders.GetDirectory(package.Type);
+            var installPath = Path.Combine(basePath, package.Author ?? "Anonymous", package.Name, version.Version);
             var files = new List<InstalledFileInfo>();
 
             foreach (var file in version.Files.Where(f => !f.Ignore))
@@ -54,7 +48,7 @@ namespace Party.Shared.Handlers
         private InstalledFileInfo GetLocalFileInfo(RegistryFile file)
         {
             // TODO: Replace this with a path manager
-            var filePath = Path.Combine(_savesDirectory, "..", file.Filename);
+            var filePath = Path.Combine(_folders.RelativeToVam(file.Filename));
             return new InstalledFileInfo
             {
                 Path = filePath,

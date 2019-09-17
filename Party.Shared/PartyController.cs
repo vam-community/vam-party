@@ -25,6 +25,7 @@ namespace Party.Shared
         private readonly PartyConfiguration _config;
         private readonly HttpClient _http;
         private readonly IFileSystem _fs;
+        private IFoldersHelper _folders;
 
         private string SavesDirectory => Path.Combine(_config.VirtAMate.VirtAMateInstallFolder, "Saves");
 
@@ -34,6 +35,7 @@ namespace Party.Shared
             _fs = new FileSystem();
             _http = new HttpClient();
             _http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Party", Version));
+            _folders = new FoldersHelper(_fs, _config.VirtAMate.VirtAMateInstallFolder);
         }
 
         public void HealthCheck()
@@ -81,10 +83,10 @@ namespace Party.Shared
                 .Search(registry, query);
         }
 
-        public Task<LocalPackageInfo> GetInstalledPackageInfoAsync(string name, RegistryPackageVersion version)
+        public Task<LocalPackageInfo> GetInstalledPackageInfoAsync(RegistryPackage package, RegistryPackageVersion version)
         {
-            return new PackageStatusHandler(_fs, SavesDirectory, _config.VirtAMate.PackagesFolder)
-                .GetInstalledPackageInfoAsync(name, version);
+            return new PackageStatusHandler(_fs, _folders)
+                .GetInstalledPackageInfoAsync(package, version);
         }
 
         public Task<LocalPackageInfo> InstallPackageAsync(LocalPackageInfo info, bool force)
@@ -187,7 +189,7 @@ namespace Party.Shared
         Task<SortedSet<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string path, DirectoryInfo saves);
         Task<SortedSet<RegistryFile>> BuildRegistryFilesFromUrlAsync(Registry registry, Uri url);
         IEnumerable<SearchResult> Search(Registry registry, string query);
-        Task<LocalPackageInfo> GetInstalledPackageInfoAsync(string name, RegistryPackageVersion version);
+        Task<LocalPackageInfo> GetInstalledPackageInfoAsync(RegistryPackage package, RegistryPackageVersion version);
         Task<LocalPackageInfo> InstallPackageAsync(LocalPackageInfo info, bool force);
         RegistrySavesMatches MatchSavesToRegistry(SavesMap saves, Registry registry);
         Task<(string before, string after)[]> UpdateScriptInSceneAsync(LocalSceneFile scene, LocalScriptFile local, LocalPackageInfo info);

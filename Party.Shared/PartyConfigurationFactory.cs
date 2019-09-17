@@ -12,8 +12,7 @@ namespace Party.Shared
                 {
                     VirtAMateInstallFolder = "./",
                     AllowedSubfolders = new[] { "Assets", "Import", "Saves", "Textures" },
-                    IgnoredFolders = new[] { Path.Combine("scene", "MeshedVR"), Path.Combine("Scripts", "MeshedVR"), "Person", "Downloads", "Dev" },
-                    PackagesFolder = "party"
+                    IgnoredFolders = new[] { Path.Combine("scene", "MeshedVR"), Path.Combine("Scripts", "MeshedVR"), "Person", "Downloads", "Dev" }
                 },
                 Registry = new PartyConfigurationRegistry
                 {
