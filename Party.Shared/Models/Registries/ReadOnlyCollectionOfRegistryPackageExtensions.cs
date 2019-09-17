@@ -4,20 +4,9 @@ using Party.Shared.Exceptions;
 
 namespace Party.Shared.Models.Registries
 {
-    public static class SortedSetOfRegistryPackageExtensions
+    public static class ReadOnlyCollectionOfRegistryPackageExtensions
     {
-        public static RegistryPackage GetOrCreatePackage(this SortedSet<RegistryPackage> set, string name)
-        {
-            // TODO: Script-specific
-            var script = set.FirstOrDefault(s => s.Name == name);
-            if (script != null) return script;
-
-            script = new RegistryPackage { Name = name, Versions = new SortedSet<RegistryPackageVersion>() };
-            set.Add(script);
-            return script;
-        }
-
-        public static IEnumerable<(RegistryPackage package, RegistryPackageVersion version, RegistryFile file)> FlattenFiles(this SortedSet<RegistryPackage> set)
+        public static IEnumerable<(RegistryPackage package, RegistryPackageVersion version, RegistryFile file)> FlattenFiles(this IReadOnlyCollection<RegistryPackage> set)
         {
             // TODO: Script-specific
             return set
@@ -25,7 +14,7 @@ namespace Party.Shared.Models.Registries
                 .SelectMany(sv => sv.version.Files.Select(file => (sv.script, sv.version, file))));
         }
 
-        public static void AssertNoDuplicates(this SortedSet<RegistryPackage> set, RegistryPackageVersion version)
+        public static void AssertNoDuplicates(this IReadOnlyCollection<RegistryPackage> set, RegistryPackageVersion version)
         {
             // TODO: Script-specific
             var hashes = version.Files.Where(f => f.Hash?.Value != null).Select(f => f.Hash.Value).ToArray();

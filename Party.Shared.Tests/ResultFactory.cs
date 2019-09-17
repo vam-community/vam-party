@@ -13,10 +13,7 @@ namespace Party.Shared
         {
             return new Registry
             {
-                Packages = new RegistryPackageGroups
-                {
-                    Scripts = new SortedSet<RegistryPackage>(scripts)
-                }
+                Packages = new SortedSet<RegistryPackage>(scripts)
             };
         }
 
@@ -24,6 +21,7 @@ namespace Party.Shared
         {
             return new RegistryPackage
             {
+                Type = RegistryPackageType.Scripts,
                 Name = name,
                 Versions = new SortedSet<RegistryPackageVersion>(versions)
             };

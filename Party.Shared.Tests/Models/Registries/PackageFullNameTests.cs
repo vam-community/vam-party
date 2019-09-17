@@ -1,7 +1,8 @@
 using NUnit.Framework;
 using Party.Shared.Models;
+using Party.Shared.Models.Registries;
 
-namespace Party.Shared
+namespace Party.Shared.Registries
 {
     public class PackageFullNameTests
     {
@@ -19,9 +20,9 @@ namespace Party.Shared
             Assert.That(result, Is.Null);
         }
 
-        [TestCase("scripts/my-package", PackageTypes.Scripts, "my-package", null)]
-        [TestCase("scripts/my-package@1.0.0", PackageTypes.Scripts, "my-package", "1.0.0")]
-        public void ValidValues(string input, PackageTypes type, string name, string version)
+        [TestCase("scripts/my-package", RegistryPackageType.Scripts, "my-package", null)]
+        [TestCase("scripts/my-package@1.0.0", RegistryPackageType.Scripts, "my-package", "1.0.0")]
+        public void ValidValues(string input, RegistryPackageType type, string name, string version)
         {
             var success = PackageFullName.TryParsePackage(input, out var result);
 

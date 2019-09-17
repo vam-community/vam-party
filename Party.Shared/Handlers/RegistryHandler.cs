@@ -6,7 +6,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Party.Shared.Exceptions;
-using Party.Shared.Models;
 using Party.Shared.Models.Registries;
 
 namespace Party.Shared.Handlers
@@ -36,12 +35,7 @@ namespace Party.Shared.Handlers
             var registry = registries[0];
             foreach (var additional in registries.Skip(1))
             {
-                Merge(registry.Packages.Scripts, additional.Packages.Scripts);
-                Merge(registry.Packages.Scenes, additional.Packages.Scenes);
-                Merge(registry.Packages.Morphs, additional.Packages.Morphs);
-                Merge(registry.Packages.Clothing, additional.Packages.Clothing);
-                Merge(registry.Packages.Assets, additional.Packages.Assets);
-                Merge(registry.Packages.Textures, additional.Packages.Textures);
+                Merge(registry.Packages, additional.Packages);
             }
             return registry;
         }

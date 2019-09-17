@@ -33,7 +33,8 @@ namespace Party.Shared.Serializers
                 Converters =
                 {
                     new StringArrayConverter(),
-                    new VersionConverter()
+                    new VersionConverter(),
+                    new PackageTypeConverter(),
                 }
             };
 
@@ -49,7 +50,7 @@ namespace Party.Shared.Serializers
 
             public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
             {
-                throw new NotImplementedException();
+                return existingValue;
             }
 
             public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
@@ -67,7 +68,25 @@ namespace Party.Shared.Serializers
 
             public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
             {
-                throw new NotImplementedException();
+                return existingValue ?? (RegistryVersionString)reader.ReadAsString();
+            }
+
+            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+            {
+                writer.WriteRawValue($"\"{value.ToString()}\"");
+            }
+        }
+
+        public class PackageTypeConverter : JsonConverter
+        {
+            public override bool CanConvert(Type objectType)
+            {
+                return objectType == typeof(RegistryPackageType);
+            }
+
+            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+            {
+                return Enum.TryParse<RegistryPackageType>(reader.ReadAsString(), out var value) ? value : RegistryPackageType.Unknown;
             }
 
             public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

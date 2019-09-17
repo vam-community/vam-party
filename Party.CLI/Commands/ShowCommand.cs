@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Party.Shared;
 using Party.Shared.Exceptions;
 using Party.Shared.Models;
+using Party.Shared.Models.Registries;
 
 namespace Party.CLI.Commands
 {
@@ -46,7 +47,7 @@ namespace Party.CLI.Commands
             var (saves, registry) = await GetSavesAndRegistryAsync();
 
             // TODO: Should handle other types, and and be handled in the controller
-            var package = registry.Packages.Get(packageName.Type)?.FirstOrDefault(p => p.Name.Equals(packageName.Name, StringComparison.InvariantCultureIgnoreCase));
+            var package = registry.Get(packageName.Type)?.FirstOrDefault(p => p.Name.Equals(packageName.Name, StringComparison.InvariantCultureIgnoreCase));
 
             if (package == null)
             {
@@ -62,7 +63,7 @@ namespace Party.CLI.Commands
 
             PrintWarnings(args.Warnings, saves.Errors);
 
-            Renderer.WriteLine($"Package {package.Name}");
+            Renderer.WriteLine($"Package {package.Type.ToString().ToLowerInvariant()}/{package.Name}");
 
             Renderer.WriteLine($"Last version v{latestVersion.Version}, published {latestVersion.Created.ToLocalTime().ToString("D")}");
 
@@ -95,7 +96,7 @@ namespace Party.CLI.Commands
             {
                 // TODO: This should be resolved by the Controller
                 Renderer.WriteLine("Dependencies:");
-                foreach (var dependency in latestVersion.Dependencies.Select(d => (d, p: registry.Packages.Scripts.FirstOrDefault(p => p.Name == d.Name))))
+                foreach (var dependency in latestVersion.Dependencies.Select(d => (d, p: registry.Get(RegistryPackageType.Scripts).FirstOrDefault(p => p.Name == d.Name))))
                 {
                     if (dependency.p == null)
                     {

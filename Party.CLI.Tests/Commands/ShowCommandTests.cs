@@ -20,39 +20,37 @@ namespace Party.CLI
             DateTimeOffset created = new DateTimeOffset(2010, 11, 12, 0, 0, 0, 0, TimeSpan.Zero);
             _controller.Setup(x => x.GetRegistryAsync()).ReturnsAsync(new Registry
             {
-                Packages = new RegistryPackageGroups
+                Packages = new SortedSet<RegistryPackage>(new[]
                 {
-                    Scripts = new SortedSet<RegistryPackage>(new[]
+                    new RegistryPackage
                     {
-                        new RegistryPackage
+                        Type = RegistryPackageType.Scripts,
+                        Name = "cool-thing",
+                        Author = "some dude",
+                        Versions = new SortedSet<RegistryPackageVersion>(new []
                         {
-                            Name = "cool-thing",
-                            Author = "some dude",
-                            Versions = new SortedSet<RegistryPackageVersion>(new []
+                            new RegistryPackageVersion
                             {
-                                new RegistryPackageVersion
+                                Version = "1.2.3",
+                                Created = created,
+                                Files = new SortedSet<RegistryFile>
                                 {
-                                    Version = "1.2.3",
-                                    Created = created,
-                                    Files = new SortedSet<RegistryFile>
+                                    new RegistryFile
                                     {
-                                        new RegistryFile
-                                        {
-                                            Filename = "File 1.cs"
-                                        }
+                                        Filename = "File 1.cs"
                                     }
                                 }
-                            })
-                        }
-                    })
-                }
+                            }
+                        })
+                    }
+                })
             });
             _controller.Setup(x => x.GetSavesAsync(null, It.IsAny<IProgress<GetSavesProgress>>())).ReturnsAsync(new SavesMap());
 
             var result = await _program.Execute(new[] { "show", "scripts/cool-thing" });
 
             Assert.That(GetOutput().Skip(2), Is.EqualTo(new[]{
-                "Package cool-thing",
+                "Package scripts/cool-thing",
                 $"Last version v1.2.3, published {created.ToLocalTime().ToString("D")}",
                 "Versions:",
                 $"- v1.2.3, published {created.ToLocalTime().ToString("D")}: (no release notes)",
@@ -79,45 +77,43 @@ namespace Party.CLI
                         Reddit = "https://reddit.com/...profile"
                     }
                 }),
-                Packages = new RegistryPackageGroups
+                Packages = new SortedSet<RegistryPackage>(new[]
                 {
-                    Scripts = new SortedSet<RegistryPackage>(new[]
+                    new RegistryPackage
                     {
-                        new RegistryPackage
+                        Type = RegistryPackageType.Scripts,
+                        Name = "cool-thing",
+                        Author = "some dude",
+                        Tags = new List<string>(new[]{"tag1", "tag2"}),
+                        Description = "This does some things",
+                        Homepage = "https://reddit.com/...homepage",
+                        Repository = "https://github.com/...repo",
+                        Versions = new SortedSet<RegistryPackageVersion>(new []
                         {
-                            Name = "cool-thing",
-                            Author = "some dude",
-                            Tags = new List<string>(new[]{"tag1", "tag2"}),
-                            Description = "This does some things",
-                            Homepage = "https://reddit.com/...homepage",
-                            Repository = "https://github.com/...repo",
-                            Versions = new SortedSet<RegistryPackageVersion>(new []
+                            new RegistryPackageVersion
                             {
-                                new RegistryPackageVersion
+                                Version = "1.2.3",
+                                Created = created,
+                                Notes = "Some cool new stuff",
+                                Files = new SortedSet<RegistryFile>
                                 {
-                                    Version = "1.2.3",
-                                    Created = created,
-                                    Notes = "Some cool new stuff",
-                                    Files = new SortedSet<RegistryFile>
+                                    new RegistryFile
                                     {
-                                        new RegistryFile
-                                        {
-                                            Filename = "File 1.cs",
-                                            Url = "https://example.org/File%201.cs"
-                                        }
+                                        Filename = "File 1.cs",
+                                        Url = "https://example.org/File%201.cs"
                                     }
                                 }
-                            })
-                        }
-                    })
-                }
+                            }
+                        })
+                    }
+                })
             });
             _controller.Setup(x => x.GetSavesAsync(null, It.IsAny<IProgress<GetSavesProgress>>())).ReturnsAsync(new SavesMap());
 
             var result = await _program.Execute(new[] { "show", "scripts/cool-thing" });
 
             Assert.That(GetOutput().Skip(2), Is.EqualTo(new[]{
-                "Package cool-thing",
+                "Package scripts/cool-thing",
                 $"Last version v1.2.3, published {created.ToLocalTime().ToString("D")}",
                 "Versions:",
                 $"- v1.2.3, published {created.ToLocalTime().ToString("D")}: Some cool new stuff",

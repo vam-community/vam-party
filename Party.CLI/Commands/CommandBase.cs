@@ -85,8 +85,7 @@ namespace Party.CLI.Commands
             // TODO: Put in controller
             if (isFilterPackage)
             {
-                // TODO: Filter by type
-                var packageHashes = new HashSet<string>(registry.Packages.Get(filterPackage.Type).Where(s => filterPackage.Name.Equals(s.Name, StringComparison.InvariantCultureIgnoreCase)).SelectMany(s => s.Versions).SelectMany(v => v.Files).Select(f => f.Hash.Value).Distinct());
+                var packageHashes = new HashSet<string>(registry.GetPackage(filterPackage).Versions.SelectMany(v => v.Files).Select(f => f.Hash.Value).Distinct());
                 saves.Scripts = saves.Scripts.Where(s =>
                 {
                     if (s is LocalScriptListFile scriptList)

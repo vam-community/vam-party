@@ -70,7 +70,7 @@ namespace Party.CLI.Commands
             var name = args.PackageName ?? (args.Quiet ? "unnamed" : Renderer.Ask("Package Name: ", false, RegistryPackage.ValidNameRegex, "my-package"));
 
             // TODO: Handle for other types
-            var package = registry.Packages.Scripts.GetOrCreatePackage(name);
+            var package = registry.GetOrCreatePackage(RegistryPackageType.Scripts, name);
             var version = package.CreateVersion();
 
             var pathOrUrls = args.Input;
@@ -101,7 +101,7 @@ namespace Party.CLI.Commands
                 }
             }
 
-            registry.Packages.Scripts.AssertNoDuplicates(version);
+            registry.Get(RegistryPackageType.Scripts).AssertNoDuplicates(version);
 
             if (package == null || version == null || package.Versions == null) throw new NullReferenceException($"Error in {nameof(Controller.BuildRegistryFilesFromPathAsync)}: Null values were returned.");
 

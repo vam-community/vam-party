@@ -1,7 +1,8 @@
-namespace Party.Shared.Models
+namespace Party.Shared.Models.Registries
 {
-    public enum PackageTypes
+    public enum RegistryPackageType
     {
+        Unknown = 0,
         Scripts,
         Clothing,
         Scenes,

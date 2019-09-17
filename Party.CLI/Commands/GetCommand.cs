@@ -1,11 +1,11 @@
-﻿using System;
-using System.CommandLine;
+﻿using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
 using Party.Shared.Exceptions;
 using Party.Shared.Models;
+using Party.Shared.Models.Registries;
 
 namespace Party.CLI.Commands
 {

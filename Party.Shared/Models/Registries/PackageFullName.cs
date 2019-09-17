@@ -1,7 +1,7 @@
 using System;
 using System.Text.RegularExpressions;
 
-namespace Party.Shared.Models
+namespace Party.Shared.Models.Registries
 {
     public class PackageFullName
     {
@@ -23,7 +23,7 @@ namespace Party.Shared.Models
                 return false;
             }
 
-            if (!Enum.TryParse<PackageTypes>(match.Groups["type"].Value, true, out var type))
+            if (!Enum.TryParse<RegistryPackageType>(match.Groups["type"].Value, true, out var type) || type == RegistryPackageType.Unknown)
             {
                 info = null;
                 return false;
@@ -39,7 +39,7 @@ namespace Party.Shared.Models
         }
 
         public string Name { get; set; }
-        public PackageTypes Type { get; set; }
+        public RegistryPackageType Type { get; set; }
         public string Version { get; set; }
 
         public override string ToString()

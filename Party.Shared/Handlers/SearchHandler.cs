@@ -21,7 +21,7 @@ namespace Party.Shared.Handlers
             if (registry?.Packages is null) throw new ArgumentException("registry does not have any scripts", nameof(registry));
 
             // TODO: Search in all package types
-            foreach (var package in registry.Packages.Scripts)
+            foreach (var package in registry.Packages)
             {
                 if (!string.IsNullOrEmpty(query))
                 {
@@ -30,11 +30,13 @@ namespace Party.Shared.Handlers
                         continue;
                     }
                 }
+
                 var trusted = package.Versions?
                     .SelectMany(v => v.Files)
                     .Where(f => f.Url != null && !f.Ignore)
                     .All(f => _trustedDomains.Any(t => f.Url.StartsWith(t)))
                     ?? false;
+
                 yield return new SearchResult
                 {
                     Package = package,

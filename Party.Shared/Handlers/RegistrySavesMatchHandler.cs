@@ -12,7 +12,7 @@ namespace Party.Shared.Handlers
         public RegistrySavesMatches Match(SavesMap saves, Registry registry)
         {
             // TODO: Should handle other types
-            var flattened = registry.Packages.Scripts.FlattenFiles().ToList();
+            var flattened = registry.Get(RegistryPackageType.Scripts).FlattenFiles().ToList();
             var scripts = new List<LocalScriptFile>(saves.Scripts);
 
             var withHash = flattened
