@@ -153,6 +153,7 @@ Options:
 - `--package-version-download-url` A direct download link to the specific version (will fallback to the package homepage otherwise).
 - `--saves` allows specifying another saves folder, e.g. when publishing scripts from the vam-packages folder
 - `--quiet` chooses defaults for every option (e.g. when you just want to get the json output)
+- `--format` prettifies the registry, e.g. when you manually modify it
 
 ### `clean`
 

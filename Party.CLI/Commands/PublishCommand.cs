@@ -27,6 +27,7 @@ namespace Party.CLI.Commands
             command.AddOption(new Option("--registry", "Path the the index.json file of your locally cloned registry") { Argument = new Argument<FileInfo>().ExistingOnly() });
             command.AddOption(new Option("--saves", "Specify a custom saves folder, e.g. when the script is not in the Virt-A-Mate folder") { Argument = new Argument<DirectoryInfo>().ExistingOnly() });
             command.AddOption(new Option("--quiet", "Just print the hash and metadata, no questions asked"));
+            command.AddOption(new Option("--format", "Just format the registry, e.g. after manually editing it"));
 
             command.Handler = CommandHandler.Create<PublishArguments>(async args =>
             {
@@ -45,7 +46,10 @@ namespace Party.CLI.Commands
             public FileInfo Registry { get; set; }
             public DirectoryInfo Saves { get; set; }
             public bool Quiet { get; set; }
+            public bool Format { get; set; }
         }
+
+        private IRegistrySerializer _serializer = new RegistrySerializer();
 
         public PublishCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller, CommonArguments args)
             : base(renderer, config, controller, args)
@@ -63,10 +67,19 @@ namespace Party.CLI.Commands
                     throw new UserInputException("Please specify the path to your locally cloned index.json file");
 
                 registry = await Controller.GetRegistryAsync(args.Registry.FullName);
+
+                if (args.Format)
+                {
+                    Controller.SaveToFile(_serializer.Serialize(registry), args.Registry.FullName, false);
+                    return;
+                }
             }
             else
             {
                 registry = await Controller.GetRegistryAsync();
+
+                if (args.Format)
+                    throw new UserInputException("Cannot specify --format without --registry");
             }
 
             var name = args.PackageName ?? (args.Quiet ? "unnamed" : Renderer.Ask("Package Name: ", false, RegistryPackage.ValidNameRegex, "my-package"));
@@ -180,16 +193,15 @@ namespace Party.CLI.Commands
                 }
             }
 
-            var serializer = new RegistrySerializer();
             if (args.Registry != null)
             {
-                Controller.SaveToFile(serializer.Serialize(registry), args.Registry.FullName, false);
+                Controller.SaveToFile(_serializer.Serialize(registry), args.Registry.FullName, false);
                 Renderer.WriteLine($"JSON written to {args.Registry.FullName}");
             }
             else
             {
                 Renderer.WriteLine("JSON Template:");
-                Renderer.WriteLine(serializer.Serialize(package));
+                Renderer.WriteLine(_serializer.Serialize(package));
             }
         }
     }
