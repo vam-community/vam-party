@@ -13,6 +13,12 @@ namespace Party.Shared.Models.Registries
 
         int IComparable<RegistryFile>.CompareTo(RegistryFile other)
         {
+            // Anything without a filename is sent down
+            if (Filename != null && other.Filename == null)
+                return -1;
+            else if (Filename == null && other.Filename != null)
+                return 1;
+
             // Anything with a URL first
             if (Url != null && other.Url == null)
                 return -1;
@@ -24,6 +30,11 @@ namespace Party.Shared.Models.Registries
                 return -1;
             else if (Hash?.Value == null && other.Hash?.Value != null)
                 return 1;
+
+            if (Filename.StartsWith("/") && !other.Filename.StartsWith("/"))
+                return 1;
+            else if (!Filename.StartsWith("/") && other.Filename.StartsWith("/"))
+                return -1;
 
             // Start with folders at the root level
             var thisSlashes = Filename?.Count(c => c == '/') ?? 0;
