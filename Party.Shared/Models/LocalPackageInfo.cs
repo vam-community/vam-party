@@ -6,7 +6,7 @@ namespace Party.Shared.Models
     public class LocalPackageInfo
     {
         public InstalledFileInfo[] Files { get; set; }
-        public string InstallFolder { get; set; }
+        public string PackageFolder { get; set; }
         public bool Installed { get; set; }
         public bool Installable { get; set; }
         public bool Corrupted { get; set; }
@@ -23,7 +23,7 @@ namespace Party.Shared.Models
 
     public class InstalledFileInfo
     {
-        public string Path { get; set; }
+        public string FullPath { get; set; }
         public FileStatus Status { get; set; }
         public RegistryFile RegistryFile { get; set; }
     }

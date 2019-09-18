@@ -156,7 +156,7 @@ namespace Party.CLI.Commands
         {
             foreach (var file in installedStatus.Files)
             {
-                Renderer.Write($"{indent}- {file.Path}");
+                Renderer.Write($"{indent}- {file.FullPath}");
                 switch (file.Status)
                 {
                     case FileStatus.NotInstalled:
@@ -181,10 +181,11 @@ namespace Party.CLI.Commands
 
         protected void PrintScriptToPackage(RegistrySavesMatch match, RegistryPackageVersion updateToVersion)
         {
+            var (_, package, version) = match.Remote;
             Renderer.Write($"Script ");
             Renderer.Write(Controller.GetDisplayPath(match.Local.FullPath), ConsoleColor.Blue);
             Renderer.Write($" is ");
-            Renderer.Write($"{match.Package.Name} v{match.Version.Version}", ConsoleColor.Cyan);
+            Renderer.Write($"{package.Name} v{version.Version}", ConsoleColor.Cyan);
             Renderer.Write($" > ");
             if (updateToVersion == null)
             {

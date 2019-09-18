@@ -1,11 +1,19 @@
 using System;
+using System.Collections.Generic;
 
 namespace Party.Shared.Models.Registries
 {
     public class RegistryPackageDependency : IComparable<RegistryPackageDependency>, IComparable
     {
+        public RegistryPackageType Type { get; set; }
         public string Name { get; set; }
-        public string Version { get; set; }
+        public RegistryVersionString Version { get; set; }
+        public List<string> Files { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Type.ToString().ToLowerInvariant()}/{Name}@{Version}";
+        }
 
         int IComparable<RegistryPackageDependency>.CompareTo(RegistryPackageDependency other)
         {

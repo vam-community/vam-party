@@ -101,7 +101,7 @@ namespace Party.CLI.Commands
                 }
             }
 
-            registry.Get(RegistryPackageType.Scripts).AssertNoDuplicates(version);
+            registry.AssertNoDuplicates(RegistryPackageType.Scripts, version);
 
             if (package == null || version == null || package.Versions == null) throw new NullReferenceException($"Error in {nameof(Controller.BuildRegistryFilesFromPathAsync)}: Null values were returned.");
 

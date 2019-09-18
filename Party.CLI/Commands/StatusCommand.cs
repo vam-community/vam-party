@@ -57,9 +57,9 @@ namespace Party.CLI.Commands
             }
             else
             {
-                foreach (var matchScript in matches.HashMatches.GroupBy(m => m.Package).OrderBy(g => g.Key.Name))
+                foreach (var matchScript in matches.HashMatches.GroupBy(m => m.Remote.Package).OrderBy(g => g.Key.Name))
                 {
-                    foreach (var matchVersion in matchScript.GroupBy(s => s.Version).OrderBy(g => g.Key.Version))
+                    foreach (var matchVersion in matchScript.GroupBy(s => s.Remote.Version).OrderBy(g => g.Key.Version))
                     {
                         var localFiles = matchVersion.Select(v => v.Local).ToList();
                         PrintScript(matchScript.Key, matchVersion.Key, localFiles);
@@ -82,7 +82,7 @@ namespace Party.CLI.Commands
                 {
                     var files = match.ToArray();
                     var first = files.First();
-                    PrintScript(first.Package, first.Version, files.Select(f => f.Local).ToArray());
+                    PrintScript(first.Remote.Package, first.Remote.Version, files.Select(f => f.Local).ToArray());
                     PrintWarnings(args.Warnings, files.Select(f => f.Local).ToArray<LocalFile>());
                     if (args.Breakdown)
                         PrintScenes("- ", files.SelectMany(f => f.Local.Scenes).Distinct().ToList());

@@ -45,21 +45,23 @@ namespace Party.CLI.Commands
 
             var registry = await Controller.GetRegistryAsync().ConfigureAwait(false);
 
-            var registryPackage = registry.GetPackage(packageName);
-            if (registryPackage == null)
+            var package = registry.GetPackage(packageName);
+            if (package == null)
                 throw new RegistryException($"Package not found: '{packageName}'");
 
-            var registryPackageVersion = packageName.Version != null
-                ? registryPackage.GetVersion(packageName.Version)
-                : registryPackage.GetLatestVersion();
-            if (registryPackageVersion == null)
+            var version = packageName.Version != null
+                ? package.GetVersion(packageName.Version)
+                : package.GetLatestVersion();
+            if (version == null)
                 throw new RegistryException($"Package version not found: '{packageName}'");
 
-            var installedStatus = await Controller.GetInstalledPackageInfoAsync(registryPackage, registryPackageVersion);
+            var context = new RegistryPackageVersionContext(registry, package, version);
+
+            var installedStatus = await Controller.GetInstalledPackageInfoAsync(context);
 
             if (installedStatus.Installed && !args.Force)
             {
-                throw new UserInputException($"Plugin already installed at {installedStatus.InstallFolder}");
+                throw new UserInputException($"Plugin already installed at {installedStatus.PackageFolder}");
             }
             if (installedStatus.Installable || args.Force)
             {
@@ -67,16 +69,16 @@ namespace Party.CLI.Commands
                 {
                     var installResult = await Controller.InstallPackageAsync(installedStatus, args.Force);
 
-                    Renderer.WriteLine($"Installed package {registryPackage.Name} v{registryPackageVersion.Version} by {registryPackage.Author ?? "?"}");
-                    Renderer.WriteLine($"Files downloaded in {installedStatus.InstallFolder}:");
+                    Renderer.WriteLine($"Installed package {package.Name} v{version.Version} by {package.Author ?? "?"}");
+                    Renderer.WriteLine($"Files downloaded in {installedStatus.PackageFolder}:");
                     PrintInstalledFiles(installResult);
                 }
                 else
                 {
-                    Renderer.WriteLine($"Noop has been used, skipping install. Files would have been downloaded in {installedStatus.InstallFolder}:");
+                    Renderer.WriteLine($"Noop has been used, skipping install. Files would have been downloaded in {installedStatus.PackageFolder}:");
                     foreach (var file in installedStatus.Files.Where(f => f.Status == FileStatus.NotInstalled))
                     {
-                        Renderer.WriteLine($"- Path: {Controller.GetDisplayPath(file.Path)}");
+                        Renderer.WriteLine($"- Path: {Controller.GetDisplayPath(file.FullPath)}");
                         Renderer.WriteLine($"  Hash: {file.RegistryFile.Hash.Value} ({file.RegistryFile.Hash.Type})");
                         Renderer.WriteLine($"  Url:  {file.RegistryFile.Url}");
                     }
@@ -84,7 +86,7 @@ namespace Party.CLI.Commands
             }
             else
             {
-                Renderer.WriteLine($"Some files are not available for download or invalid, you can instead download it at {registryPackage.Homepage ?? registryPackage.Repository ?? "(no link provided)"}");
+                Renderer.WriteLine($"Some files are not available for download or invalid, you can instead download it at {package.Homepage ?? package.Repository ?? "(no link provided)"}");
                 PrintInstalledFiles(installedStatus);
                 return;
             }

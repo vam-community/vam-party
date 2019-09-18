@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Threading.Tasks;
+using Party.Shared.Exceptions;
 using Party.Shared.Models;
 using Party.Shared.Models.Registries;
 using Party.Shared.Utils;
@@ -21,23 +22,33 @@ namespace Party.Shared.Handlers
             _folders = folders ?? throw new ArgumentNullException(nameof(folders));
         }
 
-        public async Task<LocalPackageInfo> GetInstalledPackageInfoAsync(RegistryPackage package, RegistryPackageVersion version)
+        public async Task<LocalPackageInfo> GetInstalledPackageInfoAsync(RegistryPackageVersionContext context)
         {
-            var basePath = _folders.GetDirectory(package.Type);
-            var installPath = Path.Combine(basePath, package.Author ?? "Anonymous", package.Name, version.Version);
+            var (registry, package, version) = context;
+            var packagePath = _folders.GetDirectory(package.Type);
             var files = new List<InstalledFileInfo>();
 
             foreach (var file in version.Files.Where(f => !f.Ignore))
             {
                 if (file.Filename != null)
-                    files.Add(await GetPackageFileInfo(installPath, file).ConfigureAwait(false));
-                else if (file.LocalPath != null)
-                    files.Add(GetLocalFileInfo(file));
+                    files.Add(await GetPackageFileInfo(packagePath, file).ConfigureAwait(false));
+            }
+            // TODO: Handle deep dependencies
+            foreach (var dependency in version.Dependencies)
+            {
+                if (!registry.TryGetDependency(dependency, out var depContext))
+                    throw new RegistryException($"Could not find dependency {dependency}");
+                var depPath = _folders.GetDirectory(depContext.Package.Type);
+                var depFiles = dependency.Files != null && dependency.Files.Count > 0
+                    ? dependency.Files.Select(df => depContext.Version.Files.FirstOrDefault(vf => df == vf.Filename) ?? throw new RegistryException($"Could not find dependency file '{df}' in package '{depContext.Package}@{depContext.Version.Version}'"))
+                    : depContext.Version.Files;
+                foreach (var depFile in depFiles)
+                    files.Add(await GetPackageFileInfo(depPath, depFile).ConfigureAwait(false));
             }
 
             return new LocalPackageInfo
             {
-                InstallFolder = installPath,
+                PackageFolder = packagePath,
                 Files = files.ToArray(),
                 Corrupted = files.Any(f => f.Status == FileStatus.HashMismatch),
                 Installed = files.All(f => f.Status == FileStatus.Installed),
@@ -45,52 +56,36 @@ namespace Party.Shared.Handlers
             };
         }
 
-        private InstalledFileInfo GetLocalFileInfo(RegistryFile file)
+        private async Task<InstalledFileInfo> GetPackageFileInfo(string packagePath, RegistryFile file)
         {
-            // TODO: Replace this with a path manager
-            var filePath = Path.Combine(_folders.RelativeToVam(file.Filename));
+            var fullPath = Path.Combine(packagePath, file.Filename);
             return new InstalledFileInfo
             {
-                Path = filePath,
+                FullPath = fullPath,
                 RegistryFile = file,
-                Status = _fs.File.Exists(filePath) ? FileStatus.Installed : FileStatus.NotInstallable
+                Status = await GetFileStatusAsync(file, fullPath).ConfigureAwait(false)
             };
         }
 
-        private async Task<InstalledFileInfo> GetPackageFileInfo(string installPath, RegistryFile file)
+        private async Task<FileStatus> GetFileStatusAsync(RegistryFile file, string fullPath)
         {
-            var filePath = Path.Combine(installPath, file.Filename);
-            var fileInfo = new InstalledFileInfo
+            if (!_fs.File.Exists(fullPath))
             {
-                Path = filePath,
-                RegistryFile = file
-            };
+                return file.Ignore
+                    ? FileStatus.Ignored
+                    : FileStatus.NotInstalled;
+            }
 
-            if (_fs.File.Exists(filePath))
-            {
-                var hash = await Hashing.GetHashAsync(_fs, filePath);
-                if (file.Hash.Type != Hashing.Type)
-                {
-                    throw new InvalidOperationException($"Unsupported hash type: {file.Hash.Type}");
-                }
-                if (hash == file.Hash.Value)
-                {
-                    fileInfo.Status = FileStatus.Installed;
-                }
-                else
-                {
-                    fileInfo.Status = FileStatus.HashMismatch;
-                }
-            }
-            else if (file.Ignore)
-            {
-                fileInfo.Status = FileStatus.Ignored;
-            }
-            else
-            {
-                fileInfo.Status = FileStatus.NotInstalled;
-            }
-            return fileInfo;
+            if (file.Hash?.Type == null)
+                return FileStatus.Installed;
+
+            if (file.Hash.Type != Hashing.Type)
+                throw new InvalidOperationException($"Unsupported hash type: {file.Hash.Type}");
+
+            var hash = await Hashing.GetHashAsync(_fs, fullPath);
+            return hash == file.Hash.Value
+                ? FileStatus.Installed
+                : FileStatus.HashMismatch;
         }
     }
 }

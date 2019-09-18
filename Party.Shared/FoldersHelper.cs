@@ -15,6 +15,25 @@ namespace Party.Shared
             _vamDirectory = vamDirectory ?? throw new ArgumentNullException(nameof(vamDirectory));
         }
 
+        public string GetDirectory(RegistryPackageVersionContext context)
+        {
+            var (_, package, version) = context;
+            string author = package.Author ?? "Anonymous";
+            // TODO: Packages could define a preferred structure, e.g. for morphs backward compatibility
+            var relativeFolder = package.Type switch
+            {
+                RegistryPackageType.Scripts => _fs.Path.Combine(author, package.Name, version.Version),
+                RegistryPackageType.Clothing => _fs.Path.Combine(author, package.Name),
+                RegistryPackageType.Scenes => _fs.Path.Combine(author, package.Name),
+                RegistryPackageType.Textures => _fs.Path.Combine(author, package.Name),
+                RegistryPackageType.Assets => _fs.Path.Combine(author, package.Name),
+                RegistryPackageType.FemaleMorphs => _fs.Path.Combine(package.Name),
+                RegistryPackageType.MaleMorphs => _fs.Path.Combine(package.Name),
+                _ => throw new NotImplementedException($"Type {package.Type} is not currently handled by the folders helper."),
+            };
+            return _fs.Path.Combine(GetDirectory(package.Type), relativeFolder);
+        }
+
         public string GetDirectory(RegistryPackageType type)
         {
             return type switch
@@ -24,7 +43,8 @@ namespace Party.Shared
                 RegistryPackageType.Scenes => _fs.Path.Combine(_vamDirectory, "Saves", "scene"),
                 RegistryPackageType.Textures => _fs.Path.Combine(_vamDirectory, "Textures"),
                 RegistryPackageType.Assets => _fs.Path.Combine(_vamDirectory, "Saves", "Assets"),
-                RegistryPackageType.Morphs => _fs.Path.Combine(_vamDirectory, "Import", "morphs"),
+                RegistryPackageType.FemaleMorphs => _fs.Path.Combine(_vamDirectory, "Import", "morphs", "female"),
+                RegistryPackageType.MaleMorphs => _fs.Path.Combine(_vamDirectory, "Import", "morphs", "male"),
                 _ => throw new NotImplementedException($"Type {type} is not currently handled by the folders helper."),
             };
         }

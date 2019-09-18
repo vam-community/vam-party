@@ -79,7 +79,7 @@ namespace Party.CLI.Commands
             PrintScriptToPackage(match, null);
             PrintWarnings(args.Warnings, match.Local);
 
-            var info = await Controller.GetInstalledPackageInfoAsync(match.Package, match.Version);
+            var info = await Controller.GetInstalledPackageInfoAsync(match.Remote);
 
             if (info.Installed)
             {
@@ -93,7 +93,7 @@ namespace Party.CLI.Commands
             }
 
             Renderer.Write("  Script should bet at ", ConsoleColor.DarkGray);
-            Renderer.Write(info.InstallFolder, ConsoleColor.DarkBlue);
+            Renderer.Write(info.PackageFolder, ConsoleColor.DarkBlue);
             Renderer.WriteLine();
 
             foreach (var scene in match.Local.Scenes)

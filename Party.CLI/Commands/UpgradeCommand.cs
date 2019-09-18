@@ -67,8 +67,8 @@ namespace Party.CLI.Commands
 
         private async Task HandleOne(RegistrySavesMatch match, UpgradeArguments args)
         {
-            var latestVersion = match.Package.GetLatestVersion();
-            var updateToVersion = latestVersion.Version.Equals(match.Version.Version) ? null : latestVersion;
+            var latestVersion = match.Remote.Package.GetLatestVersion();
+            var updateToVersion = latestVersion.Version.Equals(match.Remote.Version.Version) ? null : latestVersion;
 
             if (updateToVersion == null)
             {
@@ -84,7 +84,7 @@ namespace Party.CLI.Commands
             PrintScriptToPackage(match, updateToVersion);
             PrintWarnings(args.Warnings, match.Local);
 
-            var info = await Controller.GetInstalledPackageInfoAsync(match.Package, updateToVersion ?? match.Version);
+            var info = await Controller.GetInstalledPackageInfoAsync(match.Remote.WithVersion(updateToVersion ?? match.Remote.Version));
 
             if (info.Installed)
             {
@@ -95,7 +95,7 @@ namespace Party.CLI.Commands
             if (!args.Force && (info.Corrupted || !info.Installable))
             {
                 Renderer.WriteLine("  Cannot upgrade because at least one file is either broken or not installable.");
-                Renderer.WriteLine($"  You can instead download it at {match.Package.Homepage ?? match.Package.Repository ?? "(no link provided)"}");
+                Renderer.WriteLine($"  You can instead download it at {match.Remote.Package.Homepage ?? match.Remote.Package.Repository ?? "(no link provided)"}");
                 Renderer.WriteLine("  Files:");
                 PrintInstalledFiles(info, "  ");
                 if (!args.Force)
@@ -110,7 +110,7 @@ namespace Party.CLI.Commands
             {
                 Renderer.Write($"  Downloading...");
                 info = await Controller.InstallPackageAsync(info, args.Force);
-                Renderer.WriteLine($"  installed in {info.InstallFolder}:", ConsoleColor.Green);
+                Renderer.WriteLine($"  installed in {info.PackageFolder}:", ConsoleColor.Green);
                 PrintInstalledFiles(info);
             }
         }

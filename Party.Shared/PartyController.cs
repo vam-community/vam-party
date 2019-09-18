@@ -83,10 +83,10 @@ namespace Party.Shared
                 .Search(registry, query);
         }
 
-        public Task<LocalPackageInfo> GetInstalledPackageInfoAsync(RegistryPackage package, RegistryPackageVersion version)
+        public Task<LocalPackageInfo> GetInstalledPackageInfoAsync(RegistryPackageVersionContext context)
         {
             return new PackageStatusHandler(_fs, _folders)
-                .GetInstalledPackageInfoAsync(package, version);
+                .GetInstalledPackageInfoAsync(context);
         }
 
         public Task<LocalPackageInfo> InstallPackageAsync(LocalPackageInfo info, bool force)
@@ -189,7 +189,7 @@ namespace Party.Shared
         Task<SortedSet<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string path, DirectoryInfo saves);
         Task<SortedSet<RegistryFile>> BuildRegistryFilesFromUrlAsync(Registry registry, Uri url);
         IEnumerable<SearchResult> Search(Registry registry, string query);
-        Task<LocalPackageInfo> GetInstalledPackageInfoAsync(RegistryPackage package, RegistryPackageVersion version);
+        Task<LocalPackageInfo> GetInstalledPackageInfoAsync(RegistryPackageVersionContext context);
         Task<LocalPackageInfo> InstallPackageAsync(LocalPackageInfo info, bool force);
         RegistrySavesMatches MatchSavesToRegistry(SavesMap saves, Registry registry);
         Task<(string before, string after)[]> UpdateScriptInSceneAsync(LocalSceneFile scene, LocalScriptFile local, LocalPackageInfo info);

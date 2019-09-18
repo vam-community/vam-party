@@ -7,7 +7,6 @@ namespace Party.Shared.Models.Registries
     {
         // TODO: Ensure this only contains valid characters
         public string Filename { get; set; }
-        public string LocalPath { get; set; }
         public string Url { get; set; }
         public RegistryHash Hash { get; set; }
         public bool Ignore { get; set; }
@@ -20,7 +19,7 @@ namespace Party.Shared.Models.Registries
                 return 1;
             else if (thisSlashes < otherSlashes)
                 return -1;
-            return (Filename ?? LocalPath)?.CompareTo(other.Filename ?? other.LocalPath) ?? 0;
+            return Filename?.CompareTo(other.Filename) ?? 0;
         }
 
         int IComparable.CompareTo(object obj)

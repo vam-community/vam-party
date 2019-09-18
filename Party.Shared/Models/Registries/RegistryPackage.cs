@@ -36,6 +36,11 @@ namespace Party.Shared.Models.Registries
             return version;
         }
 
+        public override string ToString()
+        {
+            return $"{Type.ToString().ToLowerInvariant()}/{Name}";
+        }
+
         int IComparable<RegistryPackage>.CompareTo(RegistryPackage other)
         {
             return Name?.CompareTo(other.Name) ?? 0;

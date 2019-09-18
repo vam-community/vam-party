@@ -8,6 +8,7 @@ namespace Party.Shared.Models.Registries
         Scenes,
         Textures,
         Assets,
-        Morphs
+        FemaleMorphs,
+        MaleMorphs
     }
 }

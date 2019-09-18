@@ -30,7 +30,7 @@ namespace Party.Shared
                                 Value = "SOMEHASH"
                             }
                         },
-                        Path = @"C:\VaM\Saves\party\some-package\1.0.0\My Script.cs"
+                        FullPath = @"C:\VaM\Saves\party\some-package\1.0.0\My Script.cs"
                     }
                 }
             };

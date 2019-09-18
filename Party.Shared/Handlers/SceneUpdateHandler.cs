@@ -49,7 +49,7 @@ namespace Party.Shared.Handlers
 
         private IEnumerable<(string before, string after)> GetTransform(LocalScriptFile local, LocalPackageInfo info)
         {
-            var after = ToRelative(info.Files.First(f => f.RegistryFile.Hash.Value == local.Hash).Path);
+            var after = ToRelative(info.Files.First(f => f.RegistryFile.Hash.Value == local.Hash).FullPath);
             yield return (before: ToRelative(local.FullPath), after);
             yield return (before: Path.GetFileName(local.FullPath), after);
         }

@@ -27,14 +27,14 @@ namespace Party.Shared.Handlers
             var files = new List<InstalledFileInfo>();
             foreach (var file in info.Files.Where(f => !f.RegistryFile.Ignore))
             {
-                var directory = Path.GetDirectoryName(file.Path);
+                var directory = Path.GetDirectoryName(file.FullPath);
                 if (!_fs.Directory.Exists(directory))
                 {
                     Directory.CreateDirectory(directory);
                 }
                 var fileResult = new InstalledFileInfo
                 {
-                    Path = file.Path,
+                    FullPath = file.FullPath,
                     RegistryFile = file.RegistryFile
                 };
                 using var response = await _http.GetAsync(file.RegistryFile.Url).ConfigureAwait(false);
@@ -46,13 +46,13 @@ namespace Party.Shared.Handlers
                 {
                     throw new PackageInstallationException($"Hash mismatch between registry file '{file.RegistryFile.Filename}' ({file.RegistryFile.Hash.Value}) and downloaded file '{file.RegistryFile.Url}' ({hash})");
                 }
-                _fs.File.WriteAllText(file.Path, content);
+                _fs.File.WriteAllText(file.FullPath, content);
                 fileResult.Status = FileStatus.Installed;
                 files.Add(fileResult);
             }
             return new LocalPackageInfo
             {
-                InstallFolder = info.InstallFolder,
+                PackageFolder = info.PackageFolder,
                 Files = files.ToArray()
             };
         }
