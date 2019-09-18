@@ -46,6 +46,7 @@ namespace Party.CLI
             var result = await _program.Execute(new[] { "show", "scripts/cool-thing" });
 
             Assert.That(GetOutput(), Is.EqualTo(new[]{
+                "Party, a Virt-A-Mate package manager, is still in it's early stages. Please file any issue or ideas at https://github.com/vam-community/vam-party/issues",
                 "Package scripts/cool-thing",
                 $"Last version v1.2.3, published {created.ToLocalTime().ToString("D")}",
                 "Versions:",
@@ -108,6 +109,7 @@ namespace Party.CLI
             var result = await _program.Execute(new[] { "show", "scripts/cool-thing" });
 
             Assert.That(GetOutput(), Is.EqualTo(new[]{
+                "Party, a Virt-A-Mate package manager, is still in it's early stages. Please file any issue or ideas at https://github.com/vam-community/vam-party/issues",
                 "Package scripts/cool-thing",
                 $"Last version v1.2.3, published {created.ToLocalTime().ToString("D")}",
                 "Versions:",

@@ -1,4 +1,5 @@
-﻿using System.CommandLine;
+﻿using System;
+using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.Linq;
 using System.Threading.Tasks;
@@ -61,7 +62,9 @@ namespace Party.CLI.Commands
 
             if (installedStatus.Installed && !args.Force)
             {
-                throw new UserInputException($"Plugin already installed at {installedStatus.PackageFolder}");
+                Renderer.WriteLine($"Plugin already installed at {installedStatus.PackageFolder}", ConsoleColor.Red);
+                PrintInstalledFiles(installedStatus);
+                return;
             }
             if (installedStatus.Installable || args.Force)
             {

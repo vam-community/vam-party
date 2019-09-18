@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Party.Shared;
 using Party.Shared.Exceptions;
 using Party.Shared.Models;
+using Party.Shared.Models.Local;
 using Party.Shared.Models.Registries;
 
 namespace Party.CLI.Commands
@@ -20,6 +21,7 @@ namespace Party.CLI.Commands
             command.AddOption(new Option("--all", "Upgrade everything"));
             command.AddOption(new Option("--warnings", "Show warnings such as broken scenes or missing scripts"));
             command.AddOption(new Option("--noop", "Prints what the script will do, but won't actually do anything"));
+            command.AddOption(new Option("--delete-unused", "Deletes unused scripts"));
             command.AddOption(new Option("--verbose", "Prints every change that will be done on every scene"));
 
             command.Handler = CommandHandler.Create<CleanArguments>(async args =>
@@ -34,6 +36,7 @@ namespace Party.CLI.Commands
             public string Filter { get; set; }
             public bool All { get; set; }
             public bool Warnings { get; set; }
+            public bool DeleteUnused { get; set; }
             public bool Noop { get; set; }
             public bool Verbose { get; set; }
         }
@@ -61,6 +64,37 @@ namespace Party.CLI.Commands
             {
                 await HandleOne(match, args);
             }
+
+            if (args.DeleteUnused)
+            {
+                Renderer.WriteLine("Cleaning up unused scripts...");
+                saves = await GetSavesAsync(args.Filter);
+                foreach (var script in saves.Scripts.Where(s => s.Scenes != null && s.Scenes.Count > 0))
+                {
+                    if (script is LocalScriptListFile scriptList && scriptList.Scripts != null)
+                    {
+                        foreach (var subscript in scriptList.Scripts)
+                        {
+                            DeleteScript(args, subscript);
+                        }
+                    }
+
+                    DeleteScript(args, script);
+                }
+            }
+        }
+
+        private void DeleteScript(CleanArguments args, LocalScriptFile subscript)
+        {
+            if (args.Noop)
+            {
+                Renderer.WriteLine($"Skipping deleting because --noop was specified: {Controller.GetDisplayPath(subscript.FullPath)}", ConsoleColor.Yellow);
+            }
+            else
+            {
+                Renderer.WriteLine($"Deleting {Controller.GetDisplayPath(subscript.FullPath)}");
+                Controller.Delete(subscript.FullPath);
+            }
         }
 
         private async Task HandleOne(RegistrySavesMatch match, CleanArguments args)
@@ -84,12 +118,21 @@ namespace Party.CLI.Commands
             if (info.Installed)
             {
                 Renderer.WriteLine("  Already in the correct location");
-                return;
             }
             else if (!info.Installable)
             {
                 Renderer.WriteLine("  Skipped because the plugin is not installable.");
                 return;
+            }
+            else
+            {
+                // TODO: It's already installed, we should just move the files
+                info = await Controller.InstallPackageAsync(info, true);
+                if (!info.Installed)
+                {
+                    Renderer.WriteLine($"  Failed to install package: {string.Join(", ", info.Files.Select(f => $"{Controller.GetDisplayPath(f.FullPath)}: {f.Status}"))}", ConsoleColor.Red);
+                    return;
+                }
             }
 
             Renderer.Write("  Script should bet at ", ConsoleColor.DarkGray);

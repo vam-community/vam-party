@@ -50,6 +50,28 @@ namespace Party.CLI.Commands
             public bool Force { get; set; }
         }
 
+        protected async Task<SavesMap> GetSavesAsync(string filter = null)
+        {
+            // NOTE: When specifying --noop to status, it puts --noop in a filter, and returns nothing. Try to avoid that, or at least specify why nothing has been returned?
+            // TODO: This should be done in the Controller
+
+            Renderer.WriteLine("Analyzing the saves folder and gettings the packages list from the registry, please wait...");
+
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            SavesMap saves;
+            using (var reporter = new ProgressReporter<GetSavesProgress>(StartProgress, ReportProgress, CompleteProgress))
+            {
+                saves = await Controller.GetSavesAsync(filter, reporter).ConfigureAwait(false);
+            }
+            var elapsed = stopwatch.Elapsed;
+            stopwatch.Stop();
+
+            Renderer.WriteLine($"Scanned {saves.Scenes?.Length ?? 0} scenes and {saves.Scripts?.Length ?? 0} scripts in {elapsed.TotalSeconds:0.00}s");
+
+            return saves;
+        }
+
         protected async Task<(SavesMap, Registry)> GetSavesAndRegistryAsync(string filter = null)
         {
             // NOTE: When specifying --noop to status, it puts --noop in a filter, and returns nothing. Try to avoid that, or at least specify why nothing has been returned?

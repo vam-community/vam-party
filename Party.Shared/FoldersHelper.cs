@@ -60,6 +60,7 @@ namespace Party.Shared
 
 public interface IFoldersHelper
 {
+    string GetDirectory(RegistryPackageVersionContext context);
     string GetDirectory(RegistryPackageType type);
     string RelativeToVam(string filename);
 }

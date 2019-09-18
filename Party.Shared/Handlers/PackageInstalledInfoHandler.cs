@@ -25,7 +25,7 @@ namespace Party.Shared.Handlers
         public async Task<LocalPackageInfo> GetInstalledPackageInfoAsync(RegistryPackageVersionContext context)
         {
             var (registry, package, version) = context;
-            var packagePath = _folders.GetDirectory(package.Type);
+            var packagePath = _folders.GetDirectory(context);
             var files = new List<InstalledFileInfo>();
 
             foreach (var file in version.Files.Where(f => !f.Ignore && f.Filename != null))

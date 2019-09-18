@@ -38,7 +38,14 @@ namespace Party.Shared.Handlers
                     RegistryFile = file.RegistryFile
                 };
                 using var response = await _http.GetAsync(file.RegistryFile.Url).ConfigureAwait(false);
-                response.EnsureSuccessStatusCode();
+                try
+                {
+                    response.EnsureSuccessStatusCode();
+                }
+                catch (Exception exc)
+                {
+                    throw new RegistryException($"Failed to download file from {file.RegistryFile.Url}", exc);
+                }
                 var content = await response.Content.ReadAsStringAsync();
                 var lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
                 var hash = Hashing.GetHash(lines);
@@ -53,7 +60,10 @@ namespace Party.Shared.Handlers
             return new LocalPackageInfo
             {
                 PackageFolder = info.PackageFolder,
-                Files = files.ToArray()
+                Files = files.ToArray(),
+                Installable = true,
+                Installed = true,
+                Corrupted = false
             };
         }
     }
