@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Party.Shared.Exceptions;
 using Party.Shared.Models.Registries;
+using Party.Shared.Serializers;
 
 namespace Party.Shared.Handlers
 {
@@ -14,11 +15,13 @@ namespace Party.Shared.Handlers
     {
         private readonly HttpClient _http;
         private readonly string[] _urls;
+        private readonly IRegistrySerializer _serializer;
 
-        public RegistryHandler(HttpClient http, string[] urls)
+        public RegistryHandler(HttpClient http, string[] urls, IRegistrySerializer serializer)
         {
             _http = http ?? throw new ArgumentNullException(nameof(http));
             _urls = urls ?? throw new ArgumentNullException(nameof(urls));
+            _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
         }
         public async Task<Registry> AcquireAsync(string[] registries)
         {
@@ -68,24 +71,21 @@ namespace Party.Shared.Handlers
             {
                 using var response = await _http.GetAsync(url).ConfigureAwait(false);
                 response.EnsureSuccessStatusCode();
-                using var streamReader = new StreamReader(await response.Content.ReadAsStreamAsync().ConfigureAwait(false));
-                return Deserialize(url, streamReader);
+                using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                return Deserialize(url, stream);
             }
             else
             {
                 using var fileStream = File.OpenRead(Path.Combine(AppContext.BaseDirectory, url));
-                using var streamReader = new StreamReader(fileStream);
-                return Deserialize(url, streamReader);
+                return Deserialize(url, fileStream);
             }
         }
 
-        private Registry Deserialize(string url, StreamReader streamReader)
+        private Registry Deserialize(string url, Stream stream)
         {
-            using var jsonTestReader = new JsonTextReader(streamReader);
-            var jsonSerializer = new JsonSerializer();
             try
             {
-                return jsonSerializer.Deserialize<Registry>(jsonTestReader);
+                return _serializer.Deserialize(stream);
             }
             catch (Exception exc)
             {

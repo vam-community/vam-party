@@ -7,6 +7,8 @@
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <RootNamespace>Party.CLI</RootNamespace>
+    <RuntimeIdentifier>win10-x64</RuntimeIdentifier>
+    <LangVersion Condition="'$(PartyBuildMode)' == 'Normal'">preview</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

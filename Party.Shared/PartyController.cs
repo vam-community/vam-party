@@ -49,7 +49,7 @@ namespace Party.Shared
 
         public Task<Registry> GetRegistryAsync(params string[] registries)
         {
-            return new RegistryHandler(_http, _config.Registry.Urls)
+            return new RegistryHandler(_http, _config.Registry.Urls, new RegistrySerializer())
                 .AcquireAsync(registries);
         }
 
