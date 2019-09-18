@@ -34,16 +34,19 @@ namespace Party.Shared.Handlers
                     files.Add(await GetPackageFileInfo(packagePath, file).ConfigureAwait(false));
             }
             // TODO: Handle deep dependencies
-            foreach (var dependency in version.Dependencies)
+            if (version.Dependencies != null)
             {
-                if (!registry.TryGetDependency(dependency, out var depContext))
-                    throw new RegistryException($"Could not find dependency {dependency}");
-                var depPath = _folders.GetDirectory(depContext.Package.Type);
-                var depFiles = dependency.Files != null && dependency.Files.Count > 0
-                    ? dependency.Files.Select(df => depContext.Version.Files.FirstOrDefault(vf => df == vf.Filename) ?? throw new RegistryException($"Could not find dependency file '{df}' in package '{depContext.Package}@{depContext.Version.Version}'"))
-                    : depContext.Version.Files;
-                foreach (var depFile in depFiles)
-                    files.Add(await GetPackageFileInfo(depPath, depFile).ConfigureAwait(false));
+                foreach (var dependency in version.Dependencies)
+                {
+                    if (!registry.TryGetDependency(dependency, out var depContext))
+                        throw new RegistryException($"Could not find dependency {dependency}");
+                    var depPath = _folders.GetDirectory(depContext.Package.Type);
+                    var depFiles = dependency.Files != null && dependency.Files.Count > 0
+                        ? dependency.Files.Select(df => depContext.Version.Files.FirstOrDefault(vf => df == vf.Filename) ?? throw new RegistryException($"Could not find dependency file '{df}' in package '{depContext.Package}@{depContext.Version.Version}'"))
+                        : depContext.Version.Files;
+                    foreach (var depFile in depFiles)
+                        files.Add(await GetPackageFileInfo(depPath, depFile).ConfigureAwait(false));
+                }
             }
 
             return new LocalPackageInfo

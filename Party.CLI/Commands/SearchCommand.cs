@@ -45,6 +45,8 @@ namespace Party.CLI.Commands
                 var package = result.Package;
                 var latestVersion = package.GetLatestVersion();
 
+                Renderer.Write(package.Type.ToString().ToLowerInvariant(), ConsoleColor.Gray);
+                Renderer.Write("/", ConsoleColor.DarkGray);
                 Renderer.Write(package.Name, ConsoleColor.Blue);
                 Renderer.Write($" v{latestVersion.Version}", ConsoleColor.Cyan);
                 Renderer.Write($" by ");
