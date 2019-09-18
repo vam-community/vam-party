@@ -216,6 +216,8 @@ namespace Party.Shared.Handlers
                     {
                         // TODO: This has possible race conditions, but only if more than one scene in filters
                         scriptRef = await LoadScript(fullPath).ConfigureAwait(false);
+                        scene.References(scriptRef);
+                        scriptRef.ReferencedBy(scene);
                         if (scriptRef.Status > LocalFileErrorLevel.None)
                         {
                             scene.AddError($"Script does not exist or is invalid: '{fullPath}'", LocalFileErrorLevel.Warning);
@@ -223,8 +225,6 @@ namespace Party.Shared.Handlers
                         else
                         {
                             scripts.TryAdd(fullPath, scriptRef);
-                            scene.References(scriptRef);
-                            scriptRef.ReferencedBy(scene);
                         }
                     }
                     else
@@ -235,7 +235,7 @@ namespace Party.Shared.Handlers
             }
             catch (Exception exc)
             {
-                scene.AddError(exc.Message, LocalFileErrorLevel.Error);
+                scene.AddError(exc.ToString(), LocalFileErrorLevel.Error);
             }
             return scene;
         }

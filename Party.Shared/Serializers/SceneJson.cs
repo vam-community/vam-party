@@ -23,17 +23,24 @@ namespace Party.Shared.Serializers
     public class AtomJson : IAtomJson
     {
         private readonly JToken _json;
-        public ICollection<IPluginJson> Plugins { get; }
+        public IEnumerable<IPluginJson> Plugins
+        {
+            get
+            {
+                if (!(_json["storables"] is JArray storablesJson))
+                    return new PluginJson[0];
+                var pluginsManager = storablesJson.FirstOrDefault(s => (string)s["id"] == "PluginManager");
+                if (!(pluginsManager != null && pluginsManager is JObject pluginsManagerObj))
+                    return new PluginJson[0];
+                if (!(pluginsManagerObj["plugins"] is JObject pluginsObj))
+                    return new PluginJson[0];
+                return pluginsObj.Properties().Select(plugin => new PluginJson(plugin)).Where(plugin => plugin.Path != null);
+            }
+        }
 
         public AtomJson(JToken json)
         {
             _json = json ?? throw new ArgumentNullException(nameof(json));
-            Plugins = (((_json["storables"] as JArray)?.FirstOrDefault(storable => (string)storable["id"] == "PluginManager") as JObject)?["plugins"] as JObject)
-                .Properties()
-                .Select(plugin => new PluginJson(plugin))
-                .Where(plugin => plugin?.Path != null)
-                .ToList<IPluginJson>()
-                ?? new List<IPluginJson>();
         }
     }
 
@@ -60,7 +67,7 @@ namespace Party.Shared.Serializers
 
     public interface IAtomJson
     {
-        public ICollection<IPluginJson> Plugins { get; }
+        public IEnumerable<IPluginJson> Plugins { get; }
     }
 
     public interface IPluginJson

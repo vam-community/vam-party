@@ -17,7 +17,7 @@ namespace Party.Shared
 
     internal class AtomJsonMock : IAtomJson
     {
-        public ICollection<IPluginJson> Plugins { get; }
+        public IEnumerable<IPluginJson> Plugins { get; }
 
         public AtomJsonMock(params PluginJsonMock[] plugins)
         {

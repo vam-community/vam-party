@@ -47,4 +47,3 @@ If you want to take on an idea, please [create an issue](https://github.com/vam-
 - Cache results (based on last modified date, i.e. a simple json file with the last results, remember to clear old entries on reload)
 - The saves/registry match should simply return a table with a match type field, not three lists
 - Review all controller namings, and move as much logic as possible out of commands (worst case provide a controller that handles steps)
-- Support fixed paths (bring back local files from previous commit)
