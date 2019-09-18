@@ -23,6 +23,7 @@ namespace Party.CLI.Commands
             command.AddOption(new Option("--package-name", "The name of your package") { Argument = new Argument<string>() });
             command.AddOption(new Option("--package-version", "The version of your package") { Argument = new Argument<string>() });
             command.AddOption(new Option("--package-author", "The author name of your package") { Argument = new Argument<string>() });
+            command.AddOption(new Option("--package-version-download-url", "The url to download this version") { Argument = new Argument<string>() });
             command.AddOption(new Option("--registry", "Path the the index.json file of your locally cloned registry") { Argument = new Argument<FileInfo>().ExistingOnly() });
             command.AddOption(new Option("--saves", "Specify a custom saves folder, e.g. when the script is not in the Virt-A-Mate folder") { Argument = new Argument<DirectoryInfo>().ExistingOnly() });
             command.AddOption(new Option("--quiet", "Just print the hash and metadata, no questions asked"));
@@ -40,6 +41,7 @@ namespace Party.CLI.Commands
             public string PackageName { get; set; }
             public string PackageVersion { get; set; }
             public string PackageAuthor { get; set; }
+            public string PackageVersionDownloadUrl { get; set; }
             public FileInfo Registry { get; set; }
             public DirectoryInfo Saves { get; set; }
             public bool Quiet { get; set; }
@@ -121,6 +123,7 @@ namespace Party.CLI.Commands
 
             version.Created = DateTimeOffset.Now;
             version.Version = args.PackageVersion ?? (args.Quiet ? "1.0.0" : Renderer.Ask("Package version: ", true, RegistryPackageVersion.ValidVersionNameRegex, "1.0.0"));
+            version.DownloadUrl = args.PackageVersionDownloadUrl ?? (args.Quiet ? null : Renderer.Ask("Package Download Url: "));
 
             if (!args.Quiet && !isNew)
             {

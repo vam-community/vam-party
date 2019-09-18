@@ -66,6 +66,8 @@ namespace Party.CLI.Commands
             foreach (var version in package.Versions)
             {
                 Renderer.WriteLine($"- v{version.Version}, published {version.Created.ToLocalTime().ToString("D")}: {version.Notes ?? "(no release notes)"}");
+                if (version.DownloadUrl != null)
+                    Renderer.WriteLine($"  Download: {version.DownloadUrl}");
             }
 
             if (package.Description != null)

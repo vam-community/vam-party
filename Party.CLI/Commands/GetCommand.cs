@@ -86,7 +86,7 @@ namespace Party.CLI.Commands
             }
             else
             {
-                Renderer.WriteLine($"Some files are not available for download or invalid, you can instead download it at {package.Homepage ?? package.Repository ?? "(no link provided)"}");
+                Renderer.WriteLine($"Some files are not available for download or invalid, you can instead download it at {version.DownloadUrl ?? package.Homepage ?? package.Repository ?? "(no link provided)"}");
                 PrintInstalledFiles(installedStatus);
                 return;
             }

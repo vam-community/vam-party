@@ -12,6 +12,7 @@ namespace Party.Shared.Models.Registries
 
         public RegistryVersionString Version { get; set; }
         public DateTimeOffset Created { get; set; }
+        public string DownloadUrl { get; set; }
         public string Notes { get; set; }
         public SortedSet<RegistryPackageDependency> Dependencies { get; set; }
         public SortedSet<RegistryFile> Files { get => _files ?? (_files = new SortedSet<RegistryFile>()); set => _files = value; }

@@ -150,6 +150,7 @@ Options:
 - `--package-name` the name of the package (lowercase, underscore, hyphen and numbers only)
 - `--package-author` the author name (allows spaces)
 - `--package-version` the version of the package to publish, either in the format `0.0.0` or `0.0.0-suffix`.
+- `--package-version-download-url` A direct download link to the specific version (will fallback to the package homepage otherwise).
 - `--saves` allows specifying another saves folder, e.g. when publishing scripts from the vam-packages folder
 - `--quiet` chooses defaults for every option (e.g. when you just want to get the json output)
 

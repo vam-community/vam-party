@@ -95,7 +95,7 @@ namespace Party.CLI.Commands
             if (!args.Force && (info.Corrupted || !info.Installable))
             {
                 Renderer.WriteLine("  Cannot upgrade because at least one file is either broken or not installable.");
-                Renderer.WriteLine($"  You can instead download it at {match.Remote.Package.Homepage ?? match.Remote.Package.Repository ?? "(no link provided)"}");
+                Renderer.WriteLine($"  You can instead download it at {match.Remote.Version.DownloadUrl ?? match.Remote.Package.Homepage ?? match.Remote.Package.Repository ?? "(no link provided)"}");
                 Renderer.WriteLine("  Files:");
                 PrintInstalledFiles(info, "  ");
                 if (!args.Force)
