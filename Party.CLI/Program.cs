@@ -96,6 +96,8 @@ namespace Party.CLI
                 .CancelOnProcessTermination()
                 .Build();
 
+            _renderer.WriteLine("Party, a Virt-A-Mate package manager, is still in it's early stages. Please file any issue or ideas at https://github.com/vam-community/vam-party/issues", ConsoleColor.Green);
+
             try
             {
                 await parser.InvokeAsync(args, _renderer);
