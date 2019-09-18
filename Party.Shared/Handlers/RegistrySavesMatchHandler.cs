@@ -49,7 +49,7 @@ namespace Party.Shared.Handlers
 
                 if (script is LocalScriptListFile scriptList)
                 {
-                    if (!scriptList.Scripts.All(s => remote.Version.Files.Any(f => s.Hash == f.Hash.Value)))
+                    if (!scriptList.Scripts.All(s => remote.Version.Files.Any(f => s.FileName != null && s.Hash == f.Hash?.Value)))
                         continue;
                 }
 
