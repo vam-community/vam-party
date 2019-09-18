@@ -42,8 +42,10 @@
 
   <ItemGroup>
     <None Include="party.settings.json" CopyToOutputDirectory="Always" />
-    <None Include="party.settings.dev.json" CopyToOutputDirectory="Always" />
-    <ExcludeFromPackageFiles Include="party.settings.dev.json" /> 
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <None Include="party.settings.dev.json" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
   <PropertyGroup>
