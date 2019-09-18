@@ -180,7 +180,7 @@ namespace Party.CLI.Commands
                     if (baseUrl != null)
                     {
                         var fileUrl = $"{baseUrl}{file.Filename.Replace(" ", "%20")}";
-                        file.Url = Renderer.Ask($"{file.Filename} URL ({fileUrl}): ") ?? fileUrl;
+                        file.Url = Renderer.Ask($"{file.Filename} URL ({fileUrl}): ", false) ?? fileUrl;
                     }
                     else
                     {

@@ -1,10 +1,13 @@
 using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Party.Shared.Models.Registries
 {
     public class RegistryFile : IComparable<RegistryFile>, IComparable
     {
+        public static readonly Regex ValidFilename = new Regex(@"^\/?([^\/:""*?|<>\.]+\/)*([^\/:""*?|<>\.]+\.)+[a-z]+$", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+
         // TODO: Ensure this only contains valid characters
         public string Filename { get; set; }
         public string Url { get; set; }
@@ -13,6 +16,9 @@ namespace Party.Shared.Models.Registries
 
         int IComparable<RegistryFile>.CompareTo(RegistryFile other)
         {
+            if (Filename == null && other.Filename == null)
+                return 0;
+
             // Anything without a filename is sent down
             if (Filename != null && other.Filename == null)
                 return -1;

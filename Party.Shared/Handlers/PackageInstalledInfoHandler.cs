@@ -11,12 +11,12 @@ using Party.Shared.Utils;
 
 namespace Party.Shared.Handlers
 {
-    public class PackageStatusHandler
+    public class PackageInstalledInfoHandler
     {
         private readonly IFileSystem _fs;
         private readonly IFoldersHelper _folders;
 
-        public PackageStatusHandler(IFileSystem fs, IFoldersHelper folders)
+        public PackageInstalledInfoHandler(IFileSystem fs, IFoldersHelper folders)
         {
             _fs = fs ?? throw new ArgumentNullException(nameof(fs));
             _folders = folders ?? throw new ArgumentNullException(nameof(folders));
@@ -28,10 +28,9 @@ namespace Party.Shared.Handlers
             var packagePath = _folders.GetDirectory(package.Type);
             var files = new List<InstalledFileInfo>();
 
-            foreach (var file in version.Files.Where(f => !f.Ignore))
+            foreach (var file in version.Files.Where(f => !f.Ignore && f.Filename != null))
             {
-                if (file.Filename != null)
-                    files.Add(await GetPackageFileInfo(packagePath, file).ConfigureAwait(false));
+                files.Add(await GetPackageFileInfo(packagePath, file).ConfigureAwait(false));
             }
             // TODO: Handle deep dependencies
             if (version.Dependencies != null)
@@ -61,7 +60,12 @@ namespace Party.Shared.Handlers
 
         private async Task<InstalledFileInfo> GetPackageFileInfo(string packagePath, RegistryFile file)
         {
-            var fullPath = Path.Combine(packagePath, file.Filename);
+            if (RegistryFile.ValidFilename.IsMatch(file.Filename))
+                throw new UnauthorizedAccessException($"Only files relative to the package (file.cs) or to vam (/file.cs) are accepted. Value: '{file.Filename}'");
+            var fullPath = file.Filename.StartsWith("/")
+                ? Path.Combine(_folders.RelativeToVam(packagePath))
+                : Path.Combine(packagePath, file.Filename);
+
             return new InstalledFileInfo
             {
                 FullPath = fullPath,

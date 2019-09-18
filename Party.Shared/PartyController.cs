@@ -120,7 +120,7 @@ namespace Party.Shared
 
         public Task<LocalPackageInfo> GetInstalledPackageInfoAsync(RegistryPackageVersionContext context)
         {
-            return new PackageStatusHandler(_fs, _folders)
+            return new PackageInstalledInfoHandler(_fs, _folders)
                 .GetInstalledPackageInfoAsync(context);
         }
 
