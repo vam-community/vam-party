@@ -13,7 +13,6 @@ namespace Party.Shared.Models.Registries
             Version = version ?? throw new System.ArgumentNullException(nameof(version));
         }
 
-
         public RegistryPackageVersionContext WithVersion(RegistryPackageVersion version)
         {
             return Version == version ? this : new RegistryPackageVersionContext(Registry, Package, version);

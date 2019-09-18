@@ -1,11 +1,1 @@
-{
-  "VirtAMate": {
-    "VirtAMateInstallFolder": "../../../../TestData"
-  },
-  "Registry": {
-    "Urls": [
-      "../../../../TestData/Registry/v1/index.json",
-      "https://raw.githubusercontent.com/vam-community/vam-registry/master/v1/index.json"
-    ]
-  }
-}
+{}

@@ -19,6 +19,7 @@ namespace Party.CLI
             var rootConfig = new ConfigurationBuilder()
                 .SetBasePath(Path.Combine(AppContext.BaseDirectory))
                 .AddJsonFile("party.settings.json", optional: true, reloadOnChange: false)
+                .AddJsonFile("party.settings.dev.json", optional: true, reloadOnChange: false)
                 .Build();
 
             var renderer = new ConsoleRenderer(Console.Out, Console.In, Console.Error, (ConsoleColor color) => Console.ForegroundColor = color, () => Console.ResetColor());

@@ -13,12 +13,27 @@ namespace Party.Shared.Models.Registries
 
         int IComparable<RegistryFile>.CompareTo(RegistryFile other)
         {
+            // Anything with a URL first
+            if (Url != null && other.Url == null)
+                return -1;
+            else if (Url == null && other.Url != null)
+                return 1;
+
+            // Then, anything with at least a hash
+            if (Hash?.Value != null && other.Hash?.Value == null)
+                return -1;
+            else if (Hash?.Value == null && other.Hash?.Value != null)
+                return 1;
+
+            // Start with folders at the root level
             var thisSlashes = Filename?.Count(c => c == '/') ?? 0;
             var otherSlashes = other.Filename?.Count(c => c == '/') ?? 0;
             if (thisSlashes > otherSlashes)
                 return 1;
             else if (thisSlashes < otherSlashes)
                 return -1;
+
+            // Finally sort by filename
             return Filename?.CompareTo(other.Filename) ?? 0;
         }
 
