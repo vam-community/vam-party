@@ -181,12 +181,7 @@
           "created": "0001-01-01",
           "files": [
             {
-              "filename": "Morph 1.dsf",
-              "url": "https://github.com/vam-community/vam-party/raw/3b53f6bd03c9de14549d72af931337875d369fcf/TestData/Import/morphs/female/Morph%201/Morph%201%20A.cs",
-              "hash": {
-                "type": "sha256",
-                "value": "B890546C710C1EA434087F60C9E58792A0FC4004F305C02A9540C052D9CFC23A"
-              }
+              "filename": "Morph 1.dsf"
             }
           ]
         }

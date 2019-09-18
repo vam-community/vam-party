@@ -71,9 +71,11 @@ namespace Party.Shared.Handlers
         {
             if (!_fs.File.Exists(fullPath))
             {
-                return file.Ignore
-                    ? FileStatus.Ignored
-                    : FileStatus.NotInstalled;
+                if (file.Ignore)
+                    return FileStatus.Ignored;
+                if (file.Url == null)
+                    return FileStatus.NotInstallable;
+                return FileStatus.NotInstalled;
             }
 
             if (file.Hash?.Type == null)
