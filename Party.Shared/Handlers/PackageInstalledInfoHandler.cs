@@ -60,7 +60,7 @@ namespace Party.Shared.Handlers
 
         private async Task<InstalledFileInfo> GetPackageFileInfo(string packagePath, RegistryFile file)
         {
-            if (RegistryFile.ValidFilename.IsMatch(file.Filename))
+            if (!RegistryFile.ValidFilename.IsMatch(file.Filename))
                 throw new UnauthorizedAccessException($"Only files relative to the package (file.cs) or to vam (/file.cs) are accepted. Value: '{file.Filename}'");
             var fullPath = file.Filename.StartsWith("/")
                 ? Path.Combine(_folders.RelativeToVam(packagePath))
