@@ -65,6 +65,41 @@ namespace Party.Shared
                     .AnalyzeSaves(filter, reporter);
         }
 
+        public async Task<(SavesMap saves, Registry registry)> GetSavesAndRegistryAsync(string[] registries, string filter, IProgress<GetSavesProgress> reporter)
+        {
+            var isFilterPackage = PackageFullName.TryParsePackage(filter, out var filterPackage);
+            var pathFilter = !isFilterPackage && filter != null ? Path.GetFullPath(filter) : null;
+
+            Task<Registry> registryTask;
+            Task<SavesMap> savesTask;
+            registryTask = GetRegistryAsync(registries);
+            // TODO: If the item is a package (no extension), resolve it to a path (if the plugin was not downloaded, throw)
+            // TODO: When the filter is a scene, mark every script that was not referenced by that scene as not safe for cleanup; also remove them for display
+            savesTask = GetSavesAsync(pathFilter, reporter);
+
+            await Task.WhenAll(registryTask, savesTask).ConfigureAwait(false);
+
+            var registry = await registryTask.ConfigureAwait(false);
+            var saves = await savesTask.ConfigureAwait(false);
+
+            if (isFilterPackage)
+            {
+                var registryPackage = registry.GetPackage(filterPackage);
+                if (registryPackage == null)
+                    throw new RegistryException($"Could not find package '{registryPackage}'");
+                var packageHashes = new HashSet<string>(registryPackage.Versions.SelectMany(v => v.Files).Select(f => f.Hash?.Value).Where(h => h != null).Distinct());
+                saves.Scripts = saves.Scripts.Where(s =>
+                {
+                    if (s is LocalScriptListFile scriptList)
+                        return new[] { scriptList.Hash }.Concat(scriptList.Scripts.Select(c => c.Hash)).All(h => packageHashes.Contains(h));
+                    else
+                        return packageHashes.Contains(s.Hash);
+                }).ToArray();
+            }
+
+            return (saves, registry);
+        }
+
         public Task<SortedSet<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string path, DirectoryInfo saves)
         {
             return new RegistryFilesFromPathHandler(saves?.FullName ?? SavesDirectory, _fs)
@@ -186,6 +221,7 @@ namespace Party.Shared
         void HealthCheck();
         Task<Registry> GetRegistryAsync(params string[] registries);
         Task<SavesMap> GetSavesAsync(string filter, IProgress<GetSavesProgress> reporter);
+        Task<(SavesMap saves, Registry registry)> GetSavesAndRegistryAsync(string[] registries, string filter, IProgress<GetSavesProgress> reporter);
         Task<SortedSet<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string path, DirectoryInfo saves);
         Task<SortedSet<RegistryFile>> BuildRegistryFilesFromUrlAsync(Registry registry, Uri url);
         IEnumerable<SearchResult> Search(Registry registry, string query);

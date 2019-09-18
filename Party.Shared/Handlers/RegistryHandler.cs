@@ -25,7 +25,7 @@ namespace Party.Shared.Handlers
         }
         public async Task<Registry> AcquireAsync(string[] registries)
         {
-            var urls = registries.Length > 0 ? registries : _urls;
+            var urls = (registries != null && registries.Length > 0) ? registries : _urls;
             if (urls.Length == 0)
             {
                 throw new ConfigurationException("At least one registry must be configured");

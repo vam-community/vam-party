@@ -139,7 +139,8 @@ namespace Party.CLI
                             .Split(new[] { '\r', '\n' })
                             .Where(line => !string.IsNullOrWhiteSpace(line))
                             .Where(line => line != "--- End of stack trace from previous location where exception was thrown ---")
-                            .Where(line => !line.StartsWith("   at System.CommandLine."))));
+                            .Where(line => !line.StartsWith("   at System.CommandLine."))
+                            .Where(line => !line.StartsWith("   at System.Runtime."))));
                 return 1;
             }
         }

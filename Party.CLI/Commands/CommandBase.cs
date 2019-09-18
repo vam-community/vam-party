@@ -57,47 +57,18 @@ namespace Party.CLI.Commands
 
             Renderer.WriteLine("Analyzing the saves folder and gettings the packages list from the registry, please wait...");
 
-            var isFilterPackage = PackageFullName.TryParsePackage(filter, out var filterPackage);
-            var pathFilter = !isFilterPackage && filter != null ? Path.GetFullPath(filter) : null;
-
-            Task<(Registry, TimeSpan)> registryTask;
-            Task<(SavesMap, TimeSpan)> savesTask;
-            TimeSpan elapsed;
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            SavesMap saves;
+            Registry registry;
             using (var reporter = new ProgressReporter<GetSavesProgress>(StartProgress, ReportProgress, CompleteProgress))
             {
-                var stopwatch = new Stopwatch();
-                stopwatch.Start();
-                registryTask = Metrics.Measure(() => Controller.GetRegistryAsync());
-                // TODO: If the item is a package (no extension), resolve it to a path (if the plugin was not downloaded, throw)
-                // TODO: When the filter is a scene, mark every script that was not referenced by that scene as not safe for cleanup; also remove them for display
-                savesTask = Metrics.Measure(() => Controller.GetSavesAsync(pathFilter, reporter));
-
-                await Task.WhenAll(registryTask, savesTask);
-
-                elapsed = stopwatch.Elapsed;
-                stopwatch.Stop();
+                (saves, registry) = await Controller.GetSavesAndRegistryAsync(null, filter, reporter).ConfigureAwait(false);
             }
+            var elapsed = stopwatch.Elapsed;
+            stopwatch.Stop();
 
-            var (registry, registryTiming) = await registryTask;
-            var (saves, savesTiming) = await savesTask;
-
-            Renderer.WriteLine($"Scanned {saves.Scenes?.Length ?? 0} scenes and {saves.Scripts?.Length ?? 0} scripts in {savesTiming.TotalSeconds:0.00}s, and downloaded registry in {registryTiming.TotalSeconds:0.00}s. Total wait time: {elapsed.TotalSeconds:0.00}s");
-
-            // TODO: Put in controller
-            if (isFilterPackage)
-            {
-                var registryPackage = registry.GetPackage(filterPackage);
-                if (registryPackage == null)
-                    throw new RegistryException($"Could not find package '{registryPackage}'");
-                var packageHashes = new HashSet<string>(registryPackage.Versions.SelectMany(v => v.Files).Select(f => f.Hash?.Value).Where(h => h != null).Distinct());
-                saves.Scripts = saves.Scripts.Where(s =>
-                {
-                    if (s is LocalScriptListFile scriptList)
-                        return new[] { scriptList.Hash }.Concat(scriptList.Scripts.Select(c => c.Hash)).All(h => packageHashes.Contains(h));
-                    else
-                        return packageHashes.Contains(s.Hash);
-                }).ToArray();
-            }
+            Renderer.WriteLine($"Scanned {saves.Scenes?.Length ?? 0} scenes, {saves.Scripts?.Length ?? 0} scripts and downloaded registry in {elapsed.TotalSeconds:0.00}s");
 
             return (saves, registry);
         }
