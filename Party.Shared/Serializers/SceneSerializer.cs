@@ -13,7 +13,7 @@ namespace Party.Shared.Serializers
     public class SceneSerializer : ISceneSerializer
     {
         private static readonly Regex _findScriptsFastRegex = new Regex(
-            "\"plugin#[0-9]+\" ?: ?\"(?<path>[^\"]+)\"",
+            "\"plugin#[0-9]{1,3}\" ?: ?\"(?<path>[^\"]{4,512})\"",
             RegexOptions.Compiled | RegexOptions.Multiline,
             TimeSpan.FromSeconds(5));
 
