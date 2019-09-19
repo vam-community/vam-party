@@ -170,12 +170,12 @@ namespace Party.CLI.Commands
             }
         }
 
-        protected void PrintScriptToPackage(RegistrySavesMatch match, RegistryPackageVersion latestVersion)
+        protected void PrintScriptToPackage(RegistrySavesMatch match, RegistryPackageVersion latestCompatVersion, RegistryPackageVersion latestVersion)
         {
-            PrintScriptToPackage(match.Remote, latestVersion, match.Local);
+            PrintScriptToPackage(match.Remote, latestCompatVersion, latestVersion, match.Local);
         }
 
-        protected void PrintScriptToPackage(RegistryPackageFileContext context, RegistryPackageVersion latestVersion, LocalScriptFile local)
+        protected void PrintScriptToPackage(RegistryPackageFileContext context, RegistryPackageVersion latestCompatVersion, RegistryPackageVersion latestVersion, LocalScriptFile local)
         {
             var (_, package, version) = context;
             Renderer.Write($"Script ");
@@ -183,16 +183,28 @@ namespace Party.CLI.Commands
             Renderer.Write($" is ");
             Renderer.Write($"{package.Name} v{version.Version}", ConsoleColor.Cyan);
             Renderer.Write($" > ");
-            if (latestVersion == null)
+            if (latestCompatVersion == null && latestVersion == null)
             {
                 Renderer.Write($"already up to date", ConsoleColor.DarkGray);
                 Renderer.WriteLine();
             }
-            else
+            if (latestCompatVersion != null && latestVersion == latestCompatVersion)
             {
-                Renderer.Write($"new version available: v{latestVersion.Version}", ConsoleColor.Magenta);
+                Renderer.Write($"new version available: v{latestCompatVersion.Version}", ConsoleColor.Magenta);
                 Renderer.WriteLine();
-                Renderer.WriteLine($"  Released {latestVersion.Created.ToLocalTime().ToString("D")}: {latestVersion.Notes ?? "No release notes"}");
+                Renderer.WriteLine($"  Released {latestCompatVersion.Created.ToLocalTime().ToString("D")}: {latestCompatVersion.Notes ?? "No release notes"}");
+            }
+            if (latestCompatVersion != null && latestVersion != latestCompatVersion)
+            {
+                Renderer.Write($"new compatible version available: v{latestCompatVersion.Version}, also (v{latestVersion.Version} is out!)", ConsoleColor.Magenta);
+                Renderer.WriteLine();
+                Renderer.WriteLine($"  Released {latestCompatVersion.Created.ToLocalTime().ToString("D")}: {latestCompatVersion.Notes ?? "No release notes"}");
+            }
+            else if (latestVersion != null)
+            {
+                Renderer.Write($"new version available: v{latestVersion.Version} (might be incompatible)", ConsoleColor.Red);
+                Renderer.WriteLine();
+                Renderer.WriteLine($"  Released {latestCompatVersion.Created.ToLocalTime().ToString("D")}: {latestCompatVersion.Notes ?? "No release notes"}");
             }
         }
 

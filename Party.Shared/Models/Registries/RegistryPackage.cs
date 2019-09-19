@@ -24,6 +24,11 @@ namespace Party.Shared.Models.Registries
             return Versions?.FirstOrDefault();
         }
 
+        public RegistryPackageVersion GetLatestVersionCompatibleWith(RegistryVersionString version)
+        {
+            return Versions?.FirstOrDefault(v => v.Version.Major == version.Major);
+        }
+
         public RegistryPackageVersion GetVersion(string version)
         {
             return Versions?.FirstOrDefault(p => p.Version.ToString().Equals(version));

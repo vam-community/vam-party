@@ -65,21 +65,24 @@ namespace Party.CLI.Commands
 
         private async Task HandleOne(RegistrySavesMatch match, UpgradeArguments args)
         {
+            var latestCompatVersion = match.Remote.Package.GetLatestVersionCompatibleWith(match.Remote.Version.Version);
             var latestVersion = match.Remote.Package.GetLatestVersion();
-            var updateToVersion = latestVersion.Version.Equals(match.Remote.Version.Version) ? null : latestVersion;
+            var updateToVersion = args.Force
+                ? (latestVersion.Version.Equals(match.Remote.Version.Version) ? null : latestVersion)
+                : (latestCompatVersion.Version.Equals(match.Remote.Version.Version) ? null : latestCompatVersion);
 
             if (updateToVersion == null)
             {
                 if (args.Verbose)
                 {
-                    PrintScriptToPackage(match, null);
+                    PrintScriptToPackage(match, null, null);
                     PrintScanErrors(args.Errors, match.Local);
                     Renderer.WriteLine($"  Skipping because no updates are available", ConsoleColor.DarkGray);
                 }
                 return;
             }
 
-            PrintScriptToPackage(match, updateToVersion);
+            PrintScriptToPackage(match, updateToVersion, latestVersion);
             PrintScanErrors(args.Errors, match.Local);
 
             var info = await Controller.GetInstalledPackageInfoAsync(match.Remote.WithVersion(updateToVersion ?? match.Remote.Version));

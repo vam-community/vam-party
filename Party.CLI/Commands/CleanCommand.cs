@@ -102,14 +102,14 @@ namespace Party.CLI.Commands
             {
                 if (args.Verbose)
                 {
-                    PrintScriptToPackage(match, null);
+                    PrintScriptToPackage(match, null, null);
                     PrintScanErrors(args.Errors, match.Local);
                     Renderer.WriteLine($"  Skipping because no scenes are using it", ConsoleColor.DarkGray);
                 }
                 return;
             }
 
-            PrintScriptToPackage(match, null);
+            PrintScriptToPackage(match, null, null);
             PrintScanErrors(args.Errors, match.Local);
 
             var info = await Controller.GetInstalledPackageInfoAsync(match.Remote);
