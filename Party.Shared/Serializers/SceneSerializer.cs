@@ -4,26 +4,33 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Party.Shared.Exceptions;
+using Party.Shared.Utils;
 
 namespace Party.Shared.Serializers
 {
     public class SceneSerializer : ISceneSerializer
     {
         private readonly IFileSystem _fs;
+        private readonly Throttler _throttler;
 
-        public SceneSerializer(IFileSystem fs)
+        public SceneSerializer(IFileSystem fs, Throttler throttler)
         {
             _fs = fs ?? throw new ArgumentNullException(nameof(fs));
+            _throttler = throttler ?? throw new ArgumentNullException(nameof(throttler));
         }
 
         public async Task<ISceneJson> Deserialize(string path)
         {
             try
             {
-                using var file = _fs.File.OpenText(path);
-                using var reader = new JsonTextReader(file);
-                var json = (JObject)await JToken.ReadFromAsync(reader).ConfigureAwait(false);
-                return new SceneJson(json);
+                JToken json;
+                using (await _throttler.ThrottleIO().ConfigureAwait(false))
+                {
+                    using var file = _fs.File.OpenText(path);
+                    using var reader = new JsonTextReader(file);
+                    json = await JToken.ReadFromAsync(reader).ConfigureAwait(false);
+                }
+                return new SceneJson((JObject)json);
             }
             catch (JsonReaderException exc)
             {

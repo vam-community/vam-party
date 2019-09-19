@@ -55,7 +55,7 @@ namespace Party.Shared.Handlers
 
         private async Task<SavesMap> AnalyzeSavesByScript(string scriptFile, IProgress<ScanLocalFilesProgress> reporter)
         {
-            var scripts = new ConcurrentDictionary<string, LocalScriptFile>();
+            var scripts = new ConcurrentDictionary<string, LocalScriptFile>(StringComparer.InvariantCultureIgnoreCase);
             var sceneTasks = new Queue<Task<LocalSceneFile>>();
             int scenesCount = 0, scenesCompletedCount = 0;
             void ReportProgress()
@@ -96,7 +96,7 @@ namespace Party.Shared.Handlers
 
         private async Task<SavesMap> AnalyzeSavesByScene(string sceneFile)
         {
-            var scripts = new ConcurrentDictionary<string, LocalScriptFile>();
+            var scripts = new ConcurrentDictionary<string, LocalScriptFile>(StringComparer.InvariantCultureIgnoreCase);
             // TODO: ScriptList handling
             var scene = await LoadScene(scripts, sceneFile, true);
             return new SavesMap
@@ -162,7 +162,10 @@ namespace Party.Shared.Handlers
                 ReportProgress();
             }
 
-            var scripts = new ConcurrentDictionary<string, LocalScriptFile>((await Task.WhenAll(scriptTasks).ConfigureAwait(false)).ToDictionary(x => x.FullPath, x => x));
+            var scripts = new ConcurrentDictionary<string, LocalScriptFile>(
+                (await Task.WhenAll(scriptTasks).ConfigureAwait(false))
+                    .Select(x => new KeyValuePair<string, LocalScriptFile>(x.FullPath, x)),
+                StringComparer.InvariantCultureIgnoreCase);
 
             if (scriptListFiles != null)
             {
@@ -202,7 +205,7 @@ namespace Party.Shared.Handlers
             try
             {
                 var json = await _sceneSerializer.Deserialize(sceneFile).ConfigureAwait(false);
-                foreach (var scriptRefRelativePath in json.Atoms.SelectMany(a => a.Plugins).Select(p => p.Path))
+                foreach (var scriptRefRelativePath in json.Atoms.SelectMany(a => a.Plugins).Select(p => p.Path).Distinct())
                 {
                     var fullPath = scriptRefRelativePath.Contains('/')
                         ? _fs.Path.GetFullPath(scriptRefRelativePath, _vamDirectory)
@@ -211,6 +214,10 @@ namespace Party.Shared.Handlers
                     {
                         scene.References(scriptRef);
                         scriptRef.ReferencedBy(scene);
+                    }
+                    else if (_ignoredPaths.Any(p => fullPath.StartsWith(p)))
+                    {
+                        continue;
                     }
                     else if (shouldTryLoadingReferences)
                     {
@@ -253,6 +260,10 @@ namespace Party.Shared.Handlers
                     {
                         scripts.Remove(fullPath);
                         scriptRefs.Add(scriptRef);
+                    }
+                    else if (_ignoredPaths.Any(p => fullPath.StartsWith(p)))
+                    {
+                        continue;
                     }
                     else if (shouldTryLoadingReferences)
                     {

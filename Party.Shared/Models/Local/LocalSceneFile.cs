@@ -4,7 +4,7 @@ namespace Party.Shared.Models.Local
 {
     public class LocalSceneFile : LocalFile
     {
-        public List<LocalScriptFile> Scripts { get; } = new List<LocalScriptFile>();
+        public HashSet<LocalScriptFile> Scripts { get; } = new HashSet<LocalScriptFile>();
 
         public LocalSceneFile(string fullPath)
             : base(fullPath, null)

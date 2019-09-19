@@ -42,10 +42,8 @@ namespace Party.Shared.Handlers
         {
             foreach (var script in scripts)
             {
-                if (!byHash.TryGetValue(script.Hash, out var remote))
-                {
+                if (script.Hash == null || !byHash.TryGetValue(script.Hash, out var remote))
                     continue;
-                }
 
                 if (script is LocalScriptListFile scriptList)
                 {

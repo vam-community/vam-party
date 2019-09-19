@@ -32,7 +32,7 @@ namespace Party.Shared
         public void Dispose()
         {
             _queue.CompleteAdding();
-            _thread.Join(100);
+            _thread.Join(10000);
             _queue.Dispose();
             _complete();
         }

@@ -141,7 +141,7 @@ namespace Party.CLI.Commands
             Renderer.WriteLine();
         }
 
-        private void PrintScenes(string indent, List<LocalSceneFile> scenes)
+        private void PrintScenes(string indent, IEnumerable<LocalSceneFile> scenes)
         {
             if (scenes == null) return;
             foreach (var scene in scenes)

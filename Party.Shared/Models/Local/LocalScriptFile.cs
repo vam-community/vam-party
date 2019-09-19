@@ -4,7 +4,7 @@ namespace Party.Shared.Models.Local
 {
     public class LocalScriptFile : LocalFile
     {
-        public List<LocalSceneFile> Scenes { get; } = new List<LocalSceneFile>();
+        public HashSet<LocalSceneFile> Scenes { get; } = new HashSet<LocalSceneFile>();
 
         public LocalScriptFile(string fullPath, string hash)
         : base(fullPath, hash)
@@ -13,10 +13,7 @@ namespace Party.Shared.Models.Local
 
         internal void ReferencedBy(LocalSceneFile scene)
         {
-            if (!Scenes.Contains(scene))
-            {
-                Scenes.Add(scene);
-            }
+            Scenes.Add(scene);
         }
     }
 }

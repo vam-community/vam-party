@@ -14,6 +14,7 @@ using Party.Shared.Models;
 using Party.Shared.Models.Local;
 using Party.Shared.Models.Registries;
 using Party.Shared.Serializers;
+using Party.Shared.Utils;
 
 namespace Party.Shared
 {
@@ -22,6 +23,7 @@ namespace Party.Shared
         public bool ChecksEnabled { get; set; }
 
         private static string Version { get; } = typeof(PartyController).Assembly.GetName().Version.ToString();
+        private readonly Throttler _throttler = new Throttler();
         private readonly PartyConfiguration _config;
         private readonly HttpClient _http;
         private readonly IFileSystem _fs;
@@ -57,8 +59,8 @@ namespace Party.Shared
         {
             return new ScanLocalFilesHandler(
                 _fs,
-                new SceneSerializer(_fs),
-                new ScriptListSerializer(_fs),
+                new SceneSerializer(_fs, _throttler),
+                new ScriptListSerializer(_fs, _throttler),
                 _config.VirtAMate.VirtAMateInstallFolder,
                 SavesDirectory,
                 _config.VirtAMate.IgnoredFolders)
@@ -138,7 +140,7 @@ namespace Party.Shared
 
         public Task<(string before, string after)[]> ApplyNormalizedPathsToSceneAsync(LocalSceneFile scene, LocalScriptFile local, LocalPackageInfo info)
         {
-            return new ApplyNormalizedPathsToSceneHandler(new SceneSerializer(_fs), SavesDirectory)
+            return new ApplyNormalizedPathsToSceneHandler(new SceneSerializer(_fs, _throttler), SavesDirectory)
                 .ApplyNormalizedPathsToSceneAsync(scene, local, info);
         }
 
