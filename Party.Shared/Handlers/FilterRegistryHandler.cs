@@ -6,16 +6,16 @@ using Party.Shared.Models.Registries;
 
 namespace Party.Shared.Handlers
 {
-    public class SearchHandler
+    public class FilterRegistryHandler
     {
         private readonly string[] _trustedDomains;
 
-        public SearchHandler(string[] trustedDomains)
+        public FilterRegistryHandler(string[] trustedDomains)
         {
             _trustedDomains = trustedDomains ?? throw new ArgumentNullException(nameof(trustedDomains));
         }
 
-        public IEnumerable<SearchResult> Search(Registry registry, string query)
+        public IEnumerable<SearchResult> FilterRegistry(Registry registry, string query)
         {
             if (registry is null) throw new ArgumentNullException(nameof(registry));
             if (registry?.Packages is null) throw new ArgumentException("registry does not have any scripts", nameof(registry));

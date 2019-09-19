@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
@@ -13,7 +13,7 @@ using Party.Shared.Utils;
 
 namespace Party.Shared
 {
-    public class SavesResolverHandlerTests
+    public class ScanLocalFilesHandlerTests
     {
         [Test]
         public async Task CanIgnoreByExtension()
@@ -24,7 +24,7 @@ namespace Party.Shared
             });
             var handler = Create(fileSystem);
 
-            var result = await handler.AnalyzeSaves(null, new ProgressMock<GetSavesProgress>());
+            var result = await handler.ScanLocalFilesAsync(null, new ProgressMock<ScanLocalFilesProgress>());
 
             PartyAssertions.AreDeepEqual(
                 ResultFactory.SavesMap().Build(),
@@ -41,7 +41,7 @@ namespace Party.Shared
             });
             var handler = Create(fileSystem, new[] { @"C:\VaM\Saves\Ignored" });
 
-            var result = await handler.AnalyzeSaves(null, new ProgressMock<GetSavesProgress>());
+            var result = await handler.ScanLocalFilesAsync(null, new ProgressMock<ScanLocalFilesProgress>());
 
             PartyAssertions.AreDeepEqual(
                 ResultFactory.SavesMap().Build(),
@@ -58,7 +58,7 @@ namespace Party.Shared
             });
             var handler = Create(fileSystem);
 
-            var result = await handler.AnalyzeSaves(null, new ProgressMock<GetSavesProgress>());
+            var result = await handler.ScanLocalFilesAsync(null, new ProgressMock<ScanLocalFilesProgress>());
 
             PartyAssertions.AreDeepEqual(
                 ResultFactory.SavesMap()
@@ -77,7 +77,7 @@ namespace Party.Shared
             });
             var handler = Create(fileSystem);
 
-            var result = await handler.AnalyzeSaves(null, new ProgressMock<GetSavesProgress>());
+            var result = await handler.ScanLocalFilesAsync(null, new ProgressMock<ScanLocalFilesProgress>());
 
             PartyAssertions.AreDeepEqual(
                 ResultFactory.SavesMap()
@@ -97,7 +97,7 @@ namespace Party.Shared
             });
             var handler = Create(fileSystem);
 
-            var result = await handler.AnalyzeSaves(null, new ProgressMock<GetSavesProgress>());
+            var result = await handler.ScanLocalFilesAsync(null, new ProgressMock<ScanLocalFilesProgress>());
 
             AssertNoErrors(result);
             Assert.That(result.Scripts.Select(s => s.FullPath), Is.EquivalentTo(new[] { @"C:\VaM\Saves\Script 1.cs" }));
@@ -116,7 +116,7 @@ namespace Party.Shared
             });
             var handler = Create(fileSystem);
 
-            var result = await handler.AnalyzeSaves(null, new ProgressMock<GetSavesProgress>());
+            var result = await handler.ScanLocalFilesAsync(null, new ProgressMock<ScanLocalFilesProgress>());
 
             AssertNoErrors(result);
             Assert.That(result.Scripts.Select(s => s.FullPath), Is.EquivalentTo(new[] { @"C:\VaM\Saves\Downloads\Scene 1\Script 1.cs" }));
@@ -135,7 +135,7 @@ namespace Party.Shared
             });
             var handler = Create(fileSystem);
 
-            var result = await handler.AnalyzeSaves(null, new ProgressMock<GetSavesProgress>());
+            var result = await handler.ScanLocalFilesAsync(null, new ProgressMock<ScanLocalFilesProgress>());
 
             PartyAssertions.AreDeepEqual(
                 ResultFactory.SavesMap()
@@ -158,7 +158,7 @@ namespace Party.Shared
             });
             var handler = Create(fileSystem);
 
-            var result = await handler.AnalyzeSaves(null, new ProgressMock<GetSavesProgress>());
+            var result = await handler.ScanLocalFilesAsync(null, new ProgressMock<ScanLocalFilesProgress>());
 
             AssertNoErrors(result);
             Assert.That(result.Scripts.Select(s => s.FullPath), Is.EquivalentTo(new[] { @"C:\VaM\Saves\Downloads\Scene 1\Add Me.cslist" }));
@@ -167,9 +167,9 @@ namespace Party.Shared
             Assert.That(result.Scenes.First().Scripts.Select(s => s.FullPath), Is.EquivalentTo(new[] { @"C:\VaM\Saves\Downloads\Scene 1\Add Me.cslist" }));
         }
 
-        private SavesResolverHandler Create(IFileSystem fileSystem, string[] ignoredPaths = null)
+        private ScanLocalFilesHandler Create(IFileSystem fileSystem, string[] ignoredPaths = null)
         {
-            return new SavesResolverHandler(
+            return new ScanLocalFilesHandler(
                 fileSystem,
                 new SceneSerializer(fileSystem),
                 new ScriptListSerializer(fileSystem),

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.Diagnostics;
@@ -7,11 +6,9 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
-using Party.Shared.Exceptions;
 using Party.Shared.Models;
 using Party.Shared.Models.Local;
 using Party.Shared.Models.Registries;
-using Party.Shared.Utils;
 
 namespace Party.CLI.Commands
 {
@@ -50,7 +47,7 @@ namespace Party.CLI.Commands
             public bool Force { get; set; }
         }
 
-        protected async Task<SavesMap> GetSavesAsync(string filter = null)
+        protected async Task<SavesMap> ScanLocalFilesAsync(string filter = null)
         {
             // NOTE: When specifying --noop to status, it puts --noop in a filter, and returns nothing. Try to avoid that, or at least specify why nothing has been returned?
             // TODO: This should be done in the Controller
@@ -60,9 +57,9 @@ namespace Party.CLI.Commands
             var stopwatch = new Stopwatch();
             stopwatch.Start();
             SavesMap saves;
-            using (var reporter = new ProgressReporter<GetSavesProgress>(StartProgress, ReportProgress, CompleteProgress))
+            using (var reporter = new ProgressReporter<ScanLocalFilesProgress>(StartProgress, ReportProgress, CompleteProgress))
             {
-                saves = await Controller.GetSavesAsync(filter, reporter).ConfigureAwait(false);
+                saves = await Controller.ScanLocalFilesAsync(filter, reporter).ConfigureAwait(false);
             }
             var elapsed = stopwatch.Elapsed;
             stopwatch.Stop();
@@ -72,7 +69,7 @@ namespace Party.CLI.Commands
             return saves;
         }
 
-        protected async Task<(SavesMap, Registry)> GetSavesAndRegistryAsync(string filter = null)
+        protected async Task<(SavesMap, Registry)> ScanLocalFilesAndAcquireRegistryAsync(string filter = null)
         {
             // NOTE: When specifying --noop to status, it puts --noop in a filter, and returns nothing. Try to avoid that, or at least specify why nothing has been returned?
             // TODO: This should be done in the Controller
@@ -83,9 +80,9 @@ namespace Party.CLI.Commands
             stopwatch.Start();
             SavesMap saves;
             Registry registry;
-            using (var reporter = new ProgressReporter<GetSavesProgress>(StartProgress, ReportProgress, CompleteProgress))
+            using (var reporter = new ProgressReporter<ScanLocalFilesProgress>(StartProgress, ReportProgress, CompleteProgress))
             {
-                (saves, registry) = await Controller.GetSavesAndRegistryAsync(null, filter, reporter).ConfigureAwait(false);
+                (saves, registry) = await Controller.ScanLocalFilesAndAcquireRegistryAsync(null, filter, reporter).ConfigureAwait(false);
             }
             var elapsed = stopwatch.Elapsed;
             stopwatch.Stop();
@@ -99,6 +96,7 @@ namespace Party.CLI.Commands
         {
             PrintWarnings(details, map.Scripts.Cast<LocalFile>().Concat(map.Scenes).ToArray());
         }
+
         protected void PrintWarnings(bool details, params LocalFile[] files)
         {
             var logs = files?.Where(f => f.Errors != null && f.Errors.Count > 0).SelectMany(f => f.Errors?.Select(e => (f, e))).ToList();
@@ -215,7 +213,7 @@ namespace Party.CLI.Commands
             Console.CursorVisible = false;
         }
 
-        private void ReportProgress(GetSavesProgress progress)
+        private void ReportProgress(ScanLocalFilesProgress progress)
         {
             Renderer.Write($"{progress.Percentage()}% ({progress.Scenes.Analyzed}/{progress.Scenes.ToAnalyze} scenes, {progress.Scripts.Analyzed}/{progress.Scripts.ToAnalyze} scripts)");
             Console.SetCursorPosition(0, Console.CursorTop);

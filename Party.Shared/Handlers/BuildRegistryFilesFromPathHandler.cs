@@ -5,26 +5,25 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared.Exceptions;
-using Party.Shared.Models;
 using Party.Shared.Models.Registries;
 using Party.Shared.Utils;
 
 namespace Party.Shared.Handlers
 {
-    public class RegistryFilesFromPathHandler
+    public class BuildRegistryFilesFromPathHandler
     {
         private const int _maxScripts = 100;
         private static readonly string[] _validFileExtensions = new[] { ".cs", ".cslist" };
         private readonly string _savesDirectory;
         private readonly IFileSystem _fs;
 
-        public RegistryFilesFromPathHandler(string savesDirectory, IFileSystem fs)
+        public BuildRegistryFilesFromPathHandler(string savesDirectory, IFileSystem fs)
         {
             _savesDirectory = savesDirectory ?? throw new ArgumentNullException(nameof(savesDirectory));
             _fs = fs ?? throw new ArgumentNullException(nameof(fs));
         }
 
-        public async Task<SortedSet<RegistryFile>> BuildFiles(Registry registry, string path)
+        public async Task<SortedSet<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string path)
         {
             if (registry is null) throw new ArgumentNullException(nameof(registry));
             if (path is null) throw new ArgumentNullException(nameof(path));

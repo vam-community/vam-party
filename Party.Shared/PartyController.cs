@@ -25,7 +25,7 @@ namespace Party.Shared
         private readonly PartyConfiguration _config;
         private readonly HttpClient _http;
         private readonly IFileSystem _fs;
-        private IFoldersHelper _folders;
+        private readonly IFoldersHelper _folders;
 
         private string SavesDirectory => Path.Combine(_config.VirtAMate.VirtAMateInstallFolder, "Saves");
 
@@ -47,35 +47,35 @@ namespace Party.Shared
                 throw new SavesException($"Could not find the '{SavesDirectory}' directory under '{_config.VirtAMate.VirtAMateInstallFolder}'. Either put party.exe in your Virt-A-Mate installation folder, or specify --vam in the options.");
         }
 
-        public Task<Registry> GetRegistryAsync(params string[] registries)
+        public Task<Registry> AcquireRegistryAsync(params string[] registries)
         {
-            return new RegistryHandler(_http, _config.Registry.Urls, new RegistrySerializer())
-                .AcquireAsync(registries);
+            return new AcquireRegistryHandler(_http, _config.Registry.Urls, new RegistrySerializer())
+                .AcquireRegistryAsync(registries);
         }
 
-        public Task<SavesMap> GetSavesAsync(string filter, IProgress<GetSavesProgress> reporter)
+        public Task<SavesMap> ScanLocalFilesAsync(string filter, IProgress<ScanLocalFilesProgress> reporter)
         {
-            return new SavesResolverHandler(
+            return new ScanLocalFilesHandler(
                 _fs,
                 new SceneSerializer(_fs),
                 new ScriptListSerializer(_fs),
                 _config.VirtAMate.VirtAMateInstallFolder,
                 SavesDirectory,
                 _config.VirtAMate.IgnoredFolders)
-                    .AnalyzeSaves(filter, reporter);
+                    .ScanLocalFilesAsync(filter, reporter);
         }
 
-        public async Task<(SavesMap saves, Registry registry)> GetSavesAndRegistryAsync(string[] registries, string filter, IProgress<GetSavesProgress> reporter)
+        public async Task<(SavesMap saves, Registry registry)> ScanLocalFilesAndAcquireRegistryAsync(string[] registries, string filter, IProgress<ScanLocalFilesProgress> reporter)
         {
             var isFilterPackage = PackageFullName.TryParsePackage(filter, out var filterPackage);
             var pathFilter = !isFilterPackage && filter != null ? Path.GetFullPath(filter) : null;
 
             Task<Registry> registryTask;
             Task<SavesMap> savesTask;
-            registryTask = GetRegistryAsync(registries);
+            registryTask = AcquireRegistryAsync(registries);
             // TODO: If the item is a package (no extension), resolve it to a path (if the plugin was not downloaded, throw)
             // TODO: When the filter is a scene, mark every script that was not referenced by that scene as not safe for cleanup; also remove them for display
-            savesTask = GetSavesAsync(pathFilter, reporter);
+            savesTask = ScanLocalFilesAsync(pathFilter, reporter);
 
             await Task.WhenAll(registryTask, savesTask).ConfigureAwait(false);
 
@@ -102,25 +102,25 @@ namespace Party.Shared
 
         public Task<SortedSet<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string path, DirectoryInfo saves)
         {
-            return new RegistryFilesFromPathHandler(saves?.FullName ?? SavesDirectory, _fs)
-                .BuildFiles(registry, saves != null ? path : SanitizePath(path));
+            return new BuildRegistryFilesFromPathHandler(saves?.FullName ?? SavesDirectory, _fs)
+                .BuildRegistryFilesFromPathAsync(registry, saves != null ? path : SanitizePath(path));
         }
 
         public Task<SortedSet<RegistryFile>> BuildRegistryFilesFromUrlAsync(Registry registry, Uri url)
         {
-            return new RegistryFilesFromUrlHandler(_http)
-                .BuildFiles(registry, url);
+            return new BuildRegistryFilesFromUrlHandler(_http)
+                .BuildRegistryFilesFromUrlAsync(registry, url);
         }
 
-        public IEnumerable<SearchResult> Search(Registry registry, string query)
+        public IEnumerable<SearchResult> FilterRegistry(Registry registry, string query)
         {
-            return new SearchHandler(_config.Registry.TrustedDomains)
-                .Search(registry, query);
+            return new FilterRegistryHandler(_config.Registry.TrustedDomains)
+                .FilterRegistry(registry, query);
         }
 
         public Task<LocalPackageInfo> GetInstalledPackageInfoAsync(RegistryPackageVersionContext context)
         {
-            return new PackageInstalledInfoHandler(_fs, _folders)
+            return new GetInstalledPackageInfoHandler(_fs, _folders)
                 .GetInstalledPackageInfoAsync(context);
         }
 
@@ -129,19 +129,20 @@ namespace Party.Shared
             return new InstallPackageHandler(_fs, _http)
                 .InstallPackageAsync(info, force);
         }
-        public RegistrySavesMatches MatchSavesToRegistry(SavesMap saves, Registry registry)
+
+        public RegistrySavesMatches MatchLocalFilesToRegistry(SavesMap saves, Registry registry)
         {
-            return new RegistrySavesMatchHandler()
-                .Match(saves, registry);
+            return new MatchLocalFilesToRegistryHandler()
+                .MatchLocalFilesToRegistry(saves, registry);
         }
 
-        public Task<(string before, string after)[]> UpdateScriptInSceneAsync(LocalSceneFile scene, LocalScriptFile local, LocalPackageInfo info)
+        public Task<(string before, string after)[]> ApplyNormalizedPathsToSceneAsync(LocalSceneFile scene, LocalScriptFile local, LocalPackageInfo info)
         {
-            return new SceneUpdateHandler(new SceneSerializer(_fs), SavesDirectory)
-                .UpdateScripts(scene, local, info);
+            return new ApplyNormalizedPathsToSceneHandler(new SceneSerializer(_fs), SavesDirectory)
+                .ApplyNormalizedPathsToSceneAsync(scene, local, info);
         }
 
-        public async Task<string> GetPartyUpdatesAvailable()
+        public async Task<string> GetPartyUpdatesAvailableAsync()
         {
             var response = await _http.GetAsync("https://api.github.com/repos/vam-community/vam-party/releases/latest");
             if (response.StatusCode == HttpStatusCode.NotFound)
@@ -219,17 +220,17 @@ namespace Party.Shared
         bool ChecksEnabled { get; set; }
 
         void HealthCheck();
-        Task<Registry> GetRegistryAsync(params string[] registries);
-        Task<SavesMap> GetSavesAsync(string filter, IProgress<GetSavesProgress> reporter);
-        Task<(SavesMap saves, Registry registry)> GetSavesAndRegistryAsync(string[] registries, string filter, IProgress<GetSavesProgress> reporter);
+        Task<Registry> AcquireRegistryAsync(params string[] registries);
+        Task<SavesMap> ScanLocalFilesAsync(string filter, IProgress<ScanLocalFilesProgress> reporter);
+        Task<(SavesMap saves, Registry registry)> ScanLocalFilesAndAcquireRegistryAsync(string[] registries, string filter, IProgress<ScanLocalFilesProgress> reporter);
         Task<SortedSet<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string path, DirectoryInfo saves);
         Task<SortedSet<RegistryFile>> BuildRegistryFilesFromUrlAsync(Registry registry, Uri url);
-        IEnumerable<SearchResult> Search(Registry registry, string query);
+        IEnumerable<SearchResult> FilterRegistry(Registry registry, string query);
         Task<LocalPackageInfo> GetInstalledPackageInfoAsync(RegistryPackageVersionContext context);
         Task<LocalPackageInfo> InstallPackageAsync(LocalPackageInfo info, bool force);
-        RegistrySavesMatches MatchSavesToRegistry(SavesMap saves, Registry registry);
-        Task<(string before, string after)[]> UpdateScriptInSceneAsync(LocalSceneFile scene, LocalScriptFile local, LocalPackageInfo info);
-        Task<string> GetPartyUpdatesAvailable();
+        RegistrySavesMatches MatchLocalFilesToRegistry(SavesMap saves, Registry registry);
+        Task<(string before, string after)[]> ApplyNormalizedPathsToSceneAsync(LocalSceneFile scene, LocalScriptFile local, LocalPackageInfo info);
+        Task<string> GetPartyUpdatesAvailableAsync();
         string GetDisplayPath(string path);
         string GetRelativePath(string path, string parentPath);
         void SaveToFile(string data, string path, bool restrict = true);

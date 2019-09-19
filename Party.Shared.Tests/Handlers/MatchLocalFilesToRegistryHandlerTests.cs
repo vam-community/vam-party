@@ -1,4 +1,4 @@
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Party.Shared.Handlers;
 using Party.Shared.Models;
 using Party.Shared.Models.Local;
@@ -6,15 +6,15 @@ using Party.Shared.Models.Registries;
 
 namespace Party.Shared
 {
-    public class RegistrySavesMatchHandlerTests
+    public class MatchLocalFilesToRegistryHandlerTests
     {
         private const string _vam = @"C:\VaM\Saves\";
-        private RegistrySavesMatchHandler _handler;
+        private MatchLocalFilesToRegistryHandler _handler;
 
         [SetUp]
         public void BeforeEach()
         {
-            _handler = new RegistrySavesMatchHandler();
+            _handler = new MatchLocalFilesToRegistryHandler();
         }
 
         [Test]
@@ -26,7 +26,7 @@ namespace Party.Shared
             var registry = ResultFactory.Reg(
                 ResultFactory.RegScript("my-script", ResultFactory.RegVer("1.0.0", ResultFactory.RegFile("2.cs", "2"))));
 
-            var result = _handler.Match(saves, registry);
+            var result = _handler.MatchLocalFilesToRegistry(saves, registry);
 
             PartyAssertions.AreDeepEqual(new RegistrySavesMatches
             {
@@ -47,7 +47,7 @@ namespace Party.Shared
             var package = ResultFactory.RegScript("my-script", version);
             var registry = ResultFactory.Reg(package);
 
-            var result = _handler.Match(saves, registry);
+            var result = _handler.MatchLocalFilesToRegistry(saves, registry);
 
             PartyAssertions.AreDeepEqual(new RegistrySavesMatches
             {
@@ -68,7 +68,7 @@ namespace Party.Shared
             var package = ResultFactory.RegScript("my-script", version);
             var registry = ResultFactory.Reg(package);
 
-            var result = _handler.Match(saves, registry);
+            var result = _handler.MatchLocalFilesToRegistry(saves, registry);
 
             PartyAssertions.AreDeepEqual(new RegistrySavesMatches
             {
@@ -89,7 +89,7 @@ namespace Party.Shared
             var package = ResultFactory.RegScript("my-script", version);
             var registry = ResultFactory.Reg(package);
 
-            var result = _handler.Match(saves, registry);
+            var result = _handler.MatchLocalFilesToRegistry(saves, registry);
 
             PartyAssertions.AreDeepEqual(new RegistrySavesMatches
             {

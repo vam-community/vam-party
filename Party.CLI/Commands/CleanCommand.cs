@@ -56,9 +56,9 @@ namespace Party.CLI.Commands
                 throw new UserInputException("You must specify what to upgrade (a .cs, .cslist, .json or package name), or pass --all to upgrade everything");
 
             // TODO: If the item is a package (no extension), resolve it to a path (if the plugin was not downloaded, throw)
-            var (saves, registry) = await GetSavesAndRegistryAsync(args.Filter);
+            var (saves, registry) = await ScanLocalFilesAndAcquireRegistryAsync(args.Filter);
 
-            var matches = Controller.MatchSavesToRegistry(saves, registry);
+            var matches = Controller.MatchLocalFilesToRegistry(saves, registry);
 
             foreach (var match in matches.HashMatches)
             {
@@ -68,7 +68,7 @@ namespace Party.CLI.Commands
             if (args.DeleteUnused)
             {
                 Renderer.WriteLine("Cleaning up unused scripts...");
-                saves = await GetSavesAsync(args.Filter);
+                saves = await ScanLocalFilesAsync(args.Filter);
                 foreach (var script in saves.Scripts.Where(s => s.Scenes != null && s.Scenes.Count > 0))
                 {
                     if (script is LocalScriptListFile scriptList && scriptList.Scripts != null)
@@ -152,7 +152,7 @@ namespace Party.CLI.Commands
                 Renderer.Write(scenePath, ConsoleColor.Blue);
                 Renderer.Write($"...");
 
-                var changes = await Controller.UpdateScriptInSceneAsync(scene, match.Local, info);
+                var changes = await Controller.ApplyNormalizedPathsToSceneAsync(scene, match.Local, info);
 
                 if (changes.Length > 0)
                     Renderer.WriteLine(" updated", ConsoleColor.Green);

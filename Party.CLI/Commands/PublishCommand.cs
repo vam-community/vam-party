@@ -66,7 +66,7 @@ namespace Party.CLI.Commands
                 if (args.Registry.Name != "index.json")
                     throw new UserInputException("Please specify the path to your locally cloned index.json file");
 
-                registry = await Controller.GetRegistryAsync(args.Registry.FullName);
+                registry = await Controller.AcquireRegistryAsync(args.Registry.FullName);
 
                 if (args.Format)
                 {
@@ -76,7 +76,7 @@ namespace Party.CLI.Commands
             }
             else
             {
-                registry = await Controller.GetRegistryAsync();
+                registry = await Controller.AcquireRegistryAsync();
 
                 if (args.Format)
                     throw new UserInputException("Cannot specify --format without --registry");

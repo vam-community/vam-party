@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -14,7 +14,7 @@ using Party.Shared.Utils;
 
 namespace Party.Shared.Handlers
 {
-    public class SavesResolverHandler
+    public class ScanLocalFilesHandler
     {
         private class Filters
         {
@@ -30,7 +30,7 @@ namespace Party.Shared.Handlers
         private readonly string[] _ignoredPaths;
         private readonly string _vamDirectory;
 
-        public SavesResolverHandler(IFileSystem fs, ISceneSerializer sceneSerializer, IScriptListSerializer scriptListSerializer, string vamDirectory, string savesDirectory, string[] ignoredPaths)
+        public ScanLocalFilesHandler(IFileSystem fs, ISceneSerializer sceneSerializer, IScriptListSerializer scriptListSerializer, string vamDirectory, string savesDirectory, string[] ignoredPaths)
         {
             _fs = fs ?? throw new ArgumentNullException(nameof(fs));
             _sceneSerializer = sceneSerializer ?? throw new ArgumentNullException(nameof(sceneSerializer));
@@ -40,7 +40,7 @@ namespace Party.Shared.Handlers
             _vamDirectory = vamDirectory;
         }
 
-        public Task<SavesMap> AnalyzeSaves(string filter, IProgress<GetSavesProgress> reporter)
+        public Task<SavesMap> ScanLocalFilesAsync(string filter, IProgress<ScanLocalFilesProgress> reporter)
         {
             var filterExt = _fs.Path.GetExtension(filter) ?? string.Empty;
             if (filterExt == string.Empty)
@@ -53,14 +53,14 @@ namespace Party.Shared.Handlers
                 throw new NotSupportedException($"Filter '{filter}' is not supported");
         }
 
-        private async Task<SavesMap> AnalyzeSavesByScript(string scriptFile, IProgress<GetSavesProgress> reporter)
+        private async Task<SavesMap> AnalyzeSavesByScript(string scriptFile, IProgress<ScanLocalFilesProgress> reporter)
         {
             var scripts = new ConcurrentDictionary<string, LocalScriptFile>();
             var sceneTasks = new Queue<Task<LocalSceneFile>>();
             int scenesCount = 0, scenesCompletedCount = 0;
             void ReportProgress()
             {
-                reporter.Report(new GetSavesProgress
+                reporter.Report(new ScanLocalFilesProgress
                 {
                     Scenes = new Progress(scenesCount, scenesCompletedCount),
                     Scripts = new Progress(1, 0),
@@ -106,7 +106,7 @@ namespace Party.Shared.Handlers
             };
         }
 
-        private async Task<SavesMap> AnalyzeSavesByDirectory(string directory, IProgress<GetSavesProgress> reporter)
+        private async Task<SavesMap> AnalyzeSavesByDirectory(string directory, IProgress<ScanLocalFilesProgress> reporter)
         {
             var sceneFiles = new Queue<string>();
             var scriptListFiles = new Queue<string>();
@@ -122,7 +122,7 @@ namespace Party.Shared.Handlers
             int scriptListsCount = 0, scriptListsCompletedCount = 0;
             void ReportProgress()
             {
-                reporter.Report(new GetSavesProgress
+                reporter.Report(new ScanLocalFilesProgress
                 {
                     Scenes = new Progress(scenesCount, scenesCompletedCount),
                     Scripts = new Progress(scriptsCount + scriptListsCount, scriptsCompletedCount + scriptListsCompletedCount),

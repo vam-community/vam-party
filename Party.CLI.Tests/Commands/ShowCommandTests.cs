@@ -21,7 +21,7 @@ namespace Party.CLI
                 .Setup(x => x.GetDisplayPath(It.IsAny<string>()))
                 .Returns((string path) => path.Replace("ROOT/", ""));
             _controller
-                .Setup(x => x.GetRegistryAsync())
+                .Setup(x => x.AcquireRegistryAsync())
                 .ReturnsAsync(new Registry
                 {
                     Authors = new SortedSet<RegistryAuthor>(new[]

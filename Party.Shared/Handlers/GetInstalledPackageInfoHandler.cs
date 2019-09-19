@@ -11,12 +11,12 @@ using Party.Shared.Utils;
 
 namespace Party.Shared.Handlers
 {
-    public class PackageInstalledInfoHandler
+    public class GetInstalledPackageInfoHandler
     {
         private readonly IFileSystem _fs;
         private readonly IFoldersHelper _folders;
 
-        public PackageInstalledInfoHandler(IFileSystem fs, IFoldersHelper folders)
+        public GetInstalledPackageInfoHandler(IFileSystem fs, IFoldersHelper folders)
         {
             _fs = fs ?? throw new ArgumentNullException(nameof(fs));
             _folders = folders ?? throw new ArgumentNullException(nameof(folders));

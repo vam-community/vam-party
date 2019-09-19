@@ -29,7 +29,7 @@ namespace Party.CLI.Commands
         private async Task ExecuteAsync()
         {
             var current = $"v{typeof(HelpCommand).Assembly.GetName().Version}";
-            var latest = await Controller.GetPartyUpdatesAvailable();
+            var latest = await Controller.GetPartyUpdatesAvailableAsync();
             Renderer.WriteLine($"Party, {current}");
             if (latest != null && latest != current)
                 Renderer.WriteLine($"An update is available: {latest}", ConsoleColor.Green);

@@ -53,9 +53,9 @@ namespace Party.CLI.Commands
             else if (!args.All && args.Filter == null)
                 throw new UserInputException("You must specify what to upgrade (a .cs, .cslist, .json or package name), or pass --all to upgrade everything");
 
-            var (saves, registry) = await GetSavesAndRegistryAsync(args.Filter);
+            var (saves, registry) = await ScanLocalFilesAndAcquireRegistryAsync(args.Filter);
 
-            var matches = Controller.MatchSavesToRegistry(saves, registry);
+            var matches = Controller.MatchLocalFilesToRegistry(saves, registry);
 
             PrintWarnings(args.Warnings, saves);
 

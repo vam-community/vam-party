@@ -1,17 +1,17 @@
-using System.Linq;
+﻿using System.Linq;
 using NUnit.Framework;
 using Party.Shared.Models;
 
 namespace Party.Shared.Handlers
 {
-    public class SearchHandlerTests
+    public class FilterRegistryHandlerTests
     {
-        private SearchHandler _handler;
+        private FilterRegistryHandler _handler;
 
         [SetUp]
         public void BeforeEach()
         {
-            _handler = new SearchHandler(new[] { "https://example.org" });
+            _handler = new FilterRegistryHandler(new[] { "https://example.org" });
         }
 
         [Test]
@@ -20,7 +20,7 @@ namespace Party.Shared.Handlers
             var script1 = ResultFactory.RegScript("script1", ResultFactory.RegVer("1.0.0", ResultFactory.RegFile("My Script.cs", "12345", "https://example.org/scripts/MyScript.cs")));
             var registry = ResultFactory.Reg(script1);
 
-            var result = _handler.Search(registry, "");
+            var result = _handler.FilterRegistry(registry, "");
 
             PartyAssertions.AreDeepEqual(new[]
             {
@@ -38,7 +38,7 @@ namespace Party.Shared.Handlers
             var script1 = ResultFactory.RegScript("script1", ResultFactory.RegVer("1.0.0", ResultFactory.RegFile("My Script.cs", "12345", "https://example.com/scripts/MyScript.cs")));
             var registry = ResultFactory.Reg(script1);
 
-            var result = _handler.Search(registry, "");
+            var result = _handler.FilterRegistry(registry, "");
 
             PartyAssertions.AreDeepEqual(new[]
             {
@@ -63,7 +63,7 @@ namespace Party.Shared.Handlers
             script2.Description = "This is a script that makes stuff go boom!";
             var registry = ResultFactory.Reg(script1, script2);
 
-            var result = _handler.Search(registry, query);
+            var result = _handler.FilterRegistry(registry, query);
 
             PartyAssertions.AreDeepEqual(new[]
             {

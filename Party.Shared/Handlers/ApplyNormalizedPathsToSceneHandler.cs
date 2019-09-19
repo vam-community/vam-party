@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,18 +9,18 @@ using Party.Shared.Serializers;
 
 namespace Party.Shared.Handlers
 {
-    public class SceneUpdateHandler
+    public class ApplyNormalizedPathsToSceneHandler
     {
         private readonly ISceneSerializer _serializer;
         private readonly string _savesDirectory;
 
-        public SceneUpdateHandler(ISceneSerializer serializer, string savesDirectory)
+        public ApplyNormalizedPathsToSceneHandler(ISceneSerializer serializer, string savesDirectory)
         {
             _savesDirectory = savesDirectory ?? throw new ArgumentNullException(nameof(savesDirectory));
             _serializer = serializer;
         }
 
-        public async Task<(string before, string after)[]> UpdateScripts(LocalSceneFile scene, LocalScriptFile local, LocalPackageInfo info)
+        public async Task<(string before, string after)[]> ApplyNormalizedPathsToSceneAsync(LocalSceneFile scene, LocalScriptFile local, LocalPackageInfo info)
         {
             var changes = new List<(string before, string after)>();
 

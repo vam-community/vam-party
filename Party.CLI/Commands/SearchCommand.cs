@@ -38,9 +38,9 @@ namespace Party.CLI.Commands
         {
             Controller.HealthCheck();
 
-            var registry = await Controller.GetRegistryAsync();
+            var registry = await Controller.AcquireRegistryAsync();
 
-            foreach (var result in Controller.Search(registry, args.Query))
+            foreach (var result in Controller.FilterRegistry(registry, args.Query))
             {
                 var package = result.Package;
                 var latestVersion = package.GetLatestVersion();

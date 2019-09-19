@@ -44,7 +44,7 @@ namespace Party.CLI.Commands
             if (!PackageFullName.TryParsePackage(args.Package, out var packageName))
                 throw new UserInputException("Invalid package name. Example: 'scripts/my-script'");
 
-            var registry = await Controller.GetRegistryAsync().ConfigureAwait(false);
+            var registry = await Controller.AcquireRegistryAsync().ConfigureAwait(false);
 
             var package = registry.GetPackage(packageName);
             if (package == null)

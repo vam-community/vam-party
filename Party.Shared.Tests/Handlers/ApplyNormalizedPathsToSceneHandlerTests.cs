@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
@@ -10,7 +10,7 @@ using Party.Shared.Serializers;
 
 namespace Party.Shared
 {
-    public class SceneUpdateHandlerTests
+    public class ApplyNormalizedPathsToSceneHandlerTests
     {
         [Test]
         public async Task CanFindAndReplaceAScript()
@@ -49,9 +49,9 @@ namespace Party.Shared
             serializer
                 .Setup(s => s.Serialize(json, @"C:\VaM\Saves\My Scene.json"))
                 .Returns(Task.CompletedTask);
-            var handler = new SceneUpdateHandler(serializer.Object, @"C:\VaM\Saves");
+            var handler = new ApplyNormalizedPathsToSceneHandler(serializer.Object, @"C:\VaM\Saves");
 
-            var result = await handler.UpdateScripts(scene, script, info);
+            var result = await handler.ApplyNormalizedPathsToSceneAsync(scene, script, info);
 
             Assert.That(result, Is.EqualTo(effectiveUpdates));
         }

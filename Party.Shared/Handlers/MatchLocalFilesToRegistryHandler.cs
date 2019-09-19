@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Party.Shared.Models;
@@ -7,9 +7,9 @@ using Party.Shared.Models.Registries;
 
 namespace Party.Shared.Handlers
 {
-    public class RegistrySavesMatchHandler
+    public class MatchLocalFilesToRegistryHandler
     {
-        public RegistrySavesMatches Match(SavesMap saves, Registry registry)
+        public RegistrySavesMatches MatchLocalFilesToRegistry(SavesMap saves, Registry registry)
         {
             // TODO: Should handle other types
             var flattened = registry.FlattenFiles(RegistryPackageType.Scripts).ToList();

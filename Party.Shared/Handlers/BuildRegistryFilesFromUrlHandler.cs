@@ -5,22 +5,21 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 using Party.Shared.Exceptions;
-using Party.Shared.Models;
 using Party.Shared.Models.Registries;
 using Party.Shared.Utils;
 
 namespace Party.Shared.Handlers
 {
-    public class RegistryFilesFromUrlHandler
+    public class BuildRegistryFilesFromUrlHandler
     {
         private readonly HttpClient _http;
 
-        public RegistryFilesFromUrlHandler(HttpClient http)
+        public BuildRegistryFilesFromUrlHandler(HttpClient http)
         {
             _http = http ?? throw new ArgumentNullException(nameof(http));
         }
 
-        public async Task<SortedSet<RegistryFile>> BuildFiles(Registry registry, Uri url)
+        public async Task<SortedSet<RegistryFile>> BuildRegistryFilesFromUrlAsync(Registry registry, Uri url)
         {
             if (registry is null) throw new ArgumentNullException(nameof(registry));
             if (url is null) throw new ArgumentNullException(nameof(url));

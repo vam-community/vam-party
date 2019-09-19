@@ -1,6 +1,6 @@
-namespace Party.Shared.Models
+﻿namespace Party.Shared.Models
 {
-    public struct GetSavesProgress
+    public struct ScanLocalFilesProgress
     {
         public Progress Scripts { get; set; }
         public Progress Scenes { get; set; }
