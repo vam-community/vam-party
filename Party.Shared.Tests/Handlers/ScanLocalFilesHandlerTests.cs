@@ -169,10 +169,11 @@ namespace Party.Shared
 
         private ScanLocalFilesHandler Create(IFileSystem fileSystem, string[] ignoredPaths = null)
         {
+            var throttler = new Throttler();
             return new ScanLocalFilesHandler(
                 fileSystem,
-                new SceneSerializer(fileSystem),
-                new ScriptListSerializer(fileSystem),
+                new SceneSerializer(fileSystem, throttler),
+                new ScriptListSerializer(fileSystem, throttler),
                 @"C:\VaM",
                 @"C:\VaM\Saves",
                 ignoredPaths ?? new string[0]);

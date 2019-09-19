@@ -3,6 +3,7 @@ using System.IO.Abstractions.TestingHelpers;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Party.Shared.Serializers;
+using Party.Shared.Utils;
 
 namespace Party.Shared
 {
@@ -24,7 +25,7 @@ namespace Party.Shared
                 ))},
             });
 
-            var result = await new ScriptListSerializer(fileSystem).GetScriptsAsync(@"C:\VaM\Saves\ADD_ME.cslist");
+            var result = await new ScriptListSerializer(fileSystem, new Throttler()).GetScriptsAsync(@"C:\VaM\Saves\ADD_ME.cslist");
 
             Assert.That(result, Is.EqualTo(new[] { "Script 1.cs", "Script 2.cs" }));
         }

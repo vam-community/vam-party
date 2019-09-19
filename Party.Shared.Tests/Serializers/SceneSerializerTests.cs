@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Party.Shared.Serializers;
+using Party.Shared.Utils;
 
 namespace Party.Shared
 {
@@ -36,7 +37,7 @@ namespace Party.Shared
                 ))},
             });
 
-            var scene = await new SceneSerializer(fileSystem).Deserialize(@"C:\VaM\Saves\Scene 1.json");
+            var scene = await new SceneSerializer(fileSystem, new Throttler()).Deserialize(@"C:\VaM\Saves\Scene 1.json");
 
             Assert.That(scene.Atoms.SelectMany(a => a.Plugins).Select(p => p.Path), Is.EqualTo(new[] { "Saves/Script 1.cs" }));
         }

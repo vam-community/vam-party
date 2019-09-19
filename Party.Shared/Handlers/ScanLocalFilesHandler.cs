@@ -44,16 +44,16 @@ namespace Party.Shared.Handlers
         {
             var filterExt = _fs.Path.GetExtension(filter) ?? string.Empty;
             if (filterExt == string.Empty)
-                return AnalyzeSavesByDirectory(filter, reporter);
+                return ScanByDirectoryAsync(filter, reporter);
             else if (filterExt == ".json")
-                return AnalyzeSavesByScene(filter);
+                return ScanBySceneAsync(filter);
             else if (filterExt == ".cs" || filterExt == ".cslist")
-                return AnalyzeSavesByScript(filter, reporter);
+                return ScanByScriptAsync(filter, reporter);
             else
                 throw new NotSupportedException($"Filter '{filter}' is not supported");
         }
 
-        private async Task<SavesMap> AnalyzeSavesByScript(string scriptFile, IProgress<ScanLocalFilesProgress> reporter)
+        private async Task<SavesMap> ScanByScriptAsync(string scriptFile, IProgress<ScanLocalFilesProgress> reporter)
         {
             var scripts = new ConcurrentDictionary<string, LocalScriptFile>(StringComparer.InvariantCultureIgnoreCase);
             var sceneTasks = new Queue<Task<LocalSceneFile>>();
@@ -74,7 +74,7 @@ namespace Party.Shared.Handlers
                 Interlocked.Increment(ref scenesCount);
                 sceneTasks.Enqueue(Task.Run(async () =>
                 {
-                    var result = await LoadScene(scripts, file, true).ConfigureAwait(false);
+                    var result = await LoadSceneAsync(scripts, file, true).ConfigureAwait(false);
                     Interlocked.Increment(ref scenesCompletedCount);
                     ReportProgress();
                     return result;
@@ -84,7 +84,7 @@ namespace Party.Shared.Handlers
 
             if (!scripts.TryGetValue(scriptFile, out var script))
             {
-                script = await LoadScript(scriptFile);
+                script = await LoadScriptAsync(scriptFile);
             }
 
             return new SavesMap
@@ -94,11 +94,11 @@ namespace Party.Shared.Handlers
             };
         }
 
-        private async Task<SavesMap> AnalyzeSavesByScene(string sceneFile)
+        private async Task<SavesMap> ScanBySceneAsync(string sceneFile)
         {
             var scripts = new ConcurrentDictionary<string, LocalScriptFile>(StringComparer.InvariantCultureIgnoreCase);
             // TODO: ScriptList handling
-            var scene = await LoadScene(scripts, sceneFile, true);
+            var scene = await LoadSceneAsync(scripts, sceneFile, true);
             return new SavesMap
             {
                 Scenes = new[] { scene },
@@ -106,7 +106,7 @@ namespace Party.Shared.Handlers
             };
         }
 
-        private async Task<SavesMap> AnalyzeSavesByDirectory(string directory, IProgress<ScanLocalFilesProgress> reporter)
+        private async Task<SavesMap> ScanByDirectoryAsync(string directory, IProgress<ScanLocalFilesProgress> reporter)
         {
             var sceneFiles = new Queue<string>();
             var scriptListFiles = new Queue<string>();
@@ -144,7 +144,7 @@ namespace Party.Shared.Handlers
                         Interlocked.Increment(ref scriptsCount);
                         scriptTasks.Add(Task.Run(async () =>
                         {
-                            var result = await LoadScript(file).ConfigureAwait(false);
+                            var result = await LoadScriptAsync(file).ConfigureAwait(false);
                             Interlocked.Increment(ref scriptsCompletedCount);
                             ReportProgress();
                             return result;
@@ -171,7 +171,7 @@ namespace Party.Shared.Handlers
             {
                 var scriptListTasks = scriptListFiles.Select(async file =>
                 {
-                    var result = await LoadScriptList(scripts, file, shouldTryLoadingReferences);
+                    var result = await LoadScriptListAsync(scripts, file, shouldTryLoadingReferences);
                     Interlocked.Increment(ref scriptListsCompletedCount);
                     ReportProgress();
                     return result;
@@ -185,7 +185,7 @@ namespace Party.Shared.Handlers
 
             var sceneTasks = sceneFiles.Select(file => Task.Run(async () =>
             {
-                var result = await LoadScene(scripts, file, shouldTryLoadingReferences).ConfigureAwait(false);
+                var result = await LoadSceneAsync(scripts, file, shouldTryLoadingReferences).ConfigureAwait(false);
                 Interlocked.Increment(ref scenesCompletedCount);
                 ReportProgress();
                 return result;
@@ -199,7 +199,7 @@ namespace Party.Shared.Handlers
             };
         }
 
-        private async Task<LocalSceneFile> LoadScene(ConcurrentDictionary<string, LocalScriptFile> scripts, string sceneFile, bool shouldTryLoadingReferences)
+        private async Task<LocalSceneFile> LoadSceneAsync(ConcurrentDictionary<string, LocalScriptFile> scripts, string sceneFile, bool shouldTryLoadingReferences)
         {
             var scene = new LocalSceneFile(sceneFile);
             try
@@ -222,7 +222,7 @@ namespace Party.Shared.Handlers
                     else if (shouldTryLoadingReferences)
                     {
                         // TODO: This has possible race conditions, but only if more than one scene in filters
-                        scriptRef = await LoadScript(fullPath).ConfigureAwait(false);
+                        scriptRef = await LoadScriptAsync(fullPath).ConfigureAwait(false);
                         scene.References(scriptRef);
                         scriptRef.ReferencedBy(scene);
                         if (scriptRef.Status > LocalFileErrorLevel.None)
@@ -247,7 +247,7 @@ namespace Party.Shared.Handlers
             return scene;
         }
 
-        private async Task<LocalScriptListFile> LoadScriptList(IDictionary<string, LocalScriptFile> scripts, string scriptListFile, bool shouldTryLoadingReferences)
+        private async Task<LocalScriptListFile> LoadScriptListAsync(IDictionary<string, LocalScriptFile> scripts, string scriptListFile, bool shouldTryLoadingReferences)
         {
             var scriptRefs = new List<LocalScriptFile>();
             try
@@ -267,7 +267,7 @@ namespace Party.Shared.Handlers
                     }
                     else if (shouldTryLoadingReferences)
                     {
-                        var script = await LoadScript(fullPath);
+                        var script = await LoadScriptAsync(fullPath);
                         scriptRefs.Add(script);
                     }
                     else
@@ -298,7 +298,7 @@ namespace Party.Shared.Handlers
             }
         }
 
-        private async Task<LocalScriptFile> LoadScript(string scriptFile)
+        private async Task<LocalScriptFile> LoadScriptAsync(string scriptFile)
         {
             try
             {
