@@ -25,9 +25,9 @@ namespace Party.CLI
             _renderer = new Mock<IConsoleRenderer>(MockBehavior.Strict);
             _renderer.Setup(x => x.WriteLine()).Callback(() => _out.Append($"\n"));
             _renderer.Setup(x => x.WriteLine(It.IsAny<string>())).Callback((string line) => _out.Append($"{line}\n"));
-            _renderer.Setup(x => x.WriteLine(It.IsAny<string>(), It.IsAny<ConsoleColor>())).Callback((string line, ConsoleColor color) => _out.Append($"[color:{color}]{line}[/color]\n"));
+            _renderer.Setup(x => x.WriteLine(It.IsAny<string>(), It.IsAny<ConsoleColor>())).Callback((string line, ConsoleColor color) => _out.Append($"[color:{color.ToString().ToLowerInvariant()}]{line}[/color]\n"));
             _renderer.Setup(x => x.Write(It.IsAny<string>())).Callback((string text) => _out.Append(text));
-            _renderer.Setup(x => x.Write(It.IsAny<string>(), It.IsAny<ConsoleColor>())).Callback((string text, ConsoleColor color) => _out.Append($"[color:{color}]{text}[/color]"));
+            _renderer.Setup(x => x.Write(It.IsAny<string>(), It.IsAny<ConsoleColor>())).Callback((string text, ConsoleColor color) => _out.Append($"[color:{color.ToString().ToLowerInvariant()}]{text}[/color]"));
             _renderer.Setup(x => x.WithColor(It.IsAny<ConsoleColor>())).Returns((ConsoleColor color) => new ColorStub(_out, color));
             _renderer.Setup(x => x.Out).Returns(outWriter);
             _renderer.Setup(x => x.Error).Returns(outWriter);
@@ -54,7 +54,7 @@ namespace Party.CLI
             public ColorStub(StringBuilder output, ConsoleColor color)
             {
                 _out = output;
-                _out.Append($"[color:{color}]");
+                _out.Append($"[color:{color.ToString().ToLowerInvariant()}]");
             }
 
             public void Dispose()

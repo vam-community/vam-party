@@ -45,60 +45,62 @@ namespace Party.CLI.Commands
             var package = registry.GetPackage(packageName);
             if (package == null)
                 throw new UserInputException($"Could not find package {args.Package}");
-            var latestVersion = package.GetLatestVersion();
-            if (latestVersion?.Files == null)
+            var version = package.GetLatestVersion();
+            if (version?.Files == null)
                 throw new RegistryException("Package does not have any versions");
-            var context = new RegistryPackageVersionContext(registry, package, latestVersion);
+            var context = new RegistryPackageVersionContext(registry, package, version);
 
-            Renderer.WriteLine($"Package {package.Type.ToString().ToLowerInvariant()}/{package.Name}");
+            var packageTitle = $"{package.Name} v{version.Version} ({package.Type.ToString().ToLowerInvariant()})";
+            Renderer.WriteLine(packageTitle, ConsoleColor.Cyan);
+            Renderer.WriteLine(new string('=', packageTitle.Length));
 
-            Renderer.WriteLine($"Last version v{latestVersion.Version}, published {latestVersion.Created.ToLocalTime().ToString("D")}");
-
-            Renderer.WriteLine("Versions:");
-            foreach (var version in package.Versions)
-            {
-                Renderer.WriteLine($"- v{version.Version}, published {version.Created.ToLocalTime().ToString("D")}: {version.Notes ?? "(no release notes)"}");
-                if (version.DownloadUrl != null)
-                    Renderer.WriteLine($"  Download: {version.DownloadUrl}");
-            }
-
+            Renderer.WriteLine("Info:", ConsoleColor.Blue);
             if (package.Description != null)
-                Renderer.WriteLine($"Description: {package.Description}");
+                Renderer.WriteLine($"  Description: {package.Description}");
             if (package.Tags != null)
-                Renderer.WriteLine($"Tags: {string.Join(", ", package.Tags)}");
+                Renderer.WriteLine($"  Tags: {string.Join(", ", package.Tags)}");
             if (package.Repository != null)
-                Renderer.WriteLine($"Repository: {package.Repository}");
+                Renderer.WriteLine($"  Repository: {package.Repository}");
             if (package.Homepage != null)
-                Renderer.WriteLine($"Homepage: {package.Homepage}");
+                Renderer.WriteLine($"  Homepage: {package.Homepage}");
 
-            Renderer.WriteLine($"Author: {package.Author}");
+            Renderer.Write("Author:", ConsoleColor.Blue);
+            Renderer.WriteLine($" {package.Author}");
             var registryAuthor = registry.Authors?.FirstOrDefault(a => a.Name == package.Author);
             if (registryAuthor != null)
             {
                 if (registryAuthor.Github != null)
-                    Renderer.WriteLine($"- Github: {registryAuthor.Github}");
+                    Renderer.WriteLine($"  Github: {registryAuthor.Github}");
                 if (registryAuthor.Reddit != null)
-                    Renderer.WriteLine($"- Reddit: {registryAuthor.Reddit}");
+                    Renderer.WriteLine($"  Reddit: {registryAuthor.Reddit}");
             }
 
-            if ((latestVersion.Dependencies?.Count ?? 0) > 0)
+            Renderer.WriteLine("Versions:", ConsoleColor.Blue);
+            foreach (var v in package.Versions)
+            {
+                Renderer.WriteLine($"  v{v.Version}, {v.Created.ToLocalTime().ToString("d")}: {v.Notes ?? "(none)"}");
+                if (version.DownloadUrl != null)
+                    Renderer.WriteLine($"  Download: {v.DownloadUrl}");
+            }
+
+            if ((version.Dependencies?.Count ?? 0) > 0)
             {
                 // TODO: This should be resolved by the Controller
-                Renderer.WriteLine("Dependencies:");
-                foreach (var dependency in latestVersion.Dependencies)
+                Renderer.WriteLine("Dependencies:", ConsoleColor.Blue);
+                foreach (var dependency in version.Dependencies)
                 {
                     if (registry.TryGetDependency(dependency, out var depContext))
                     {
-                        Renderer.WriteLine($"- {depContext.Package.Name} v{depContext.Version.Version} by {depContext.Package.Author} ({depContext.Version.Files.Count} files)");
+                        Renderer.WriteLine($"  {depContext.Package.Name} v{depContext.Version.Version} by {depContext.Package.Author} ({depContext.Version.Files.Count} files)");
                     }
                     else
                     {
-                        Renderer.WriteLine($"- Dependency {dependency} was not found in the registry");
+                        Renderer.WriteLine($"  Dependency {dependency} was not found in the registry");
                     }
                 }
             }
 
-            Renderer.WriteLine($"Files:");
+            Renderer.WriteLine($"Files (for v{version.Version}):", ConsoleColor.Blue);
             var info = await Controller.GetInstalledPackageInfoAsync(context);
             PrintInstalledFiles(info, "");
         }
