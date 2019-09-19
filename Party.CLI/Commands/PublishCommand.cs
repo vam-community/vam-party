@@ -49,7 +49,7 @@ namespace Party.CLI.Commands
             public bool Format { get; set; }
         }
 
-        private IRegistrySerializer _serializer = new RegistrySerializer();
+        private readonly IRegistrySerializer _serializer = new RegistrySerializer();
 
         public PublishCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller, CommonArguments args)
             : base(renderer, config, controller, args)
