@@ -45,6 +45,13 @@
                 "type": "sha256",
                 "value": "5EE72D08BE822B417D97F84A0880CB70B02B80031A1FA03776A6592AA3711838"
               }
+            },
+            {
+              "filename": "Complex Plugin Subfolder/Complex Script 3.cs",
+              "hash": {
+                "type": "sha256",
+                "value": "7F965649254F55584CFB213D12DD403D31F6502D6B353DE618E7A62FC6680630"
+              }
             }
           ]
         }

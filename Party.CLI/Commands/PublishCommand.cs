@@ -110,9 +110,17 @@ namespace Party.CLI.Commands
             {
                 foreach (var pathOrUrl in pathOrUrls)
                 {
-                    version.Files.AddRange(pathOrUrl.StartsWith("http") && Uri.TryCreate(pathOrUrl, UriKind.Absolute, out var url)
-                         ? await Controller.BuildRegistryFilesFromUrlAsync(registry, url).ConfigureAwait(false)
-                         : await Controller.BuildRegistryFilesFromPathAsync(registry, Path.GetFullPath(pathOrUrl), args.Saves).ConfigureAwait(false));
+                    var sanitizedPathOrUrl = pathOrUrl.Trim('"');
+                    try
+                    {
+                        version.Files.AddRange(sanitizedPathOrUrl.StartsWith("http") && Uri.TryCreate(sanitizedPathOrUrl, UriKind.Absolute, out var url)
+                             ? await Controller.BuildRegistryFilesFromUrlAsync(registry, url).ConfigureAwait(false)
+                             : await Controller.BuildRegistryFilesFromPathAsync(registry, Path.GetFullPath(sanitizedPathOrUrl), args.Saves).ConfigureAwait(false));
+                    }
+                    catch (ArgumentException exc)
+                    {
+                        throw new UserInputException($"Failed to process file '{sanitizedPathOrUrl}': {exc.Message}");
+                    }
                 }
             }
 

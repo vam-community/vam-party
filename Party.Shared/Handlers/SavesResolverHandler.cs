@@ -235,7 +235,7 @@ namespace Party.Shared.Handlers
             }
             catch (Exception exc)
             {
-                scene.AddError(exc.ToString(), LocalFileErrorLevel.Error);
+                scene.AddError(exc.Message, LocalFileErrorLevel.Error);
             }
             return scene;
         }
