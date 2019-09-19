@@ -36,7 +36,7 @@ If a script contains files that are hosted on an untrusted server (i.e. a server
 Options:
 
 - `--no-usage` skips scanning the saves folder, outputs faster but won't tell you if you already have it
-- `--warnings` prints warnings found while scanning your saves folder
+- `--errors` prints warnings found while scanning your saves folder
 
 ### `get`
 
@@ -78,7 +78,7 @@ To avoid clutter, you can delete unused scripts after upgrading using `--clean`.
 Options:
 
 - `--all` upgrade everything
-- `--warnings` show warnings such as broken scenes or missing scripts
+- `--errors` show warnings such as broken scenes or missing scripts
 - `--noop` prints what the script will do, but won't actually do anything
 - `--verbose` prints every change that will be done on every scene
 
@@ -89,7 +89,7 @@ Prints the list of all installed scripts, identify the ones that are out of date
     > party status
     Analyzing the saves folder and gettings the packages list from the registry, please wait...
     Scanned 338 scenes and 123 scripts in 13.91s, and downloaded 15 packages in 0.24s. Total wait time: 14.03s
-    There were 3 errors in the saves folder. Run with --warnings to print them.
+    There were 3 errors in the saves folder. Run with --errors to print them.
     some-script 1.0.0 "Script Name.cs" (referenced by 2 scenes)
     - scene\Some Scene.json
     - scene\Some Other Scene.json
@@ -104,7 +104,7 @@ You can also specify a script, a scene or a package name to show if you don't wa
 Options:
 
 - `--breakdown` shows every file/scene actually referencing the script
-- `--warnings` prints warnings found while scanning your saves folder
+- `--errors` prints warnings found while scanning your saves folder
 - `--unregistered` prints every script that was found but did not match a package
 
 If you also want to list unregistered scripts (scripts that did not match)
@@ -124,7 +124,7 @@ Shows more information about a specific package:
 
 Options:
 
-- `--warnings` prints warnings found while scanning your saves folder
+- `--errors` prints warnings found while scanning your saves folder
 
 ### `publish`
 
@@ -151,7 +151,6 @@ Options:
 - `--package-author` the author name (allows spaces)
 - `--package-version` the version of the package to publish, either in the format `0.0.0` or `0.0.0-suffix`.
 - `--package-version-download-url` A direct download link to the specific version (will fallback to the package homepage otherwise).
-- `--saves` allows specifying another saves folder, e.g. when publishing scripts from the vam-packages folder
 - `--quiet` chooses defaults for every option (e.g. when you just want to get the json output)
 - `--format` prettifies the registry, e.g. when you manually modify it
 
@@ -163,7 +162,7 @@ Moves references to use the ones used when downloading using party.
 
 Options:
 
-- `--warnings` prints warnings found while scanning your saves folder
+- `--errors` prints warnings found while scanning your saves folder
 - `--all` cleans everything
 - `--noop` prints what the script will do, but won't actually do anything
 - `--verbose` prints every change that will be done on every scene

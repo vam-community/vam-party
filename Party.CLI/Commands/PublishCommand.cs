@@ -20,14 +20,13 @@ namespace Party.CLI.Commands
             var command = new Command("publish", "Prepares files for publishing (using a folder, a list of files or a list of urls)");
             AddCommonOptions(command);
             command.AddArgument(new Argument<string>("input", null) { Arity = ArgumentArity.OneOrMore });
-            command.AddOption(new Option("--package-name", "The name of your package") { Argument = new Argument<string>() });
-            command.AddOption(new Option("--package-version", "The version of your package") { Argument = new Argument<string>() });
-            command.AddOption(new Option("--package-author", "The author name of your package") { Argument = new Argument<string>() });
-            command.AddOption(new Option("--package-version-download-url", "The url to download this version") { Argument = new Argument<string>() });
-            command.AddOption(new Option("--registry", "Path the the index.json file of your locally cloned registry") { Argument = new Argument<FileInfo>().ExistingOnly() });
-            command.AddOption(new Option("--saves", "Specify a custom saves folder, e.g. when the script is not in the Virt-A-Mate folder") { Argument = new Argument<DirectoryInfo>().ExistingOnly() });
-            command.AddOption(new Option("--quiet", "Just print the hash and metadata, no questions asked"));
-            command.AddOption(new Option("--format", "Just format the registry, e.g. after manually editing it"));
+            command.AddOption(new Option("--package-name", "The name of your package") { Argument = new Argument<string>() }.WithAlias("-pn"));
+            command.AddOption(new Option("--package-version", "The version of your package") { Argument = new Argument<string>() }.WithAlias("-v"));
+            command.AddOption(new Option("--package-author", "The author name of your package") { Argument = new Argument<string>() }.WithAlias("-pa"));
+            command.AddOption(new Option("--package-version-download-url", "The url to download this version") { Argument = new Argument<string>() }.WithAlias("-pu"));
+            command.AddOption(new Option("--registry", "Path the the index.json file of your locally cloned registry") { Argument = new Argument<FileInfo>().ExistingOnly() }.WithAlias("-r"));
+            command.AddOption(new Option("--quiet", "Just print the hash and metadata, no questions asked").WithAlias("-q"));
+            command.AddOption(new Option("--format", "Just format the registry, e.g. after manually editing it").WithAlias("-fmt"));
 
             command.Handler = CommandHandler.Create<PublishArguments>(async args =>
             {
@@ -44,7 +43,6 @@ namespace Party.CLI.Commands
             public string PackageAuthor { get; set; }
             public string PackageVersionDownloadUrl { get; set; }
             public FileInfo Registry { get; set; }
-            public DirectoryInfo Saves { get; set; }
             public bool Quiet { get; set; }
             public bool Format { get; set; }
         }
@@ -115,7 +113,7 @@ namespace Party.CLI.Commands
                     {
                         version.Files.AddRange(sanitizedPathOrUrl.StartsWith("http") && Uri.TryCreate(sanitizedPathOrUrl, UriKind.Absolute, out var url)
                              ? await Controller.BuildRegistryFilesFromUrlAsync(registry, url).ConfigureAwait(false)
-                             : await Controller.BuildRegistryFilesFromPathAsync(registry, Path.GetFullPath(sanitizedPathOrUrl), args.Saves).ConfigureAwait(false));
+                             : await Controller.BuildRegistryFilesFromPathAsync(registry, Path.GetFullPath(sanitizedPathOrUrl)).ConfigureAwait(false));
                     }
                     catch (ArgumentException exc)
                     {

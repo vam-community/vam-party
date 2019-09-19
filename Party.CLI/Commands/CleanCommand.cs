@@ -7,7 +7,6 @@ using Party.Shared;
 using Party.Shared.Exceptions;
 using Party.Shared.Models;
 using Party.Shared.Models.Local;
-using Party.Shared.Models.Registries;
 
 namespace Party.CLI.Commands
 {
@@ -18,11 +17,11 @@ namespace Party.CLI.Commands
             var command = new Command("clean", "Updates scenes to reference scripts from their expected folder. You can specify a specific script or scene to clean.");
             AddCommonOptions(command);
             command.AddArgument(new Argument<string>("filter") { Arity = ArgumentArity.ZeroOrOne, Description = "Optional package name or file to clean" });
-            command.AddOption(new Option("--all", "Upgrade everything"));
-            command.AddOption(new Option("--warnings", "Show warnings such as broken scenes or missing scripts"));
+            command.AddOption(new Option("--all", "Upgrade everything").WithAlias("-a"));
+            command.AddOption(new Option("--errors", "Show warnings such as broken scenes or missing scripts").WithAlias("-e"));
             command.AddOption(new Option("--noop", "Prints what the script will do, but won't actually do anything"));
-            command.AddOption(new Option("--delete-unused", "Deletes unused scripts"));
-            command.AddOption(new Option("--verbose", "Prints every change that will be done on every scene"));
+            command.AddOption(new Option("--delete-unused", "Deletes unused scripts").WithAlias("-d"));
+            command.AddOption(new Option("--verbose", "Prints every change that will be done on every scene").WithAlias("-v"));
 
             command.Handler = CommandHandler.Create<CleanArguments>(async args =>
             {
@@ -35,7 +34,7 @@ namespace Party.CLI.Commands
         {
             public string Filter { get; set; }
             public bool All { get; set; }
-            public bool Warnings { get; set; }
+            public bool Errors { get; set; }
             public bool DeleteUnused { get; set; }
             public bool Noop { get; set; }
             public bool Verbose { get; set; }
@@ -104,14 +103,14 @@ namespace Party.CLI.Commands
                 if (args.Verbose)
                 {
                     PrintScriptToPackage(match, null);
-                    PrintWarnings(args.Warnings, match.Local);
+                    PrintScanErrors(args.Errors, match.Local);
                     Renderer.WriteLine($"  Skipping because no scenes are using it", ConsoleColor.DarkGray);
                 }
                 return;
             }
 
             PrintScriptToPackage(match, null);
-            PrintWarnings(args.Warnings, match.Local);
+            PrintScanErrors(args.Errors, match.Local);
 
             var info = await Controller.GetInstalledPackageInfoAsync(match.Remote);
 

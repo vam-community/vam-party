@@ -17,9 +17,9 @@ namespace Party.CLI.Commands
             var command = new Command("status", "Shows the state of the current scripts and scenes");
             AddCommonOptions(command);
             command.AddArgument(new Argument<string>("filter") { Arity = ArgumentArity.ZeroOrOne });
-            command.AddOption(new Option("--breakdown", "Show the list of scenes and files for each script"));
-            command.AddOption(new Option("--warnings", "Show warnings such as broken scenes or missing scripts"));
-            command.AddOption(new Option("--unregistered", "Show all scripts that were not registered"));
+            command.AddOption(new Option("--breakdown", "Show the list of scenes and files for each script").WithAlias("-b"));
+            command.AddOption(new Option("--errors", "Show warnings such as broken scenes or missing scripts").WithAlias("-e"));
+            command.AddOption(new Option("--unregistered", "Show all scripts that were not registered").WithAlias("-u"));
 
             command.Handler = CommandHandler.Create<StatusArguments>(async args =>
             {
@@ -32,7 +32,7 @@ namespace Party.CLI.Commands
         {
             public string Filter { get; set; }
             public bool Breakdown { get; set; }
-            public bool Warnings { get; set; }
+            public bool Errors { get; set; }
             public bool Unregistered { get; set; }
         }
 
@@ -49,7 +49,7 @@ namespace Party.CLI.Commands
 
             var matches = Controller.MatchLocalFilesToRegistry(saves, registry);
 
-            PrintWarnings(args.Warnings, saves);
+            PrintScanErrors(args.Errors, saves);
 
             if (matches.HashMatches.Length == 0)
             {
@@ -63,7 +63,7 @@ namespace Party.CLI.Commands
                     {
                         var localFiles = matchVersion.Select(v => v.Local).ToList();
                         PrintScript(matchScript.Key, matchVersion.Key, localFiles);
-                        PrintWarnings(args.Warnings, localFiles.ToArray<LocalFile>());
+                        PrintScanErrors(args.Errors, localFiles.ToArray<LocalFile>());
                         if (args.Breakdown)
                         {
                             foreach (var localFile in localFiles.OrderBy(p => p.FullPath))
@@ -83,7 +83,7 @@ namespace Party.CLI.Commands
                     var files = match.ToArray();
                     var first = files.First();
                     PrintScript(first.Remote.Package, first.Remote.Version, files.Select(f => f.Local).ToArray());
-                    PrintWarnings(args.Warnings, files.Select(f => f.Local).ToArray<LocalFile>());
+                    PrintScanErrors(args.Errors, files.Select(f => f.Local).ToArray<LocalFile>());
                     if (args.Breakdown)
                         PrintScenes("- ", files.SelectMany(f => f.Local.Scenes).Distinct().ToList());
                 }

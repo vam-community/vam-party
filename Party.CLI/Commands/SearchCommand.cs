@@ -3,7 +3,6 @@ using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.Threading.Tasks;
 using Party.Shared;
-using Party.Shared.Models;
 
 namespace Party.CLI.Commands
 {
@@ -26,7 +25,7 @@ namespace Party.CLI.Commands
         {
             public string Query { get; set; }
             public bool NoUsage { get; set; }
-            public bool Warnings { get; set; }
+            public bool Errors { get; set; }
         }
 
         public SearchCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller, CommonArguments args)

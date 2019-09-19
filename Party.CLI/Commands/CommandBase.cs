@@ -38,7 +38,7 @@ namespace Party.CLI.Commands
         protected static void AddCommonOptions(Command command)
         {
             command.AddOption(new Option("--vam", "Specify the Virt-A-Mate install folder") { Argument = new Argument<DirectoryInfo>().ExistingOnly() });
-            command.AddOption(new Option("--force", "Ignores most security checks and health checks"));
+            command.AddOption(new Option("--force", "Ignores most security checks and health checks").WithAlias("-f"));
         }
 
         public abstract class CommonArguments
@@ -92,12 +92,12 @@ namespace Party.CLI.Commands
             return (saves, registry);
         }
 
-        protected void PrintWarnings(bool details, SavesMap map)
+        protected void PrintScanErrors(bool details, SavesMap map)
         {
-            PrintWarnings(details, map.Scripts.Cast<LocalFile>().Concat(map.Scenes).ToArray());
+            PrintScanErrors(details, map.Scripts.Cast<LocalFile>().Concat(map.Scenes).ToArray());
         }
 
-        protected void PrintWarnings(bool details, params LocalFile[] files)
+        protected void PrintScanErrors(bool details, params LocalFile[] files)
         {
             var logs = files?.Where(f => f.Errors != null && f.Errors.Count > 0).SelectMany(f => f.Errors?.Select(e => (f, e))).ToList();
             if (logs == null || logs.Count == 0) return;
@@ -138,7 +138,7 @@ namespace Party.CLI.Commands
             {
                 using (Renderer.WithColor(errors.Length > 0 ? ConsoleColor.Red : ConsoleColor.Yellow))
                 {
-                    Renderer.Error.WriteLine($"Found {Pluralize(warnings?.Length ?? 0, "warning", "warnings")} and {Pluralize(errors?.Length ?? 0, "error", "errors")} while scanning. Run with --warnings to print them.");
+                    Renderer.Error.WriteLine($"Found {Pluralize(warnings?.Length ?? 0, "warning", "warnings")} and {Pluralize(errors?.Length ?? 0, "error", "errors")} while scanning. Run with --errors to print them.");
                 }
             }
         }

@@ -102,10 +102,10 @@ namespace Party.Shared
             return (saves, registry);
         }
 
-        public Task<SortedSet<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string path, DirectoryInfo saves)
+        public Task<SortedSet<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string path)
         {
-            return new BuildRegistryFilesFromPathHandler(saves?.FullName ?? SavesDirectory, _fs)
-                .BuildRegistryFilesFromPathAsync(registry, saves != null ? path : SanitizePath(path));
+            return new BuildRegistryFilesFromPathHandler(_fs)
+                .BuildRegistryFilesFromPathAsync(registry, SanitizePath(path));
         }
 
         public Task<SortedSet<RegistryFile>> BuildRegistryFilesFromUrlAsync(Registry registry, Uri url)
@@ -225,7 +225,7 @@ namespace Party.Shared
         Task<Registry> AcquireRegistryAsync(params string[] registries);
         Task<SavesMap> ScanLocalFilesAsync(string filter, IProgress<ScanLocalFilesProgress> reporter);
         Task<(SavesMap saves, Registry registry)> ScanLocalFilesAndAcquireRegistryAsync(string[] registries, string filter, IProgress<ScanLocalFilesProgress> reporter);
-        Task<SortedSet<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string path, DirectoryInfo saves);
+        Task<SortedSet<RegistryFile>> BuildRegistryFilesFromPathAsync(Registry registry, string path);
         Task<SortedSet<RegistryFile>> BuildRegistryFilesFromUrlAsync(Registry registry, Uri url);
         IEnumerable<SearchResult> FilterRegistry(Registry registry, string query);
         Task<LocalPackageInfo> GetInstalledPackageInfoAsync(RegistryPackageVersionContext context);

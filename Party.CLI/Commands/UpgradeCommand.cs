@@ -1,12 +1,10 @@
 ﻿using System;
 using System.CommandLine;
 using System.CommandLine.Invocation;
-using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
 using Party.Shared.Exceptions;
 using Party.Shared.Models;
-using Party.Shared.Models.Local;
 
 namespace Party.CLI.Commands
 {
@@ -18,10 +16,10 @@ namespace Party.CLI.Commands
             AddCommonOptions(command);
             // TODO: Specify specific scenes and/or specific scripts and/or specific packages to upgrade
             command.AddArgument(new Argument<string>("filter") { Arity = ArgumentArity.ZeroOrOne });
-            command.AddOption(new Option("--all", "Upgrade everything"));
-            command.AddOption(new Option("--warnings", "Show warnings such as broken scenes or missing scripts"));
+            command.AddOption(new Option("--all", "Upgrade everything").WithAlias("-a"));
+            command.AddOption(new Option("--errors", "Show warnings such as broken scenes or missing scripts").WithAlias("-e"));
             command.AddOption(new Option("--noop", "Prints what the script will do, but won't actually do anything"));
-            command.AddOption(new Option("--verbose", "Prints every change that will be done on every scene"));
+            command.AddOption(new Option("--verbose", "Prints every change that will be done on every scene").WithAlias("-v"));
 
             command.Handler = CommandHandler.Create<UpgradeArguments>(async args =>
             {
@@ -34,7 +32,7 @@ namespace Party.CLI.Commands
         {
             public string Filter { get; set; }
             public bool All { get; set; }
-            public bool Warnings { get; set; }
+            public bool Errors { get; set; }
             public bool Noop { get; set; }
             public bool Verbose { get; set; }
         }
@@ -57,7 +55,7 @@ namespace Party.CLI.Commands
 
             var matches = Controller.MatchLocalFilesToRegistry(saves, registry);
 
-            PrintWarnings(args.Warnings, saves);
+            PrintScanErrors(args.Errors, saves);
 
             foreach (var match in matches.HashMatches)
             {
@@ -75,14 +73,14 @@ namespace Party.CLI.Commands
                 if (args.Verbose)
                 {
                     PrintScriptToPackage(match, null);
-                    PrintWarnings(args.Warnings, match.Local);
+                    PrintScanErrors(args.Errors, match.Local);
                     Renderer.WriteLine($"  Skipping because no updates are available", ConsoleColor.DarkGray);
                 }
                 return;
             }
 
             PrintScriptToPackage(match, updateToVersion);
-            PrintWarnings(args.Warnings, match.Local);
+            PrintScanErrors(args.Errors, match.Local);
 
             var info = await Controller.GetInstalledPackageInfoAsync(match.Remote.WithVersion(updateToVersion ?? match.Remote.Version));
 

@@ -14,12 +14,10 @@ namespace Party.Shared.Handlers
     {
         private const int _maxScripts = 100;
         private static readonly string[] _validFileExtensions = new[] { ".cs", ".cslist" };
-        private readonly string _savesDirectory;
         private readonly IFileSystem _fs;
 
-        public BuildRegistryFilesFromPathHandler(string savesDirectory, IFileSystem fs)
+        public BuildRegistryFilesFromPathHandler(IFileSystem fs)
         {
-            _savesDirectory = savesDirectory ?? throw new ArgumentNullException(nameof(savesDirectory));
             _fs = fs ?? throw new ArgumentNullException(nameof(fs));
         }
 
@@ -27,8 +25,6 @@ namespace Party.Shared.Handlers
         {
             if (registry is null) throw new ArgumentNullException(nameof(registry));
             if (path is null) throw new ArgumentNullException(nameof(path));
-
-            if (!path.StartsWith(_savesDirectory)) throw new UserInputException($"Path must be inside the saves directory.\nPath: {path}\nSaves: {_savesDirectory}");
 
             var files = GetFilesFromFileSystem(path);
 
