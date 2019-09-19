@@ -22,7 +22,7 @@ namespace Party.Shared
                      new MockFileData(GetSampleSceneJson())},
             });
 
-            var scene = await new SceneSerializer(fileSystem, new Throttler()).Deserialize(ScenePath);
+            var scene = await new SceneSerializer(fileSystem, new Throttler()).DeserializeAsync(ScenePath);
 
             Assert.That(scene.Atoms.SelectMany(a => a.Plugins).Select(p => p.Path), Is.EqualTo(new[] { "Saves/Script 1.cs" }));
         }
@@ -39,10 +39,30 @@ namespace Party.Shared
             });
 
             var serializer = new SceneSerializer(fileSystem, new Throttler());
-            var scene = await serializer.Deserialize(ScenePath);
-            await serializer.Serialize(scene, ScenePath);
+            var scene = await serializer.DeserializeAsync(ScenePath);
+            await serializer.SerializeAsync(scene, ScenePath);
 
             Assert.That(fileSystem.File.ReadAllText(ScenePath), Is.EqualTo(sceneJson));
+        }
+
+        [Test]
+        public async Task CanGetScriptsFast()
+        {
+            string sceneJson = GetSampleSceneJson();
+            var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
+            {
+                {
+                     ScenePath,
+                     new MockFileData(sceneJson)},
+            });
+
+            var serializer = new SceneSerializer(fileSystem, new Throttler());
+            var scripts = await serializer.FindScriptsFastAsync(ScenePath);
+
+            Assert.That(scripts, Is.EqualTo(new[]
+            {
+                "Saves/Script 1.cs"
+            }));
         }
 
         private static string GetSampleSceneJson()

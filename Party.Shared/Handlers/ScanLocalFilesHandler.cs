@@ -204,8 +204,8 @@ namespace Party.Shared.Handlers
             var scene = new LocalSceneFile(sceneFile);
             try
             {
-                var json = await _sceneSerializer.Deserialize(sceneFile).ConfigureAwait(false);
-                foreach (var scriptRefRelativePath in json.Atoms.SelectMany(a => a.Plugins).Select(p => p.Path).Distinct())
+                var scriptRefs = await _sceneSerializer.FindScriptsFastAsync(sceneFile).ConfigureAwait(false);
+                foreach (var scriptRefRelativePath in scriptRefs.Distinct())
                 {
                     var fullPath = scriptRefRelativePath.Contains('/')
                         ? _fs.Path.GetFullPath(scriptRefRelativePath, _vamDirectory)

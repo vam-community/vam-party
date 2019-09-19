@@ -31,7 +31,7 @@ namespace Party.Shared.Handlers
                 changes.AddRange(scriptList.Scripts.SelectMany(script => GetTransform(script, info)));
             }
 
-            var json = await _serializer.Deserialize(scene.FullPath).ConfigureAwait(false);
+            var json = await _serializer.DeserializeAsync(scene.FullPath).ConfigureAwait(false);
             var affected = new List<(string before, string after)>();
             foreach (var change in changes)
             {
@@ -42,7 +42,7 @@ namespace Party.Shared.Handlers
                 }
             }
             if (affected.Count > 0)
-                await _serializer.Serialize(json, scene.FullPath).ConfigureAwait(false);
+                await _serializer.SerializeAsync(json, scene.FullPath).ConfigureAwait(false);
 
             return affected.ToArray();
         }

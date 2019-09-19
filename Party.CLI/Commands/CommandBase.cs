@@ -103,12 +103,12 @@ namespace Party.CLI.Commands
             if (logs == null || logs.Count == 0) return;
 
             var grouped = logs.GroupBy(fe => fe.e.Level).ToDictionary(g => g.Key, g => g.ToArray());
-            grouped.TryGetValue(LocalFileErrorLevel.Error, out var errors);
-            grouped.TryGetValue(LocalFileErrorLevel.Warning, out var warnings);
+            if (!grouped.TryGetValue(LocalFileErrorLevel.Error, out var errors)) errors = new (LocalFile f, LocalFileError e)[0];
+            if (!grouped.TryGetValue(LocalFileErrorLevel.Warning, out var warnings)) warnings = new (LocalFile f, LocalFileError e)[0];
 
             if (details)
             {
-                if (errors != null)
+                if (errors.Length > 0)
                 {
                     using (Renderer.WithColor(ConsoleColor.Red))
                     {
@@ -121,7 +121,7 @@ namespace Party.CLI.Commands
                     Renderer.WriteLine();
                 }
 
-                if (warnings != null)
+                if (warnings.Length > 0)
                 {
                     using (Renderer.WithColor(ConsoleColor.Yellow))
                     {
@@ -134,7 +134,7 @@ namespace Party.CLI.Commands
                 }
                 Renderer.WriteLine();
             }
-            else
+            else if (errors.Length > 0 || warnings.Length > 0)
             {
                 using (Renderer.WithColor(errors.Length > 0 ? ConsoleColor.Red : ConsoleColor.Yellow))
                 {

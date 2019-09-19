@@ -44,10 +44,10 @@ namespace Party.Shared
             };
             var json = new SceneJsonMock(new AtomJsonMock(new PluginJsonMock(@"Saves/My Script.cs")));
             serializer
-                .Setup(s => s.Deserialize(@"C:\VaM\Saves\My Scene.json"))
+                .Setup(s => s.DeserializeAsync(@"C:\VaM\Saves\My Scene.json"))
                 .ReturnsAsync(json);
             serializer
-                .Setup(s => s.Serialize(json, @"C:\VaM\Saves\My Scene.json"))
+                .Setup(s => s.SerializeAsync(json, @"C:\VaM\Saves\My Scene.json"))
                 .Returns(Task.CompletedTask);
             var handler = new ApplyNormalizedPathsToSceneHandler(serializer.Object, @"C:\VaM\Saves");
 
