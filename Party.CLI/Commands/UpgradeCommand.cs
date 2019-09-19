@@ -57,13 +57,20 @@ namespace Party.CLI.Commands
 
             PrintScanErrors(args.Errors, saves);
 
+            var counter = 0;
             foreach (var match in matches.HashMatches)
             {
-                await HandleOne(match, args);
+                if (await HandleOne(match, args))
+                    counter++;
             }
+
+            if (counter > 0)
+                Renderer.WriteLine($"Finished upgrading {counter} packages");
+            else
+                Renderer.WriteLine("Nothing to upgrade!");
         }
 
-        private async Task HandleOne(RegistrySavesMatch match, UpgradeArguments args)
+        private async Task<bool> HandleOne(RegistrySavesMatch match, UpgradeArguments args)
         {
             var latestCompatVersion = match.Remote.Package.GetLatestVersionCompatibleWith(match.Remote.Version.Version);
             var latestVersion = match.Remote.Package.GetLatestVersion();
@@ -79,7 +86,7 @@ namespace Party.CLI.Commands
                     PrintScanErrors(args.Errors, match.Local);
                     Renderer.WriteLine($"  Skipping because no updates are available", ConsoleColor.DarkGray);
                 }
-                return;
+                return false;
             }
 
             PrintScriptToPackage(match, updateToVersion, latestVersion);
@@ -90,7 +97,7 @@ namespace Party.CLI.Commands
             if (info.Installed)
             {
                 Renderer.WriteLine("  Already installed");
-                return;
+                return false;
             }
 
             if (!args.Force && (info.Corrupted || !info.Installable))
@@ -100,20 +107,20 @@ namespace Party.CLI.Commands
                 Renderer.WriteLine("  Files:");
                 PrintInstalledFiles(info, "  ");
                 if (!args.Force)
-                    return;
+                    return false;
             }
 
             if (args.Noop)
             {
                 Renderer.WriteLine("  Skipping install because the --noop option was specified", ConsoleColor.Yellow);
+                return false;
             }
-            else
-            {
-                Renderer.Write($"  Downloading...");
-                info = await Controller.InstallPackageAsync(info, args.Force);
-                Renderer.WriteLine($"  installed in {info.PackageFolder}:", ConsoleColor.Green);
-                PrintInstalledFiles(info);
-            }
+
+            Renderer.Write($"  Downloading...");
+            info = await Controller.InstallPackageAsync(info, args.Force);
+            Renderer.WriteLine($"  installed in {info.PackageFolder}:", ConsoleColor.Green);
+            PrintInstalledFiles(info);
+            return true;
         }
     }
 }
