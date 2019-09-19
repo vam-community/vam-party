@@ -17,7 +17,7 @@ namespace Party.CLI.Commands
             var command = new Command("upgrade", "Updates scenes to reference scripts from the Party folder. You can specify a package, scene or script to upgrade. If you don't specify anything, all scenes and scripts will be upgraded.");
             AddCommonOptions(command);
             // TODO: Specify specific scenes and/or specific scripts and/or specific packages to upgrade
-            command.AddArgument(new Argument<string>("filter"));
+            command.AddArgument(new Argument<string>("filter") { Arity = ArgumentArity.ZeroOrOne });
             command.AddOption(new Option("--all", "Upgrade everything"));
             command.AddOption(new Option("--warnings", "Show warnings such as broken scenes or missing scripts"));
             command.AddOption(new Option("--noop", "Prints what the script will do, but won't actually do anything"));
@@ -94,7 +94,7 @@ namespace Party.CLI.Commands
 
             if (!args.Force && (info.Corrupted || !info.Installable))
             {
-                Renderer.WriteLine("  Cannot upgrade because at least one file is either broken or not installable.");
+                Renderer.WriteLine("  Cannot upgrade because at least one file is either broken or not downloadable.");
                 Renderer.WriteLine($"  You can instead download it at {match.Remote.Version.DownloadUrl ?? match.Remote.Package.Homepage ?? match.Remote.Package.Repository ?? "(no link provided)"}");
                 Renderer.WriteLine("  Files:");
                 PrintInstalledFiles(info, "  ");

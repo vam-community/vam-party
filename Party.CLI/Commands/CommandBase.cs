@@ -149,7 +149,7 @@ namespace Party.CLI.Commands
         {
             foreach (var file in installedStatus.Files)
             {
-                Renderer.Write($"{indent}- {file.FullPath}");
+                Renderer.Write($"{indent}- {Controller.GetDisplayPath(file.FullPath)}");
                 switch (file.Status)
                 {
                     case FileStatus.NotInstalled:
@@ -164,7 +164,7 @@ namespace Party.CLI.Commands
                     case FileStatus.Ignored:
                         Renderer.Write($" [ignored]", ConsoleColor.DarkGray);
                         break;
-                    case FileStatus.NotInstallable:
+                    case FileStatus.NotDownloadable:
                         Renderer.Write($" [not downloadable]", ConsoleColor.Yellow);
                         break;
                 }

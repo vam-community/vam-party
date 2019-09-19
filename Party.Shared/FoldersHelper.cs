@@ -52,7 +52,7 @@ namespace Party.Shared
         public string RelativeToVam(string filename)
         {
             var result = _fs.Path.GetFullPath(_fs.Path.Combine(_vamDirectory, filename));
-            if (!result.StartsWith(_vamDirectory)) throw new UnauthorizedAccessException($"{filename} must traverse paths");
+            if (!result.StartsWith(_vamDirectory)) throw new UnauthorizedAccessException($"Path traversal is disallowed: '{filename}'");
             return result;
         }
     }

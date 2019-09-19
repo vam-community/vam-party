@@ -54,7 +54,7 @@ namespace Party.Shared.Handlers
                 Files = files.ToArray(),
                 Corrupted = files.Any(f => f.Status == FileStatus.HashMismatch),
                 Installed = files.All(f => f.Status == FileStatus.Installed),
-                Installable = files.All(f => f.Status != FileStatus.NotInstallable && f.Status != FileStatus.HashMismatch)
+                Installable = files.All(f => f.Status != FileStatus.NotDownloadable && f.Status != FileStatus.HashMismatch)
             };
         }
 
@@ -63,7 +63,7 @@ namespace Party.Shared.Handlers
             if (!RegistryFile.ValidFilename.IsMatch(file.Filename))
                 throw new UnauthorizedAccessException($"Only files relative to the package (file.cs) or to vam (/file.cs) are accepted. Value: '{file.Filename}'");
             var fullPath = file.Filename.StartsWith("/")
-                ? Path.Combine(_folders.RelativeToVam(packagePath))
+                ? Path.Combine(_folders.RelativeToVam(file.Filename.Substring(1)))
                 : Path.Combine(packagePath, file.Filename);
 
             return new InstalledFileInfo
@@ -81,7 +81,7 @@ namespace Party.Shared.Handlers
                 if (file.Ignore)
                     return FileStatus.Ignored;
                 if (file.Url == null)
-                    return FileStatus.NotInstallable;
+                    return FileStatus.NotDownloadable;
                 return FileStatus.NotInstalled;
             }
 

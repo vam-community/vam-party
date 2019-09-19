@@ -42,21 +42,13 @@ namespace Party.CLI.Commands
                 throw new UserInputException("Invalid package name. Example: 'scripts/my-script'");
 
             var registry = await Controller.GetRegistryAsync().ConfigureAwait(false);
-
-            // TODO: Should handle other types, and and be handled in the controller
-            var package = registry.Get(packageName.Type)?.FirstOrDefault(p => p.Name.Equals(packageName.Name, StringComparison.InvariantCultureIgnoreCase));
-
+            var package = registry.GetPackage(packageName);
             if (package == null)
-            {
                 throw new UserInputException($"Could not find package {args.Package}");
-            }
-
             var latestVersion = package.GetLatestVersion();
-
             if (latestVersion?.Files == null)
-            {
                 throw new RegistryException("Package does not have any versions");
-            }
+            var context = new RegistryPackageVersionContext(registry, package, latestVersion);
 
             Renderer.WriteLine($"Package {package.Type.ToString().ToLowerInvariant()}/{package.Name}");
 
@@ -93,24 +85,22 @@ namespace Party.CLI.Commands
             {
                 // TODO: This should be resolved by the Controller
                 Renderer.WriteLine("Dependencies:");
-                foreach (var dependency in latestVersion.Dependencies.Select(d => (d, p: registry.Get(RegistryPackageType.Scripts).FirstOrDefault(p => p.Name == d.Name))))
+                foreach (var dependency in latestVersion.Dependencies)
                 {
-                    if (dependency.p == null)
+                    if (registry.TryGetDependency(dependency, out var depContext))
                     {
-                        Renderer.WriteLine($"- {dependency.d.Name} v{dependency.d.Version} (not found in the registry)");
+                        Renderer.WriteLine($"- {depContext.Package.Name} v{depContext.Version.Version} by {depContext.Package.Author} ({depContext.Version.Files.Count} files)");
                     }
                     else
                     {
-                        Renderer.WriteLine($"- {dependency.d.Name} v{dependency.d.Version} by {dependency.p.Author}");
+                        Renderer.WriteLine($"- Dependency {dependency} was not found in the registry");
                     }
                 }
             }
 
-            Renderer.WriteLine($"Files in v{latestVersion.Version}:");
-            foreach (var file in latestVersion.Files.Where(f => !f.Ignore && f.Filename != null))
-            {
-                Renderer.WriteLine($"- {file.Filename}: {file.Url ?? "not available in registry"}");
-            }
+            Renderer.WriteLine($"Files:");
+            var info = await Controller.GetInstalledPackageInfoAsync(context);
+            PrintInstalledFiles(info, "");
         }
     }
 }

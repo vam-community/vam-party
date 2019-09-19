@@ -18,7 +18,7 @@ namespace Party.Shared.Models
         Installed,
         HashMismatch,
         Ignored,
-        NotInstallable
+        NotDownloadable
     }
 
     public class InstalledFileInfo

@@ -14,7 +14,12 @@ namespace Party.Shared.Models.Registries
 
         public RegistryPackage GetPackage(PackageFullName packageName)
         {
-            return Get(packageName.Type).FirstOrDefault(s => s.Name.Equals(packageName.Name, StringComparison.InvariantCultureIgnoreCase));
+            return GetPackage(packageName.Type, packageName.Name);
+        }
+
+        public RegistryPackage GetPackage(RegistryPackageType type, string name)
+        {
+            return Get(type).FirstOrDefault(s => s.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
         }
 
         public IReadOnlyCollection<RegistryPackage> Get(RegistryPackageType type)
