@@ -28,7 +28,7 @@ namespace Party.Shared
         }
 
         [Test]
-        public async Task CanDeserializeAndReserializeAsIs()
+        public async Task CanDeserializeAndReSerializeAsIs()
         {
             string sceneJson = GetSampleSceneJson();
             var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
