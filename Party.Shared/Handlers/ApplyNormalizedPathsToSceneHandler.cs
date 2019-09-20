@@ -33,7 +33,7 @@ namespace Party.Shared.Handlers
 
             var json = await _serializer.DeserializeAsync(scene.FullPath).ConfigureAwait(false);
             var affected = new List<(string before, string after)>();
-            foreach (var change in changes)
+            foreach (var change in changes.Where(c => c.before != c.after))
             {
                 foreach (var script in json.Atoms.SelectMany(a => a.Plugins).Where(p => p.Path == change.before))
                 {

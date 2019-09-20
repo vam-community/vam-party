@@ -68,7 +68,7 @@ namespace Party.CLI.Commands
             {
                 Renderer.WriteLine("Cleaning up unused scripts...");
                 saves = await ScanLocalFilesAsync(args.Filter);
-                foreach (var script in saves.Scripts.Where(s => s.Scenes != null && s.Scenes.Count > 0))
+                foreach (var script in saves.Scripts.Where(s => s.Scenes != null && s.Scenes.Count == 0))
                 {
                     if (script is LocalScriptListFile scriptList && scriptList.Scripts != null)
                     {
@@ -116,7 +116,7 @@ namespace Party.CLI.Commands
 
             if (info.Installed)
             {
-                Renderer.WriteLine("  Already in the correct location");
+                Renderer.WriteLine("  Already in the correct location", ConsoleColor.DarkGray);
             }
             else if (!info.Installable)
             {
@@ -126,6 +126,9 @@ namespace Party.CLI.Commands
             else
             {
                 // TODO: It's already installed, we should just move the files
+                Renderer.Write("  Script should bet at ", ConsoleColor.DarkGray);
+                Renderer.Write(info.PackageFolder, ConsoleColor.DarkBlue);
+                Renderer.WriteLine(". Installing...");
                 info = await Controller.InstallPackageAsync(info, true);
                 if (!info.Installed)
                 {
@@ -133,10 +136,6 @@ namespace Party.CLI.Commands
                     return;
                 }
             }
-
-            Renderer.Write("  Script should bet at ", ConsoleColor.DarkGray);
-            Renderer.Write(info.PackageFolder, ConsoleColor.DarkBlue);
-            Renderer.WriteLine();
 
             foreach (var scene in match.Local.Scenes)
             {
