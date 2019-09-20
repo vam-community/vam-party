@@ -8,11 +8,11 @@ namespace Party.CLI.Commands
 {
     public class HelpCommand : CommandBase
     {
-        public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller)
+        public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory)
         {
             var command = new Command("help", "Show useful information about party")
             {
-                Handler = CommandHandler.Create<HelpArguments>(args => new HelpCommand(renderer, config, controller, args).ExecuteAsync())
+                Handler = CommandHandler.Create<HelpArguments>(args => new HelpCommand(renderer, config, controllerFactory, args).ExecuteAsync())
             };
             return command;
         }
@@ -21,8 +21,8 @@ namespace Party.CLI.Commands
         {
         }
 
-        public HelpCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller, CommonArguments args)
-            : base(renderer, config, controller, args)
+        public HelpCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory, CommonArguments args)
+            : base(renderer, config, controllerFactory, args)
         {
         }
 

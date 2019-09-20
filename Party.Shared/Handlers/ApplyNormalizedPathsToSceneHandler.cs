@@ -12,11 +12,11 @@ namespace Party.Shared.Handlers
     public class ApplyNormalizedPathsToSceneHandler
     {
         private readonly ISceneSerializer _serializer;
-        private readonly string _savesDirectory;
+        private readonly string _vamDirectory;
 
-        public ApplyNormalizedPathsToSceneHandler(ISceneSerializer serializer, string savesDirectory)
+        public ApplyNormalizedPathsToSceneHandler(ISceneSerializer serializer, string vamDirectory)
         {
-            _savesDirectory = savesDirectory ?? throw new ArgumentNullException(nameof(savesDirectory));
+            _vamDirectory = vamDirectory ?? throw new ArgumentNullException(nameof(vamDirectory));
             _serializer = serializer;
         }
 
@@ -56,7 +56,7 @@ namespace Party.Shared.Handlers
 
         private string ToRelative(string path)
         {
-            return "Saves/" + path.Substring(_savesDirectory.Length).TrimStart(Path.DirectorySeparatorChar).Replace("\\", "/");
+            return path.Substring(_vamDirectory.Length).TrimStart(Path.DirectorySeparatorChar).Replace("\\", "/");
         }
     }
 }

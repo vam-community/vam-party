@@ -28,11 +28,11 @@ namespace Party.CLI.Commands
         protected PartyConfiguration Config { get; }
         protected IPartyController Controller { get; }
 
-        protected CommandBase(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller, CommonArguments args)
+        protected CommandBase(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory, CommonArguments args)
         {
             Renderer = renderer;
             Config = GetConfig(config, args.VaM);
-            Controller = controller;
+            Controller = controllerFactory.Create(Config);
             Controller.ChecksEnabled = args.Force;
         }
 
@@ -195,24 +195,24 @@ namespace Party.CLI.Commands
             Renderer.Write($" > ");
             if (latestCompatVersion == null && latestVersion == null)
             {
-                Renderer.Write($"already up to date", ConsoleColor.DarkGray);
+                Renderer.Write($"  already up to date", ConsoleColor.DarkGray);
                 Renderer.WriteLine();
             }
-            if (latestCompatVersion != null && latestVersion == latestCompatVersion)
+            else if (latestCompatVersion != null && latestVersion == latestCompatVersion)
             {
-                Renderer.Write($"new version available: v{latestCompatVersion.Version}", ConsoleColor.Magenta);
+                Renderer.Write($"  new version available: v{latestCompatVersion.Version}", ConsoleColor.Magenta);
                 Renderer.WriteLine();
                 Renderer.WriteLine($"  Released {latestCompatVersion.Created.ToLocalTime().ToString("D")}: {latestCompatVersion.Notes ?? "No release notes"}");
             }
-            if (latestCompatVersion != null && latestVersion != latestCompatVersion)
+            else if (latestCompatVersion != null && latestVersion != latestCompatVersion)
             {
-                Renderer.Write($"new compatible version available: v{latestCompatVersion.Version}, also (v{latestVersion.Version} is out!)", ConsoleColor.Magenta);
+                Renderer.Write($"  new compatible version available: v{latestCompatVersion.Version}, also (v{latestVersion.Version} is out!)", ConsoleColor.Magenta);
                 Renderer.WriteLine();
                 Renderer.WriteLine($"  Released {latestCompatVersion.Created.ToLocalTime().ToString("D")}: {latestCompatVersion.Notes ?? "No release notes"}");
             }
             else if (latestVersion != null)
             {
-                Renderer.Write($"new version available: v{latestVersion.Version} (might be incompatible)", ConsoleColor.Red);
+                Renderer.Write($"  new version available: v{latestVersion.Version} (might be incompatible)", ConsoleColor.Red);
                 Renderer.WriteLine();
                 Renderer.WriteLine($"  Released {latestCompatVersion.Created.ToLocalTime().ToString("D")}: {latestCompatVersion.Notes ?? "No release notes"}");
             }

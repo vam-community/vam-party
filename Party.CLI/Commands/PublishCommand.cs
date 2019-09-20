@@ -15,7 +15,7 @@ namespace Party.CLI.Commands
 {
     public class PublishCommand : CommandBase
     {
-        public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller)
+        public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory)
         {
             var command = new Command("publish", "Prepares files for publishing (using a folder, a list of files or a list of urls)");
             AddCommonOptions(command);
@@ -30,7 +30,7 @@ namespace Party.CLI.Commands
 
             command.Handler = CommandHandler.Create<PublishArguments>(async args =>
             {
-                await new PublishCommand(renderer, config, controller, args).ExecuteAsync(args);
+                await new PublishCommand(renderer, config, controllerFactory, args).ExecuteAsync(args);
             });
             return command;
         }
@@ -49,8 +49,8 @@ namespace Party.CLI.Commands
 
         private readonly IRegistrySerializer _serializer = new RegistrySerializer();
 
-        public PublishCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller, CommonArguments args)
-            : base(renderer, config, controller, args)
+        public PublishCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory, CommonArguments args)
+            : base(renderer, config, controllerFactory, args)
         {
         }
 

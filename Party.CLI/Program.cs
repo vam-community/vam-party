@@ -29,9 +29,9 @@ namespace Party.CLI
             var config = PartyConfigurationFactory.Create(vamFolder);
             rootConfig.Bind(config);
 
-            var controller = new PartyController(config);
+            var controllerFactory = new PartyControllerFactory();
 
-            return await new Program(renderer, config, controller).Execute(args).ConfigureAwait(false);
+            return await new Program(renderer, config, controllerFactory).Execute(args).ConfigureAwait(false);
         }
 
         private static string FindVaMDirectory()
@@ -54,27 +54,27 @@ namespace Party.CLI
 
         private readonly IConsoleRenderer _renderer;
         private readonly PartyConfiguration _config;
-        private readonly IPartyController _controller;
+        private readonly IPartyControllerFactory _controllerFactory;
 
-        public Program(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller)
+        public Program(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory)
         {
             _renderer = renderer;
             _config = config;
-            _controller = controller;
+            _controllerFactory = controllerFactory;
         }
 
         public async Task<int> Execute(string[] args)
         {
             var rootCommand = new RootCommand("Party: A Virt-A-Mate package manager")
             {
-                HelpCommand.CreateCommand(_renderer, _config, _controller),
-                SearchCommand.CreateCommand(_renderer, _config, _controller),
-                GetCommand.CreateCommand(_renderer, _config, _controller),
-                ShowCommand.CreateCommand(_renderer, _config, _controller),
-                StatusCommand.CreateCommand(_renderer, _config, _controller),
-                UpgradeCommand.CreateCommand(_renderer, _config, _controller),
-                PublishCommand.CreateCommand(_renderer, _config, _controller),
-                CleanCommand.CreateCommand(_renderer, _config, _controller),
+                HelpCommand.CreateCommand(_renderer, _config, _controllerFactory),
+                SearchCommand.CreateCommand(_renderer, _config, _controllerFactory),
+                GetCommand.CreateCommand(_renderer, _config, _controllerFactory),
+                ShowCommand.CreateCommand(_renderer, _config, _controllerFactory),
+                StatusCommand.CreateCommand(_renderer, _config, _controllerFactory),
+                UpgradeCommand.CreateCommand(_renderer, _config, _controllerFactory),
+                PublishCommand.CreateCommand(_renderer, _config, _controllerFactory),
+                CleanCommand.CreateCommand(_renderer, _config, _controllerFactory),
             };
 
             // For CoreRT:

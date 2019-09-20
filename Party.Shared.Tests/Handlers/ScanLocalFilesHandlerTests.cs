@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
@@ -175,7 +174,6 @@ namespace Party.Shared
                 new SceneSerializer(fileSystem, throttler),
                 new ScriptListSerializer(fileSystem, throttler),
                 @"C:\VaM",
-                @"C:\VaM\Saves",
                 ignoredPaths ?? new string[0]);
         }
 

@@ -34,7 +34,9 @@ namespace Party.CLI
             _controller = new Mock<IPartyController>(MockBehavior.Strict);
             _controller.SetupProperty(mock => mock.ChecksEnabled);
             var config = PartyConfigurationFactory.Create(@"C:\VaM");
-            _program = new Program(_renderer.Object, config, _controller.Object);
+            var factory = new Mock<IPartyControllerFactory>(MockBehavior.Strict);
+            factory.Setup(x => x.Create(config)).Returns(_controller.Object);
+            _program = new Program(_renderer.Object, config, factory.Object);
         }
 
         protected string[] GetOutput()

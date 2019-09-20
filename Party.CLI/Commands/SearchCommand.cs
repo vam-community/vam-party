@@ -8,7 +8,7 @@ namespace Party.CLI.Commands
 {
     public class SearchCommand : CommandBase
     {
-        public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller)
+        public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory)
         {
             var command = new Command("search", "Search for packages in the registry");
             AddCommonOptions(command);
@@ -16,7 +16,7 @@ namespace Party.CLI.Commands
 
             command.Handler = CommandHandler.Create<SearchArguments>(async args =>
             {
-                await new SearchCommand(renderer, config, controller, args).ExecuteAsync(args);
+                await new SearchCommand(renderer, config, controllerFactory, args).ExecuteAsync(args);
             });
             return command;
         }
@@ -28,8 +28,8 @@ namespace Party.CLI.Commands
             public bool Errors { get; set; }
         }
 
-        public SearchCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller, CommonArguments args)
-            : base(renderer, config, controller, args)
+        public SearchCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory, CommonArguments args)
+            : base(renderer, config, controllerFactory, args)
         {
         }
 

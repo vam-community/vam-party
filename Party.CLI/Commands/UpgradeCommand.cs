@@ -10,7 +10,7 @@ namespace Party.CLI.Commands
 {
     public class UpgradeCommand : CommandBase
     {
-        public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller)
+        public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory)
         {
             var command = new Command("upgrade", "Updates scenes to reference scripts from the Party folder. You can specify a package, scene or script to upgrade. If you don't specify anything, all scenes and scripts will be upgraded.");
             AddCommonOptions(command);
@@ -23,7 +23,7 @@ namespace Party.CLI.Commands
 
             command.Handler = CommandHandler.Create<UpgradeArguments>(async args =>
             {
-                await new UpgradeCommand(renderer, config, controller, args).ExecuteAsync(args);
+                await new UpgradeCommand(renderer, config, controllerFactory, args).ExecuteAsync(args);
             });
             return command;
         }
@@ -37,8 +37,8 @@ namespace Party.CLI.Commands
             public bool Verbose { get; set; }
         }
 
-        public UpgradeCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller, CommonArguments args)
-            : base(renderer, config, controller, args)
+        public UpgradeCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory, CommonArguments args)
+            : base(renderer, config, controllerFactory, args)
         {
         }
 

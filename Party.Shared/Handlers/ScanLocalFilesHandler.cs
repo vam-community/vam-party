@@ -26,18 +26,16 @@ namespace Party.Shared.Handlers
         private readonly IFileSystem _fs;
         private readonly ISceneSerializer _sceneSerializer;
         private readonly IScriptListSerializer _scriptListSerializer;
-        private readonly string _savesDirectory;
         private readonly string[] _ignoredPaths;
         private readonly string _vamDirectory;
 
-        public ScanLocalFilesHandler(IFileSystem fs, ISceneSerializer sceneSerializer, IScriptListSerializer scriptListSerializer, string vamDirectory, string savesDirectory, string[] ignoredPaths)
+        public ScanLocalFilesHandler(IFileSystem fs, ISceneSerializer sceneSerializer, IScriptListSerializer scriptListSerializer, string vamDirectory, string[] ignoredPaths)
         {
             _fs = fs ?? throw new ArgumentNullException(nameof(fs));
+            _vamDirectory = vamDirectory ?? throw new ArgumentNullException(nameof(vamDirectory));
             _sceneSerializer = sceneSerializer ?? throw new ArgumentNullException(nameof(sceneSerializer));
             _scriptListSerializer = scriptListSerializer ?? throw new ArgumentNullException(nameof(scriptListSerializer));
-            _savesDirectory = savesDirectory ?? throw new ArgumentNullException(nameof(savesDirectory));
-            _ignoredPaths = ignoredPaths?.Select(path => _fs.Path.GetFullPath(path, savesDirectory)).ToArray() ?? new string[0];
-            _vamDirectory = vamDirectory;
+            _ignoredPaths = ignoredPaths?.Select(path => _fs.Path.GetFullPath(path, vamDirectory)).ToArray() ?? new string[0];
         }
 
         public Task<SavesMap> ScanLocalFilesAsync(string filter, IProgress<ScanLocalFilesProgress> reporter)
@@ -67,7 +65,7 @@ namespace Party.Shared.Handlers
                 });
             }
 
-            foreach (var file in _fs.Directory.EnumerateFiles(_savesDirectory, "*.json", SearchOption.AllDirectories))
+            foreach (var file in _fs.Directory.EnumerateFiles(Path.Combine(_vamDirectory, "Saves"), "*.json", SearchOption.AllDirectories))
             {
                 if (_ignoredPaths.Any(ignoredPath => file.StartsWith(ignoredPath))) continue;
 
@@ -129,7 +127,7 @@ namespace Party.Shared.Handlers
                 });
             }
 
-            foreach (var file in _fs.Directory.EnumerateFiles(directory ?? _savesDirectory, "*.*", SearchOption.AllDirectories))
+            foreach (var file in _fs.Directory.EnumerateFiles(directory ?? Path.Combine(_vamDirectory, "Saves"), "*.*", SearchOption.AllDirectories))
             {
                 if (_ignoredPaths.Any(ignoredPath => file.StartsWith(ignoredPath))) continue;
 

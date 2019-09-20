@@ -12,7 +12,7 @@ namespace Party.CLI.Commands
 {
     public class CleanCommand : CommandBase
     {
-        public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller)
+        public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory)
         {
             var command = new Command("clean", "Updates scenes to reference scripts from their expected folder. You can specify a specific script or scene to clean.");
             AddCommonOptions(command);
@@ -25,7 +25,7 @@ namespace Party.CLI.Commands
 
             command.Handler = CommandHandler.Create<CleanArguments>(async args =>
             {
-                await new CleanCommand(renderer, config, controller, args).ExecuteAsync(args);
+                await new CleanCommand(renderer, config, controllerFactory, args).ExecuteAsync(args);
             });
             return command;
         }
@@ -40,8 +40,8 @@ namespace Party.CLI.Commands
             public bool Verbose { get; set; }
         }
 
-        public CleanCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller, CommonArguments args)
-            : base(renderer, config, controller, args)
+        public CleanCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory, CommonArguments args)
+            : base(renderer, config, controllerFactory, args)
         {
         }
 

@@ -11,7 +11,7 @@ namespace Party.CLI.Commands
 {
     public class ShowCommand : CommandBase
     {
-        public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller)
+        public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory)
         {
             var command = new Command("show", "Show information about a package");
             AddCommonOptions(command);
@@ -19,7 +19,7 @@ namespace Party.CLI.Commands
 
             command.Handler = CommandHandler.Create<ShowArguments>(async args =>
             {
-                await new ShowCommand(renderer, config, controller, args).ExecuteAsync(args);
+                await new ShowCommand(renderer, config, controllerFactory, args).ExecuteAsync(args);
             });
             return command;
         }
@@ -29,8 +29,8 @@ namespace Party.CLI.Commands
             public string Package { get; set; }
         }
 
-        public ShowCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller, CommonArguments args)
-            : base(renderer, config, controller, args)
+        public ShowCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory, CommonArguments args)
+            : base(renderer, config, controllerFactory, args)
         {
         }
 

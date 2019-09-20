@@ -12,7 +12,7 @@ namespace Party.CLI.Commands
 {
     public class StatusCommand : CommandBase
     {
-        public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller)
+        public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory)
         {
             var command = new Command("status", "Shows the state of the current scripts and scenes");
             AddCommonOptions(command);
@@ -23,7 +23,7 @@ namespace Party.CLI.Commands
 
             command.Handler = CommandHandler.Create<StatusArguments>(async args =>
             {
-                await new StatusCommand(renderer, config, controller, args).ExecuteAsync(args);
+                await new StatusCommand(renderer, config, controllerFactory, args).ExecuteAsync(args);
             });
             return command;
         }
@@ -36,8 +36,8 @@ namespace Party.CLI.Commands
             public bool Unregistered { get; set; }
         }
 
-        public StatusCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller, CommonArguments args)
-            : base(renderer, config, controller, args)
+        public StatusCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory, CommonArguments args)
+            : base(renderer, config, controllerFactory, args)
         {
         }
 

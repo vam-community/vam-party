@@ -49,7 +49,7 @@ namespace Party.Shared
             serializer
                 .Setup(s => s.SerializeAsync(json, @"C:\VaM\Saves\My Scene.json"))
                 .Returns(Task.CompletedTask);
-            var handler = new ApplyNormalizedPathsToSceneHandler(serializer.Object, @"C:\VaM\Saves");
+            var handler = new ApplyNormalizedPathsToSceneHandler(serializer.Object, @"C:\VaM");
 
             var result = await handler.ApplyNormalizedPathsToSceneAsync(scene, script, info);
 

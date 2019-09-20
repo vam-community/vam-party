@@ -29,8 +29,6 @@ namespace Party.Shared
         private readonly IFileSystem _fs;
         private readonly IFoldersHelper _folders;
 
-        private string SavesDirectory => Path.Combine(_config.VirtAMate.VirtAMateInstallFolder, "Saves");
-
         public PartyController(PartyConfiguration config)
         {
             _config = config;
@@ -45,8 +43,8 @@ namespace Party.Shared
             if (!ChecksEnabled)
                 return;
 
-            if (!_fs.Directory.Exists(SavesDirectory))
-                throw new SavesException($"Could not find the '{SavesDirectory}' directory under '{_config.VirtAMate.VirtAMateInstallFolder}'. Either put party.exe in your Virt-A-Mate installation folder, or specify --vam in the options.");
+            if (!_fs.Directory.Exists(Path.Combine(_config.VirtAMate.VirtAMateInstallFolder, "Saves")))
+                throw new SavesException($"Could not find the 'Saves' directory under '{_config.VirtAMate.VirtAMateInstallFolder}'. Either put party.exe in your Virt-A-Mate installation folder, or specify --vam in the options.");
         }
 
         public Task<Registry> AcquireRegistryAsync(params string[] registries)
@@ -62,7 +60,6 @@ namespace Party.Shared
                 new SceneSerializer(_fs, _throttler),
                 new ScriptListSerializer(_fs, _throttler),
                 _config.VirtAMate.VirtAMateInstallFolder,
-                SavesDirectory,
                 _config.VirtAMate.IgnoredFolders)
                     .ScanLocalFilesAsync(filter, reporter);
         }
@@ -140,7 +137,7 @@ namespace Party.Shared
 
         public Task<(string before, string after)[]> ApplyNormalizedPathsToSceneAsync(LocalSceneFile scene, LocalScriptFile local, LocalPackageInfo info)
         {
-            return new ApplyNormalizedPathsToSceneHandler(new SceneSerializer(_fs, _throttler), SavesDirectory)
+            return new ApplyNormalizedPathsToSceneHandler(new SceneSerializer(_fs, _throttler), _config.VirtAMate.VirtAMateInstallFolder)
                 .ApplyNormalizedPathsToSceneAsync(scene, local, info);
         }
 
@@ -158,7 +155,7 @@ namespace Party.Shared
 
         public string GetDisplayPath(string path)
         {
-            return GetRelativePath(path, SavesDirectory);
+            return GetRelativePath(path, _config.VirtAMate.VirtAMateInstallFolder);
         }
 
         public string GetRelativePath(string path, string parentPath)
@@ -190,7 +187,7 @@ namespace Party.Shared
             {
                 path = _fs.Path.GetDirectoryName(path);
                 if (path == null) return;
-                if (!path.StartsWith(SavesDirectory)) return;
+                if (!path.StartsWith(_config.VirtAMate.VirtAMateInstallFolder)) return;
                 if (_fs.Directory.EnumerateFileSystemEntries(path).Any()) return;
                 _fs.Directory.Delete(path);
             }

@@ -12,7 +12,7 @@ namespace Party.CLI.Commands
 {
     public class GetCommand : CommandBase
     {
-        public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller)
+        public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory)
         {
             var command = new Command("get", "Downloads a package (script, morph or scene) into the saves folder");
             AddCommonOptions(command);
@@ -21,7 +21,7 @@ namespace Party.CLI.Commands
 
             command.Handler = CommandHandler.Create<GetArguments>(async args =>
             {
-                await new GetCommand(renderer, config, controller, args).ExecuteAsync(args);
+                await new GetCommand(renderer, config, controllerFactory, args).ExecuteAsync(args);
             });
             return command;
         }
@@ -32,8 +32,8 @@ namespace Party.CLI.Commands
             public bool Noop { get; set; }
         }
 
-        public GetCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyController controller, CommonArguments args)
-            : base(renderer, config, controller, args)
+        public GetCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory, CommonArguments args)
+            : base(renderer, config, controllerFactory, args)
         {
         }
 
