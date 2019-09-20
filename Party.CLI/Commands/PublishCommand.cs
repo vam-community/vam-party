@@ -56,6 +56,7 @@ namespace Party.CLI.Commands
 
         private async Task ExecuteAsync(PublishArguments args)
         {
+            ValidateArguments(args.Input);
             Controller.HealthCheck();
 
             Registry registry;

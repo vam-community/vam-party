@@ -44,6 +44,7 @@ namespace Party.CLI.Commands
 
         private async Task ExecuteAsync(UpgradeArguments args)
         {
+            ValidateArguments(args.Filter);
             Controller.HealthCheck();
 
             if (args.All && args.Filter != null)

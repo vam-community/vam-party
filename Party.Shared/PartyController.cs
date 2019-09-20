@@ -88,7 +88,7 @@ namespace Party.Shared
             {
                 var registryPackage = registry.GetPackage(filterPackage);
                 if (registryPackage == null)
-                    throw new RegistryException($"Could not find package '{registryPackage}'");
+                    throw new RegistryException($"Could not find package '{filterPackage}'");
                 var packageHashes = new HashSet<string>(registryPackage.Versions.SelectMany(v => v.Files).Select(f => f.Hash?.Value).Where(h => h != null).Distinct());
                 saves.Scripts = saves.Scripts.Where(s =>
                 {

@@ -35,6 +35,7 @@ namespace Party.CLI.Commands
 
         private async Task ExecuteAsync(SearchArguments args)
         {
+            ValidateArguments(args.Query);
             Controller.HealthCheck();
 
             var registry = await Controller.AcquireRegistryAsync();

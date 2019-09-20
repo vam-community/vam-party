@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
+using Party.Shared.Exceptions;
 using Party.Shared.Models;
 using Party.Shared.Models.Local;
 using Party.Shared.Models.Registries;
@@ -45,6 +46,15 @@ namespace Party.CLI.Commands
         {
             public DirectoryInfo VaM { get; set; }
             public bool Force { get; set; }
+        }
+
+        protected void ValidateArguments(params string[] values)
+        {
+            foreach (var value in values)
+            {
+                if (value != null && value.StartsWith("-"))
+                    throw new UserInputException($"Unknown argument: {value}");
+            }
         }
 
         protected async Task<SavesMap> ScanLocalFilesAsync(string filter = null)

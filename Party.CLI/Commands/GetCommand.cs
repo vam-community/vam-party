@@ -39,6 +39,7 @@ namespace Party.CLI.Commands
 
         private async Task ExecuteAsync(GetArguments args)
         {
+            ValidateArguments(args.Package);
             Controller.HealthCheck();
 
             if (!PackageFullName.TryParsePackage(args.Package, out var packageName))

@@ -43,6 +43,7 @@ namespace Party.CLI.Commands
 
         private async Task ExecuteAsync(StatusArguments args)
         {
+            ValidateArguments(args.Filter);
             Controller.HealthCheck();
 
             var (saves, registry) = await ScanLocalFilesAndAcquireRegistryAsync(args.Filter);
