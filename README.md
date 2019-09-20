@@ -35,6 +35,10 @@ Publish your own scripts:
 
 Find more information and more commands in the [commands documentation](USAGE.md).
 
+## API
+
+You can integrate with Party in your own software using the .Net [API](API.md)
+
 ## Contributing
 
 Pull requests welcome! Find more information on the architecture, how to compile and how to contribute in the [contributing guide](CONTRIBUTING.md)
