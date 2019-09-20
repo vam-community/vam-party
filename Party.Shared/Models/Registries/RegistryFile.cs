@@ -8,7 +8,6 @@ namespace Party.Shared.Models.Registries
     {
         public static readonly Regex ValidFilename = new Regex(@"^\/?([^\/:""*?|<>\.]+\/)*([^\/:""*?|<>\.]+\.)+[a-z]+$", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
 
-        // TODO: Ensure this only contains valid characters
         public string Filename { get; set; }
         public string Url { get; set; }
         public RegistryHash Hash { get; set; }

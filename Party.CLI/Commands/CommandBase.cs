@@ -60,9 +60,6 @@ namespace Party.CLI.Commands
 
         protected async Task<SavesMap> ScanLocalFilesAsync(string filter = null)
         {
-            // NOTE: When specifying --noop to status, it puts --noop in a filter, and returns nothing. Try to avoid that, or at least specify why nothing has been returned?
-            // TODO: This should be done in the Controller
-
             Renderer.WriteLine("Analyzing the saves folder and gettings the packages list from the registry, please wait...");
 
             var stopwatch = new Stopwatch();
@@ -82,9 +79,6 @@ namespace Party.CLI.Commands
 
         protected async Task<(SavesMap, Registry)> ScanLocalFilesAndAcquireRegistryAsync(string filter = null)
         {
-            // NOTE: When specifying --noop to status, it puts --noop in a filter, and returns nothing. Try to avoid that, or at least specify why nothing has been returned?
-            // TODO: This should be done in the Controller
-
             Renderer.WriteLine("Analyzing the saves folder and gettings the packages list from the registry, please wait...");
 
             var stopwatch = new Stopwatch();

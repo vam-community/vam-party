@@ -19,7 +19,6 @@ namespace Party.Shared
         {
             var (_, package, version) = context;
             string author = package.Author ?? "Anonymous";
-            // TODO: Packages could define a preferred structure, e.g. for morphs backward compatibility
             var relativeFolder = package.Type switch
             {
                 RegistryPackageType.Scripts => _fs.Path.Combine(author, package.Name, version.Version),

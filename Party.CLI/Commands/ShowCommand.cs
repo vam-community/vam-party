@@ -86,7 +86,6 @@ namespace Party.CLI.Commands
 
             if ((version.Dependencies?.Count ?? 0) > 0)
             {
-                // TODO: This should be resolved by the Controller
                 Renderer.WriteLine("Dependencies:", ConsoleColor.Blue);
                 foreach (var dependency in version.Dependencies)
                 {

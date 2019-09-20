@@ -14,7 +14,6 @@ namespace Party.CLI.Commands
         {
             var command = new Command("upgrade", "Updates scenes to reference scripts from the Party folder. You can specify a package, scene or script to upgrade. If you don't specify anything, all scenes and scripts will be upgraded.");
             AddCommonOptions(command);
-            // TODO: Specify specific scenes and/or specific scripts and/or specific packages to upgrade
             command.AddArgument(new Argument<string>("filter") { Arity = ArgumentArity.ZeroOrOne });
             command.AddOption(new Option("--all", "Upgrade everything").WithAlias("-a"));
             command.AddOption(new Option("--errors", "Show warnings such as broken scenes or missing scripts").WithAlias("-e"));

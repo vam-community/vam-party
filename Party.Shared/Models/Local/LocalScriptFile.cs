@@ -4,6 +4,8 @@ namespace Party.Shared.Models.Local
 {
     public class LocalScriptFile : LocalFile
     {
+        private readonly object _sync = new object();
+
         public HashSet<LocalSceneFile> Scenes { get; } = new HashSet<LocalSceneFile>();
 
         public LocalScriptFile(string fullPath, string hash)
@@ -13,7 +15,8 @@ namespace Party.Shared.Models.Local
 
         internal void ReferencedBy(LocalSceneFile scene)
         {
-            Scenes.Add(scene);
+            lock (_sync)
+                Scenes.Add(scene);
         }
     }
 }

@@ -131,6 +131,28 @@
       ]
     },
     {
+      "type": "scripts",
+      "name": "match-by-filename-script-1",
+      "description": "This is a package that will only match by filename",
+      "tags": ["match", "test"],
+      "author": "John Doe",
+      "versions": [
+        {
+          "version": "1.0.0-test",
+          "created": "0001-01-01",
+          "files": [
+            {
+              "filename": "Match By Filename Script 1.cs",
+              "hash": {
+                "type": "sha256",
+                "value": "0000000000000000000000000000000000000000000000000000000000000000"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
       "type": "femalemorphs",
       "name": "Morph 1",
       "description": "This is a morph",

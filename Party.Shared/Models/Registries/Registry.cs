@@ -38,7 +38,6 @@ namespace Party.Shared.Models.Registries
 
         public RegistryPackage GetOrCreatePackage(RegistryPackageType type, string name)
         {
-            // TODO: Script-specific
             var script = Get(type).FirstOrDefault(s => s.Name == name);
             if (script != null) return script;
 
@@ -69,7 +68,6 @@ namespace Party.Shared.Models.Registries
 
         public IEnumerable<RegistryPackageFileContext> FlattenFiles(RegistryPackageType type)
         {
-            // TODO: Script-specific
             return Get(type)
                 .SelectMany(package => package.Versions.Select(version => new RegistryPackageVersionContext(this, package, version))
                 .SelectMany(context => context.Version.Files.Select(file => new RegistryPackageFileContext(context, file))));
@@ -77,7 +75,6 @@ namespace Party.Shared.Models.Registries
 
         public void AssertNoDuplicates(RegistryPackageType type, RegistryPackageVersion version)
         {
-            // TODO: Script-specific
             var hashes = version.Files.Where(f => f.Hash?.Value != null).Select(f => f.Hash.Value).ToArray();
             var conflictingVersion = Get(type)
                 .SelectMany(s => s.Versions.Where(v => !ReferenceEquals(v, version)).Select(v => (s, v)))

@@ -32,13 +32,14 @@ namespace Party.Shared.Handlers
             {
                 files.Add(await GetPackageFileInfo(packagePath, file).ConfigureAwait(false));
             }
-            // TODO: Handle deep dependencies
             if (version.Dependencies != null)
             {
                 foreach (var dependency in version.Dependencies)
                 {
                     if (!registry.TryGetDependency(dependency, out var depContext))
                         throw new RegistryException($"Could not find dependency {dependency}");
+                    if (depContext.Version.Dependencies != null && depContext.Version.Dependencies.Count > 0)
+                        throw new RegistryException($"Nesting of dependencies is not yet supported. {context} -> {depContext} -> {depContext.Version.Dependencies.FirstOrDefault()}");
                     var depPath = _folders.GetDirectory(depContext.Package.Type);
                     var depFiles = dependency.Files != null && dependency.Files.Count > 0
                         ? dependency.Files.Select(df => depContext.Version.Files.FirstOrDefault(vf => df == vf.Filename) ?? throw new RegistryException($"Could not find dependency file '{df}' in package '{depContext.Package}@{depContext.Version.Version}'"))

@@ -95,7 +95,6 @@ namespace Party.Shared.Handlers
         private async Task<SavesMap> ScanBySceneAsync(string sceneFile)
         {
             var scripts = new ConcurrentDictionary<string, LocalScriptFile>(StringComparer.InvariantCultureIgnoreCase);
-            // TODO: ScriptList handling
             var scene = await LoadSceneAsync(scripts, sceneFile, true);
             return new SavesMap
             {
@@ -131,7 +130,6 @@ namespace Party.Shared.Handlers
             {
                 if (_ignoredPaths.Any(ignoredPath => file.StartsWith(ignoredPath))) continue;
 
-                // TODO: Here we should simply check if files match the filters, since we have to iterate anyway...
                 switch (Path.GetExtension(file))
                 {
                     case ".json":
@@ -219,18 +217,18 @@ namespace Party.Shared.Handlers
                     }
                     else if (shouldTryLoadingReferences)
                     {
-                        // TODO: This has possible race conditions, but only if more than one scene in filters
-                        scriptRef = await LoadScriptAsync(fullPath).ConfigureAwait(false);
+                        if (_fs.Path.GetExtension(scriptRefRelativePath) == ".cslist")
+                            scriptRef = await LoadScriptListAsync(scripts, fullPath, true).ConfigureAwait(false);
+                        else
+                            scriptRef = await LoadScriptAsync(fullPath).ConfigureAwait(false);
+
                         scene.References(scriptRef);
                         scriptRef.ReferencedBy(scene);
+
                         if (scriptRef.Status > LocalFileErrorLevel.None)
-                        {
                             scene.AddError($"Script does not exist or is invalid: '{fullPath}'", LocalFileErrorLevel.Warning);
-                        }
                         else
-                        {
                             scripts.TryAdd(fullPath, scriptRef);
-                        }
                     }
                     else
                     {

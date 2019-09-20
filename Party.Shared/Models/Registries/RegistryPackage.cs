@@ -14,7 +14,6 @@ namespace Party.Shared.Models.Registries
         public string Description { get; set; }
         public List<string> Tags { get; set; }
         public string Author { get; set; }
-        // TODO: Ensure this only contains valid characters
         public string Homepage { get; set; }
         public string Repository { get; set; }
         public SortedSet<RegistryPackageVersion> Versions { get; set; }

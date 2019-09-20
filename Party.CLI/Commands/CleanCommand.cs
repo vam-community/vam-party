@@ -54,7 +54,6 @@ namespace Party.CLI.Commands
             else if (!args.All && args.Filter == null)
                 throw new UserInputException("You must specify what to upgrade (a .cs, .cslist, .json or package name), or pass --all to upgrade everything");
 
-            // TODO: If the item is a package (no extension), resolve it to a path (if the plugin was not downloaded, throw)
             var (saves, registry) = await ScanLocalFilesAndAcquireRegistryAsync(args.Filter);
 
             var matches = Controller.MatchLocalFilesToRegistry(saves, registry);

@@ -73,8 +73,6 @@ namespace Party.Shared
             Task<Registry> registryTask;
             Task<SavesMap> savesTask;
             registryTask = AcquireRegistryAsync(registries);
-            // TODO: If the item is a package (no extension), resolve it to a path (if the plugin was not downloaded, throw)
-            // TODO: When the filter is a scene, mark every script that was not referenced by that scene as not safe for cleanup; also remove them for display
             savesTask = ScanLocalFilesAsync(pathFilter, reporter);
 
             await Task.WhenAll(registryTask, savesTask).ConfigureAwait(false);

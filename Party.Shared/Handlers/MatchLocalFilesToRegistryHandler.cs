@@ -11,14 +11,14 @@ namespace Party.Shared.Handlers
     {
         public RegistrySavesMatches MatchLocalFilesToRegistry(SavesMap saves, Registry registry)
         {
-            // TODO: Should handle other types
-            var flattened = registry.FlattenFiles(RegistryPackageType.Scripts).ToList();
+            var flattened = registry.FlattenFiles(RegistryPackageType.Scripts).Where(IsScript).ToList();
             var scripts = new List<LocalScriptFile>(saves.Scripts);
 
             var withHash = flattened
                 .Where(svf => svf.File.Hash?.Value != null)
+                // NOTE: This will match the first of two packages sharing the same file
                 .GroupBy(svf => svf.File.Hash.Value)
-                .ToDictionary(svf => svf.Key, svf => svf.First());
+                .ToDictionary(svf => svf.Key, svf => svf.ToList());
             var byHash = MatchByHash(scripts, withHash).ToArray();
             var matchedByHash = new HashSet<LocalScriptFile>(byHash.Select(m => m.Local));
 
@@ -26,7 +26,8 @@ namespace Party.Shared.Handlers
             var withFilename = flattened
                 .Where(remote => remote.File.Filename != null)
                 .GroupBy(remote => Path.GetFileName(remote.File.Filename))
-                .ToDictionary(g => g.Key, g => g.FirstOrDefault());
+                .Where(g => g.Count() == 1)
+                .ToDictionary(g => g.Key, g => g.ToList());
             var byFilename = MatchByFilename(scripts, withFilename).ToArray();
             var matchedByFilename = new HashSet<LocalScriptFile>(byFilename.Concat(byHash).Select(m => m.Local));
 
@@ -38,39 +39,53 @@ namespace Party.Shared.Handlers
             };
         }
 
-        private IEnumerable<RegistrySavesMatch> MatchByHash(IEnumerable<LocalScriptFile> scripts, Dictionary<string, RegistryPackageFileContext> byHash)
+        private bool IsScript(RegistryPackageFileContext ctx)
+        {
+            var extension = Path.GetExtension(ctx.File.Filename);
+            return extension == ".cs" || extension == ".cslist";
+        }
+
+        private IEnumerable<RegistrySavesMatch> MatchByHash(IEnumerable<LocalScriptFile> scripts, Dictionary<string, List<RegistryPackageFileContext>> byHash)
         {
             foreach (var script in scripts)
             {
-                if (script.Hash == null || !byHash.TryGetValue(script.Hash, out var remote))
+                if (script.Hash == null || !byHash.TryGetValue(script.Hash, out var remotes))
                     continue;
 
                 if (script is LocalScriptListFile scriptList)
                 {
-                    if (!scriptList.Scripts.All(s => remote.Version.Files.Any(f => s.FileName != null && s.Hash == f.Hash?.Value)))
-                        continue;
+                    foreach (var remote in remotes)
+                    {
+                        if (scriptList.Scripts.All(s => remote.Version.Files.Any(f => s.FileName != null && s.Hash == f.Hash?.Value)))
+                            yield return new RegistrySavesMatch(remote, script);
+                    }
+                    continue;
                 }
 
-                yield return new RegistrySavesMatch(remote, script);
+                yield return new RegistrySavesMatch(remotes.First(), script);
             }
         }
 
-        private IEnumerable<RegistrySavesMatch> MatchByFilename(IEnumerable<LocalScriptFile> localFiles, Dictionary<string, RegistryPackageFileContext> byFilename)
+        private IEnumerable<RegistrySavesMatch> MatchByFilename(IEnumerable<LocalScriptFile> localFiles, Dictionary<string, List<RegistryPackageFileContext>> byFilename)
         {
             foreach (var local in localFiles)
             {
-                if (local is LocalScriptListFile)
+                if (!byFilename.TryGetValue(local.FileName, out var remotes))
+                    continue;
+
+                if (local is LocalScriptListFile scriptList)
                 {
-                    // We'll only match simple cases
+                    foreach (var remote in remotes)
+                    {
+                        if (scriptList.Scripts.All(s => remote.Version.Files.Any(f => s.FileName == Path.GetFileName(f.Filename))))
+                            yield return new RegistrySavesMatch(remote, local);
+                    }
                     continue;
                 }
 
-                if (!byFilename.TryGetValue(local.FileName, out var remote))
-                {
-                    continue;
-                }
-
-                yield return new RegistrySavesMatch(remote, local);
+                var packages = remotes.GroupBy(r => r.Package.Name);
+                var package = packages.SingleOrDefault();
+                yield return new RegistrySavesMatch(package.FirstOrDefault(), local);
             }
         }
     }
