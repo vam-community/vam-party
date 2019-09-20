@@ -50,6 +50,7 @@ namespace Party.CLI.Commands
 
         protected void ValidateArguments(params string[] values)
         {
+            if (values == null) return;
             foreach (var value in values)
             {
                 if (value != null && value.StartsWith("-"))

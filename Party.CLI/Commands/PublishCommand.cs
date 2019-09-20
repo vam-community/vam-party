@@ -69,7 +69,7 @@ namespace Party.CLI.Commands
 
                 if (args.Format)
                 {
-                    Controller.SaveToFile(_serializer.Serialize(registry), args.Registry.FullName, false);
+                    Controller.SaveRegistry(registry, args.Registry.FullName);
                     return;
                 }
             }
@@ -202,7 +202,8 @@ namespace Party.CLI.Commands
 
             if (args.Registry != null)
             {
-                Controller.SaveToFile(_serializer.Serialize(registry), args.Registry.FullName, false);
+                Controller.SaveRegistry(registry, args.Registry.FullName);
+                // NOTE: This is a workaround for incorrect members sorting, not sure why
                 Renderer.WriteLine($"JSON written to {args.Registry.FullName}");
             }
             else

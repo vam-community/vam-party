@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Party.Shared.Exceptions;
@@ -167,12 +168,20 @@ namespace Party.Shared
             return path.Substring(parentPath.Length).TrimStart(Path.DirectorySeparatorChar);
         }
 
-        public void SaveToFile(string data, string path, bool restrict)
+        public void SaveRegistry(Registry registry, string path)
         {
-            if (restrict)
-                path = SanitizePath(path);
+            if (_fs.Path.GetFileName(path) != "index.json")
+                throw new UserInputException("Looks like the path you provided is not the registry. Make sure the filename is index.json and try again.");
 
-            _fs.File.WriteAllText(path, data);
+            var serializer = new RegistrySerializer();
+            var serialized = serializer.Serialize(registry);
+
+            // NOTE: This is to avoid a hard to reproduce bug where things are out of order sometimes.
+            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(serialized));
+            var deserialized = serializer.Deserialize(stream);
+            serialized = serializer.Serialize(deserialized);
+
+            _fs.File.WriteAllText(path, serialized);
         }
 
         public void Delete(string path)
@@ -232,7 +241,7 @@ namespace Party.Shared
         Task<string> GetPartyUpdatesAvailableAsync();
         string GetDisplayPath(string path);
         string GetRelativePath(string path, string parentPath);
-        void SaveToFile(string data, string path, bool restrict = true);
+        void SaveRegistry(Registry registry, string path);
         void Delete(string path);
         bool Exists(string path);
     }
