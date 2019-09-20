@@ -13,6 +13,17 @@ namespace Party.Shared.Models.Registries
         public RegistryHash Hash { get; set; }
         public bool Ignore { get; set; }
 
+        public override string ToString()
+        {
+            if (Filename == null)
+                return "{(no filename)}";
+            if (Ignore)
+                return $"{{'{Filename}' -> [ignored]}}";
+            if (Hash?.Value != null)
+                return $"{{'{Filename}' -> {Hash?.Value}}}";
+            return $"{{'{Filename}'}}";
+        }
+
         int IComparable<RegistryFile>.CompareTo(RegistryFile other)
         {
             if (Filename == null && other.Filename == null)

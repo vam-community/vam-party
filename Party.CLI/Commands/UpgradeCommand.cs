@@ -72,6 +72,17 @@ namespace Party.CLI.Commands
 
         private async Task<bool> HandleOne(RegistrySavesMatch match, UpgradeArguments args)
         {
+            if (match.Local.Scenes == null || match.Local.Scenes.Count == 0)
+            {
+                if (args.Verbose)
+                {
+                    PrintScriptToPackage(match, null, null);
+                    PrintScanErrors(args.Errors, match.Local);
+                    Renderer.WriteLine($"  Skipping because unused", ConsoleColor.DarkGray);
+                }
+                return false;
+            }
+
             var latestCompatVersion = match.Remote.Package.GetLatestVersionCompatibleWith(match.Remote.Version.Version);
             var latestVersion = match.Remote.Package.GetLatestVersion();
             var updateToVersion = args.Force
@@ -118,8 +129,27 @@ namespace Party.CLI.Commands
 
             Renderer.Write($"  Downloading...");
             info = await Controller.InstallPackageAsync(info, args.Force);
+            if (!info.Installed)
+            {
+                PrintInstalledFiles(info);
+                return false;
+            }
             Renderer.WriteLine($"  installed in {info.PackageFolder}:", ConsoleColor.Green);
             PrintInstalledFiles(info);
+
+            foreach (var scene in match.Local.Scenes)
+            {
+                Renderer.Write($"  Updating scene ");
+                Renderer.Write(Controller.GetDisplayPath(scene.FullPath), ConsoleColor.Blue);
+                Renderer.Write($"...");
+
+                var changes = await Controller.ApplyNormalizedPathsToSceneAsync(scene, match.Local, info);
+
+                if (changes.Length > 0)
+                    Renderer.WriteLine(" updated", ConsoleColor.Green);
+                else
+                    Renderer.WriteLine(" already up to date", ConsoleColor.DarkGray);
+            }
             return true;
         }
     }

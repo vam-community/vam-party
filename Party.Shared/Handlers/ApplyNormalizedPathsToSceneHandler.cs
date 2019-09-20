@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Party.Shared.Exceptions;
 using Party.Shared.Models;
 using Party.Shared.Models.Local;
 using Party.Shared.Serializers;
@@ -49,7 +50,15 @@ namespace Party.Shared.Handlers
 
         private IEnumerable<(string before, string after)> GetTransform(LocalScriptFile local, LocalPackageInfo info)
         {
-            var after = ToRelative(info.Files.First(f => f.RegistryFile.Hash.Value == local.Hash).FullPath);
+            string after;
+            try
+            {
+                after = ToRelative(info.Files.First(f => f.RegistryFile.Hash.Value == local.Hash).FullPath);
+            }
+            catch (InvalidOperationException exc)
+            {
+                throw new SavesException($"Could not find local '{local}' in files {string.Join(", ", info.Files.Select(f => f.RegistryFile.ToString()))}", exc);
+            }
             yield return (before: ToRelative(local.FullPath), after);
             yield return (before: Path.GetFileName(local.FullPath), after);
         }

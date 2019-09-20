@@ -23,5 +23,10 @@ namespace Party.Shared.Models.Local
             if (level > Status) Status = level;
             Errors.Add(new LocalFileError(message, level));
         }
+
+        public override string ToString()
+        {
+            return $"{{'{FullPath}' -> {Hash ?? "(not hashed)"}}}";
+        }
     }
 }

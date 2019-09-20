@@ -131,7 +131,8 @@ namespace Party.CLI.Commands
                 info = await Controller.InstallPackageAsync(info, true);
                 if (!info.Installed)
                 {
-                    Renderer.WriteLine($"  Failed to install package: {string.Join(", ", info.Files.Select(f => $"{Controller.GetDisplayPath(f.FullPath)}: {f.Status}"))}", ConsoleColor.Red);
+                    Renderer.WriteLine($"  Failed to install package:");
+                    PrintInstalledFiles(info);
                     return;
                 }
             }
