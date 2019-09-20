@@ -25,7 +25,7 @@
           "files": [
             {
               "filename": "Complex Plugin.cslist",
-              "url": "https://github.com/vam-community/vam-party/raw/TBD/TestData/Saves/Scripts/Complex%20Plugin/Complex%20Plugin.cslist",
+              "url": "https://github.com/vam-community/vam-party/raw/b8f7957293cdcbd08165118b88dd0d0e233cbc7c/TestData/Saves/Scripts/Complex%20Plugin/Complex%20Plugin.cslist",
               "hash": {
                 "type": "sha256",
                 "value": "5E765D8319F31EA0B091A804BF4FC9B9313D9D36818D2E2E8B26FCB0B956C698"
@@ -33,7 +33,7 @@
             },
             {
               "filename": "Complex Script 1.cs",
-              "url": "https://github.com/vam-community/vam-party/raw/TBD/TestData/Saves/Scripts/Complex%20Plugin/Complex%20Script%201.cs",
+              "url": "https://github.com/vam-community/vam-party/raw/b8f7957293cdcbd08165118b88dd0d0e233cbc7c/TestData/Saves/Scripts/Complex%20Plugin/Complex%20Script%201.cs",
               "hash": {
                 "type": "sha256",
                 "value": "1D432B576F8CF80B2AA5DDB794DFA8A6593149DD682EA265B220C189D49B57EB"
@@ -41,7 +41,7 @@
             },
             {
               "filename": "Complex Script 2.cs",
-              "url": "https://github.com/vam-community/vam-party/raw/TBD/TestData/Saves/Scripts/Complex%20Plugin/Complex%20Script%202.cs",
+              "url": "https://github.com/vam-community/vam-party/raw/b8f7957293cdcbd08165118b88dd0d0e233cbc7c/TestData/Saves/Scripts/Complex%20Plugin/Complex%20Script%202.cs",
               "hash": {
                 "type": "sha256",
                 "value": "5EE72D08BE822B417D97F84A0880CB70B02B80031A1FA03776A6592AA3711838"
@@ -49,7 +49,7 @@
             },
             {
               "filename": "Complex Plugin Subfolder/Complex Script 3.cs",
-              "url": "https://github.com/vam-community/vam-party/raw/TBD/TestData/Saves/Scripts/Complex%20Plugin/Complex%20Plugin%20Subfolder/Complex%20Script%203.cs",
+              "url": "https://github.com/vam-community/vam-party/raw/b8f7957293cdcbd08165118b88dd0d0e233cbc7c/TestData/Saves/Scripts/Complex%20Plugin/Complex%20Plugin%20Subfolder/Complex%20Script%203.cs",
               "hash": {
                 "type": "sha256",
                 "value": "7F965649254F55584CFB213D12DD403D31F6502D6B353DE618E7A62FC6680630"
@@ -58,7 +58,7 @@
           ]
         },
         {
-          "version": "0.0.1-alpha",
+          "version": "1.0.0-test",
           "created": "0001-01-01",
           "files": [
             {
@@ -104,7 +104,7 @@
       "author": "John Doe",
       "versions": [
         {
-          "version": "1.0.0",
+          "version": "1.0.0-test",
           "created": "0001-01-01",
           "dependencies": [
             {
@@ -138,7 +138,7 @@
       "author": "John Doe",
       "versions": [
         {
-          "version": "1.0.0",
+          "version": "1.0.0-test",
           "created": "0001-01-01",
           "files": [
             {
@@ -162,7 +162,7 @@
           "files": [
             {
               "filename": "Multi Script 1.cs",
-              "url": "https://github.com/vam-community/vam-party/raw/TBD/TestData/Saves/Scripts/Multi%20Plugin/Multi%20Script%201.cs",
+              "url": "https://github.com/vam-community/vam-party/raw/b8f7957293cdcbd08165118b88dd0d0e233cbc7c/TestData/Saves/Scripts/Multi%20Plugin/Multi%20Script%201.cs",
               "hash": {
                 "type": "sha256",
                 "value": "D09580C4F9060C444A970013FC228AD0F1052F38031701347B4BB629B24E0E74"
@@ -170,7 +170,7 @@
             },
             {
               "filename": "Multi Script 2.cs",
-              "url": "https://github.com/vam-community/vam-party/raw/TBD/TestData/Saves/Scripts/Multi%20Plugin/Multi%20Script%202.cs",
+              "url": "https://github.com/vam-community/vam-party/raw/b8f7957293cdcbd08165118b88dd0d0e233cbc7c/TestData/Saves/Scripts/Multi%20Plugin/Multi%20Script%202.cs",
               "hash": {
                 "type": "sha256",
                 "value": "4CEAED9623474C738DA02C95B92242B3D5AF5CD8A9EE1F696F7E5C535C85B15F"
@@ -210,13 +210,13 @@
       "author": "John Doe",
       "versions": [
         {
-          "version": "2.0.0",
+          "version": "2.0.0-test",
           "created": "2019-09-19",
           "notes": "Major version!",
           "files": [
             {
               "filename": "Simple Script 1.cs",
-              "url": "https://github.com/vam-community/vam-party/raw/TBD/TestData/Saves/Scripts/Simple%20Script%201.cs",
+              "url": "https://github.com/vam-community/vam-party/raw/b8f7957293cdcbd08165118b88dd0d0e233cbc7c/TestData/Saves/Scripts/Simple%20Script%201.cs",
               "hash": {
                 "type": "sha256",
                 "value": "6283EE45E2CF481A15925122E5197E804CBC91DBDA6203065A2BDBF33DAE0303"
@@ -225,7 +225,7 @@
           ]
         },
         {
-          "version": "1.0.0",
+          "version": "1.0.0-test",
           "created": "0001-01-01",
           "files": [
             {
@@ -248,7 +248,7 @@
       "author": "John Doe",
       "versions": [
         {
-          "version": "1.0.0",
+          "version": "1.0.0-test",
           "created": "0001-01-01",
           "files": [
             {
