@@ -30,16 +30,21 @@ namespace Party.Shared.Handlers
 
         private Dictionary<string, string> DetermineChanges(LocalScriptFile local, LocalPackageInfo after)
         {
-            if (local is LocalScriptListFile)
-                throw new NotImplementedException(".cslist is not yet supported for upgrades");
-
             var changes = new Dictionary<string, string>();
             if (after.Files.Length == 1)
+            {
                 AddChanges(changes, local.FullPath, after.Files[0].FullPath);
-            else
-                throw new NotImplementedException("No automatic strategy implement for this upgrade type");
+                return changes;
+            }
 
-            return changes;
+            var sameFilename = after.Files.FirstOrDefault(f => Path.GetFileName(f.FullPath) == local.FileName);
+            if (sameFilename != null)
+            {
+                AddChanges(changes, local.FullPath, sameFilename.FullPath);
+                return changes;
+            }
+
+            throw new NotImplementedException("No automatic strategy implement for this upgrade type");
         }
 
         private async Task<int> ApplyChanges(LocalSceneFile scene, Dictionary<string, string> changes)
