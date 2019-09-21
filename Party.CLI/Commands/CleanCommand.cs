@@ -150,9 +150,9 @@ namespace Party.CLI.Commands
                 Renderer.Write(scenePath, ConsoleColor.Blue);
                 Renderer.Write($"...");
 
-                var changes = await Controller.ApplyNormalizedPathsToSceneAsync(scene, match.Local, info);
+                var changes = await Controller.UpgradeSceneAsync(scene, match.Local, info);
 
-                if (changes.Length > 0)
+                if (changes > 0)
                     Renderer.WriteLine(" updated", ConsoleColor.Green);
                 else
                     Renderer.WriteLine(" already up to date", ConsoleColor.DarkGray);
@@ -161,14 +161,11 @@ namespace Party.CLI.Commands
                 {
                     using (Renderer.WithColor(ConsoleColor.DarkGray))
                     {
-                        foreach (var (before, after) in changes)
-                        {
-                            Renderer.WriteLine($"    {before} > {after}");
-                        }
+                        Renderer.WriteLine($"    {changes} changes");
                     }
                 }
 
-                if (changes.Length > 0)
+                if (changes > 0)
                 {
                     if (args.Noop)
                     {

@@ -143,9 +143,9 @@ namespace Party.CLI.Commands
                 Renderer.Write(Controller.GetDisplayPath(scene.FullPath), ConsoleColor.Blue);
                 Renderer.Write($"...");
 
-                var changes = await Controller.ApplyNormalizedPathsToSceneAsync(scene, match.Local, info);
+                var changes = await Controller.UpgradeSceneAsync(scene, match.Local, info);
 
-                if (changes.Length > 0)
+                if (changes > 0)
                     Renderer.WriteLine(" updated", ConsoleColor.Green);
                 else
                     Renderer.WriteLine(" already up to date", ConsoleColor.DarkGray);

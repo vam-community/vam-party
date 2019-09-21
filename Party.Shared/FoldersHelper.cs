@@ -54,6 +54,11 @@ namespace Party.Shared
             if (!result.StartsWith(_vamDirectory)) throw new UnauthorizedAccessException($"Path traversal is disallowed: '{filename}'");
             return result;
         }
+
+        public string ToRelative(string path)
+        {
+            return path.Substring(_vamDirectory.Length).TrimStart(_fs.Path.DirectorySeparatorChar);
+        }
     }
 }
 
@@ -62,4 +67,5 @@ public interface IFoldersHelper
     string GetDirectory(RegistryPackageVersionContext context);
     string GetDirectory(RegistryPackageType type);
     string RelativeToVam(string filename);
+    string ToRelative(string path);
 }

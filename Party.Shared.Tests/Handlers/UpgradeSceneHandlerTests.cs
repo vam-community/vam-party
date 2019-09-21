@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
@@ -10,11 +11,15 @@ using Party.Shared.Serializers;
 
 namespace Party.Shared
 {
-    public class ApplyNormalizedPathsToSceneHandlerTests
+    public class UpgradeSceneHandlerTests
     {
         [Test]
         public async Task CanFindAndReplaceAScript()
         {
+            var folders = new Mock<IFoldersHelper>();
+            folders
+            .Setup(x => x.ToRelative(It.IsAny<string>()))
+            .Returns((string path) => path.Replace(@"C:\VaM\", ""));
             var scene = new LocalSceneFile(@"C:\VaM\Saves\My Scene.json");
             var script = new LocalScriptFile(@"C:\VaM\Saves\My Script.cs", "SOMEHASH");
             var info = new LocalPackageInfo
@@ -49,11 +54,12 @@ namespace Party.Shared
             serializer
                 .Setup(s => s.SerializeAsync(json, @"C:\VaM\Saves\My Scene.json"))
                 .Returns(Task.CompletedTask);
-            var handler = new ApplyNormalizedPathsToSceneHandler(serializer.Object, @"C:\VaM");
+            var handler = new UpgradeSceneHandler(serializer.Object, folders.Object);
 
-            var result = await handler.ApplyNormalizedPathsToSceneAsync(scene, script, info);
+            var result = await handler.UpgradeSceneAsync(scene, script, info);
 
-            Assert.That(result, Is.EqualTo(effectiveUpdates));
+            Assert.That(result, Is.EqualTo(1));
+            Assert.That(json.Atoms.First().Plugins.First().Path, Is.EqualTo("Saves/party/some-package/1.0.0/My Script.cs"));
         }
     }
 }

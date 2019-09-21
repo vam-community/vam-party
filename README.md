@@ -8,9 +8,11 @@ Find, download and keep Virt-A-Mate scripts up to date. Uses the [Virt-A-Mate re
 
 This repository and the maintainers are not affiliated in any way with Virt-A-Mate or its developers.
 
-## Usage
+## Installation
 
-Simply download `party.exe` from the [releases](https://github.com/vam-community/vam-party/releases) and put it in your `VaM` directory.
+Simply download `party.zip` from the [releases](https://github.com/vam-community/vam-party/releases) and put it in your `VaM` directory. You should end up with `(your vam install directory)/party/party.exe`.
+
+## Examples
 
 Find packages:
 
@@ -33,11 +35,13 @@ Publish your own scripts:
 
     > party publish Saves\Scripts\My Script.cs
 
-Find more information and more commands in the [commands documentation](USAGE.md).
+## Usage
+
+All commands and their parameters can be found in the [commands documentation](USAGE.md).
 
 ## API
 
-You can integrate with Party in your own software using the .Net [API](API.md)
+You can integrate with Party in your own software using the .Net [API](API.md).
 
 ## Contributing
 

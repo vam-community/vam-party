@@ -65,8 +65,8 @@ namespace Party.CLI.Commands
             if (package.Homepage != null)
                 Renderer.WriteLine($"  Homepage: {package.Homepage}");
 
-            Renderer.Write("Author:", ConsoleColor.Blue);
-            Renderer.WriteLine($" {package.Author}");
+            Renderer.WriteLine("Author:", ConsoleColor.Blue);
+            Renderer.WriteLine($"  {package.Author}");
             var registryAuthor = registry.Authors?.FirstOrDefault(a => a.Name == package.Author);
             if (registryAuthor != null)
             {
@@ -101,6 +101,7 @@ namespace Party.CLI.Commands
             }
 
             Renderer.WriteLine($"Files (for v{version.Version}):", ConsoleColor.Blue);
+            Renderer.WriteLine("Note: This only checks for the expected location. To see other locations, use party status.");
             var info = await Controller.GetInstalledPackageInfoAsync(context);
             PrintInstalledFiles(info, "");
         }

@@ -134,10 +134,10 @@ namespace Party.Shared
                 .MatchLocalFilesToRegistry(saves, registry);
         }
 
-        public Task<(string before, string after)[]> ApplyNormalizedPathsToSceneAsync(LocalSceneFile scene, LocalScriptFile local, LocalPackageInfo info)
+        public Task<int> UpgradeSceneAsync(LocalSceneFile scene, LocalScriptFile local, LocalPackageInfo info)
         {
-            return new ApplyNormalizedPathsToSceneHandler(new SceneSerializer(_fs, _throttler), _config.VirtAMate.VirtAMateInstallFolder)
-                .ApplyNormalizedPathsToSceneAsync(scene, local, info);
+            return new UpgradeSceneHandler(new SceneSerializer(_fs, _throttler), _folders)
+                .UpgradeSceneAsync(scene, local, info);
         }
 
         public async Task<string> GetPartyUpdatesAvailableAsync()
@@ -235,7 +235,7 @@ namespace Party.Shared
         Task<LocalPackageInfo> GetInstalledPackageInfoAsync(RegistryPackageVersionContext context);
         Task<LocalPackageInfo> InstallPackageAsync(LocalPackageInfo info, bool force);
         RegistrySavesMatches MatchLocalFilesToRegistry(SavesMap saves, Registry registry);
-        Task<(string before, string after)[]> ApplyNormalizedPathsToSceneAsync(LocalSceneFile scene, LocalScriptFile local, LocalPackageInfo info);
+        Task<int> UpgradeSceneAsync(LocalSceneFile scene, LocalScriptFile local, LocalPackageInfo info);
         Task<string> GetPartyUpdatesAvailableAsync();
         string GetDisplayPath(string path);
         string GetRelativePath(string path, string parentPath);

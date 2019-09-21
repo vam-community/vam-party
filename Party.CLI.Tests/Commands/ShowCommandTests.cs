@@ -89,12 +89,14 @@ namespace Party.CLI
                 "  Tags: tag1, tag2",
                 "  Repository: https://github.com/...repo",
                 "  Homepage: https://reddit.com/...homepage",
-                "[color:blue]Author:[/color] some dude",
+                "[color:blue]Author:[/color]",
+                "  some dude",
                 "  Github: https://github.com/...profile",
                 "  Reddit: https://reddit.com/...profile",
                 "[color:blue]Versions:[/color]",
                 $"  v1.2.3, {created.ToLocalTime().ToString("d")}: Some cool new stuff",
                 "[color:blue]Files (for v1.2.3):[/color]",
+                "Note: This only checks for the expected location. To see other locations, use party status.",
                 "- Folder/File.cs [color:green][installed][/color]"
             }));
             Assert.That(result, Is.EqualTo(0));
