@@ -64,7 +64,7 @@ namespace Party.Shared.Handlers
             if (!RegistryFile.ValidFilename.IsMatch(file.Filename))
                 throw new UnauthorizedAccessException($"Only files relative to the package (file.cs) or to vam (/file.cs) are accepted. Value: '{file.Filename}'");
             var fullPath = file.Filename.StartsWith("/")
-                ? Path.Combine(_folders.RelativeToVam(file.Filename.Substring(1)))
+                ? Path.Combine(_folders.FromRelativeToVam(file.Filename.Substring(1)))
                 : Path.Combine(packagePath, file.Filename);
 
             return new InstalledFileInfo

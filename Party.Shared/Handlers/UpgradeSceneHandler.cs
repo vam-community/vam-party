@@ -73,8 +73,8 @@ namespace Party.Shared.Handlers
 
         private void AddChanges(IDictionary<string, string> changes, string before, string after)
         {
-            after = _folders.ToRelative(after).Replace("\\", "/");
-            changes.Add(_folders.ToRelative(before).Replace("\\", "/"), after);
+            after = _folders.ToRelativeToVam(after).Replace("\\", "/");
+            changes.Add(_folders.ToRelativeToVam(before).Replace("\\", "/"), after);
             changes.Add(Path.GetFileName(before), after);
         }
     }

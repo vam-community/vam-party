@@ -1,5 +1,6 @@
 using System;
 using System.IO.Abstractions;
+using System.Linq;
 using Party.Shared.Models.Registries;
 
 namespace Party.Shared
@@ -8,11 +9,15 @@ namespace Party.Shared
     {
         private readonly IFileSystem _fs;
         private readonly string _vamDirectory;
+        private readonly string[] _allowedSubfolders;
+        private readonly bool _checksEnabled;
 
-        public FoldersHelper(IFileSystem fs, string vamDirectory)
+        public FoldersHelper(IFileSystem fs, string vamDirectory, string[] allowedSubfolders, bool checksEnabled)
         {
             _fs = fs ?? throw new ArgumentNullException(nameof(fs));
             _vamDirectory = vamDirectory ?? throw new ArgumentNullException(nameof(vamDirectory));
+            _allowedSubfolders = allowedSubfolders ?? new string[0];
+            _checksEnabled = checksEnabled;
         }
 
         public string GetDirectory(RegistryPackageVersionContext context)
@@ -48,16 +53,31 @@ namespace Party.Shared
             };
         }
 
-        public string RelativeToVam(string filename)
+        public string FromRelativeToVam(string filename)
         {
             var result = _fs.Path.GetFullPath(_fs.Path.Combine(_vamDirectory, filename));
             if (!result.StartsWith(_vamDirectory)) throw new UnauthorizedAccessException($"Path traversal is disallowed: '{filename}'");
             return result;
         }
 
-        public string ToRelative(string path)
+        public string ToRelativeToVam(string path)
         {
             return path.Substring(_vamDirectory.Length).TrimStart(_fs.Path.DirectorySeparatorChar);
+        }
+
+        public string SanitizePath(string path)
+        {
+            path = _fs.Path.GetFullPath(path, _vamDirectory);
+            if (_checksEnabled)
+            {
+                if (!path.StartsWith(_vamDirectory)) throw new UnauthorizedAccessException($"Cannot process path '{path}' because it is not in the Virt-A-Mate installation folder.");
+                var localPath = path.Substring(_vamDirectory.Length).TrimStart(new[] { '/', '\\' });
+                var directorySeparatorIndex = localPath.IndexOf('\\');
+                if (directorySeparatorIndex == -1) throw new UnauthorizedAccessException($"Cannot access files directly at Virt-A-Mate's root");
+                var subFolder = localPath.Substring(0, directorySeparatorIndex);
+                if (!_allowedSubfolders.Contains(subFolder)) throw new UnauthorizedAccessException($"Accessing Virt-A-Mate subfolder '{subFolder}' is not allowed");
+            }
+            return path;
         }
     }
 }
@@ -66,6 +86,7 @@ public interface IFoldersHelper
 {
     string GetDirectory(RegistryPackageVersionContext context);
     string GetDirectory(RegistryPackageType type);
-    string RelativeToVam(string filename);
-    string ToRelative(string path);
+    string FromRelativeToVam(string filename);
+    string ToRelativeToVam(string path);
+    string SanitizePath(string path);
 }

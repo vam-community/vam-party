@@ -18,7 +18,7 @@ namespace Party.Shared
         {
             var folders = new Mock<IFoldersHelper>();
             folders
-            .Setup(x => x.ToRelative(It.IsAny<string>()))
+            .Setup(x => x.ToRelativeToVam(It.IsAny<string>()))
             .Returns((string path) => path.Replace(@"C:\VaM\", ""));
             var scene = new LocalSceneFile(@"C:\VaM\Saves\My Scene.json");
             var script = new LocalScriptFile(@"C:\VaM\Saves\My Script.cs", "SOMEHASH");

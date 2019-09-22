@@ -32,8 +32,7 @@ namespace Party.CLI.Commands
         {
             Renderer = renderer;
             Config = GetConfig(config, args.VaM);
-            Controller = controllerFactory.Create(Config);
-            Controller.ChecksEnabled = args.Force;
+            Controller = controllerFactory.Create(Config, !args.Force);
         }
 
         protected static void AddCommonOptions(Command command)

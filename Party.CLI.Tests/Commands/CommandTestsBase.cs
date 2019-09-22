@@ -32,10 +32,9 @@ namespace Party.CLI
             _renderer.Setup(x => x.Out).Returns(outWriter);
             _renderer.Setup(x => x.Error).Returns(outWriter);
             _controller = new Mock<IPartyController>(MockBehavior.Strict);
-            _controller.SetupProperty(mock => mock.ChecksEnabled);
             var config = PartyConfigurationFactory.Create(@"C:\VaM");
             var factory = new Mock<IPartyControllerFactory>(MockBehavior.Strict);
-            factory.Setup(x => x.Create(config)).Returns(_controller.Object);
+            factory.Setup(x => x.Create(config, true)).Returns(_controller.Object);
             _program = new Program(_renderer.Object, config, factory.Object);
         }
 
