@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Invocation;
+using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
 using Party.Shared.Exceptions;
 using Party.Shared.Models;
+using Party.Shared.Models.Local;
+using Party.Shared.Models.Registries;
 
 namespace Party.CLI.Commands
 {
@@ -57,21 +61,61 @@ namespace Party.CLI.Commands
 
             PrintScanErrors(args.Errors, saves);
 
-            var counter = 0;
+            Renderer.WriteLine("Upgrading packages...");
+
+            var updatedPackagesCounter = 0;
+            var upgraded = new Dictionary<RegistryPackageVersionContext, LocalPackageInfo>();
+
             foreach (var match in matches.HashMatches)
             {
-                if (await HandleOne(match, args))
-                    counter++;
+                await TryInstallUpdate(match, args, upgraded);
             }
 
-            if (counter > 0)
-                Renderer.WriteLine($"Finished upgrading {counter} packages");
+            if (updatedPackagesCounter > 0)
+                Renderer.WriteLine($"Finished upgrading {updatedPackagesCounter} packages");
             else
-                Renderer.WriteLine("Nothing to upgrade!");
+                Renderer.WriteLine("No packages to update!");
+
+            Renderer.WriteLine("Upgrading scenes...");
+
+            var upgradedScenesCounter = 0;
+
+            foreach (var scene in matches.HashMatches.SelectMany(m => m.Local.Scenes.Select(x => (match: m, scene: x))).GroupBy(x => x.scene).Distinct())
+            {
+                if (await UpgradeScene(scene.Key, scene.Select(s => s.match).Distinct(), args, upgraded))
+                    upgradedScenesCounter++;
+            }
+
+            if (upgradedScenesCounter > 0)
+                Renderer.WriteLine($"Finished upgrading {upgradedScenesCounter} scenes");
+            else
+                Renderer.WriteLine("No scenes to upgrade!");
         }
 
-        private async Task<bool> HandleOne(RegistrySavesMatch match, UpgradeArguments args)
+        private async Task<bool> UpgradeScene(LocalSceneFile scene, IEnumerable<RegistrySavesMatch> matches, UpgradeArguments args, IDictionary<RegistryPackageVersionContext, LocalPackageInfo> upgraded)
         {
+            Renderer.Write($"Updating scene ");
+            Renderer.Write(Controller.GetDisplayPath(scene.FullPath), ConsoleColor.Blue);
+            Renderer.Write($"... ");
+
+            var changes = 0;
+            foreach (var match in matches)
+            {
+                if (upgraded.TryGetValue(match.Remote, out var info))
+                    changes += await Controller.UpgradeSceneAsync(scene, match.Local, info);
+            }
+
+            if (changes > 0)
+                Renderer.WriteLine("  Scene updated", ConsoleColor.Green);
+            else
+                Renderer.WriteLine("  Scene already up to date", ConsoleColor.DarkGray);
+
+            return true;
+        }
+
+        private async Task<LocalPackageInfo> TryInstallUpdate(RegistrySavesMatch match, UpgradeArguments args, IDictionary<RegistryPackageVersionContext, LocalPackageInfo> upgraded)
+        {
+            // No reason to upgrade since nothing uses it
             if (match.Local.Scenes == null || match.Local.Scenes.Count == 0)
             {
                 if (args.Verbose)
@@ -80,7 +124,7 @@ namespace Party.CLI.Commands
                     PrintScanErrors(args.Errors, match.Local);
                     Renderer.WriteLine($"  Skipping because unused", ConsoleColor.DarkGray);
                 }
-                return false;
+                return null;
             }
 
             var latestCompatVersion = match.Remote.Package.GetLatestVersionCompatibleWith(match.Remote.Version.Version);
@@ -97,7 +141,7 @@ namespace Party.CLI.Commands
                     PrintScanErrors(args.Errors, match.Local);
                     Renderer.WriteLine($"  Skipping because no updates are available", ConsoleColor.DarkGray);
                 }
-                return false;
+                return null;
             }
 
             PrintScriptToPackage(match, updateToVersion, latestVersion);
@@ -108,7 +152,7 @@ namespace Party.CLI.Commands
             if (info.Installed)
             {
                 Renderer.WriteLine("  Already installed");
-                return false;
+                return null;
             }
 
             if (!args.Force && (info.Corrupted || !info.Installable))
@@ -118,39 +162,20 @@ namespace Party.CLI.Commands
                 Renderer.WriteLine("  Files:");
                 PrintInstalledFiles(info, "  ");
                 if (!args.Force)
-                    return false;
+                    return null;
             }
 
             if (args.Noop)
             {
-                Renderer.WriteLine("  Skipping install because the --noop option was specified", ConsoleColor.Yellow);
-                return false;
+                Renderer.WriteLine("skipping install because the --noop option was specified", ConsoleColor.Yellow);
+                return null;
             }
 
-            Renderer.Write($"  Downloading...");
+            Renderer.WriteLine($"  Downloading... ");
             info = await Controller.InstallPackageAsync(info, args.Force);
-            if (!info.Installed)
-            {
-                PrintInstalledFiles(info);
-                return false;
-            }
-            Renderer.WriteLine($"  installed in {info.PackageFolder}:", ConsoleColor.Green);
-            PrintInstalledFiles(info);
-
-            foreach (var scene in match.Local.Scenes)
-            {
-                Renderer.Write($"  Updating scene ");
-                Renderer.Write(Controller.GetDisplayPath(scene.FullPath), ConsoleColor.Blue);
-                Renderer.Write($"...");
-
-                var changes = await Controller.UpgradeSceneAsync(scene, match.Local, info);
-
-                if (changes > 0)
-                    Renderer.WriteLine(" updated", ConsoleColor.Green);
-                else
-                    Renderer.WriteLine(" already up to date", ConsoleColor.DarkGray);
-            }
-            return true;
+            upgraded.Add(match.Remote, info);
+            Renderer.WriteLine($"  Installed in {Controller.GetDisplayPath(info.PackageFolder)}:", ConsoleColor.Green);
+            return info;
         }
     }
 }

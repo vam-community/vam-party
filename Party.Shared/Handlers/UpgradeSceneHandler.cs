@@ -22,6 +22,10 @@ namespace Party.Shared.Handlers
 
         public async Task<int> UpgradeSceneAsync(LocalSceneFile scene, LocalScriptFile local, LocalPackageInfo after)
         {
+            if (scene is null) throw new ArgumentNullException(nameof(scene));
+            if (local is null) throw new ArgumentNullException(nameof(local));
+            if (after is null) throw new ArgumentNullException(nameof(after));
+
             var changes = DetermineChanges(local, after);
             if (changes.Count == 0) return 0;
 
