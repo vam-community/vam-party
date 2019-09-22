@@ -101,6 +101,14 @@ namespace Party.CLI.Commands
                         PrintScenes("- ", script.Scenes);
                 }
             }
+            else
+            {
+                if (matches.FilenameMatches.Length > 0)
+                    Renderer.WriteLine($"Also found {matches.FilenameMatches.Length} scripts with a filename matching a known script. They are either unpublished or were modified. Run with --unregistered to see them.");
+
+                if (matches.NoMatches.Length > 0)
+                    Renderer.WriteLine($"Also found {matches.NoMatches.Length} scripts that could not be matched to a registered package. Run with --unregistered to see them.");
+            }
         }
 
         private void PrintScript(RegistryPackage script, RegistryPackageVersion version, IReadOnlyCollection<LocalScriptFile> localFiles)
