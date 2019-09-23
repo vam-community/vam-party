@@ -82,7 +82,7 @@ namespace Party.CLI.Commands
 
             foreach (var scene in matches.HashMatches.SelectMany(m => m.Local.Scenes.Select(x => (match: m, scene: x))).GroupBy(x => x.scene).Distinct())
             {
-                if (await UpgradeScene(scene.Key, scene.Select(s => s.match).Distinct(), args, upgraded))
+                if (await UpgradeScene(scene.Key, scene.Select(s => s.match).Distinct(), upgraded))
                     upgradedScenesCounter++;
             }
 
@@ -92,7 +92,7 @@ namespace Party.CLI.Commands
                 Renderer.WriteLine("No scenes to upgrade!");
         }
 
-        private async Task<bool> UpgradeScene(LocalSceneFile scene, IEnumerable<RegistrySavesMatch> matches, UpgradeArguments args, IDictionary<RegistryPackageVersionContext, LocalPackageInfo> upgraded)
+        private async Task<bool> UpgradeScene(LocalSceneFile scene, IEnumerable<RegistrySavesMatch> matches, IDictionary<RegistryPackageVersionContext, LocalPackageInfo> upgraded)
         {
             Renderer.Write($"Updating scene ");
             Renderer.Write(Controller.GetDisplayPath(scene.FullPath), ConsoleColor.Blue);

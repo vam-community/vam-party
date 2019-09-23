@@ -10,7 +10,7 @@ namespace Party.Shared
 {
     public class SceneSerializerTests
     {
-        private const string ScenePath = @"C:\VaM\Saves\Scene 1.json";
+        private const string _scenePath = @"C:\VaM\Saves\Scene 1.json";
 
         [Test]
         public async Task CanDeserialize()
@@ -18,11 +18,11 @@ namespace Party.Shared
             var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
             {
                 {
-                     ScenePath,
+                     _scenePath,
                      new MockFileData(GetSampleSceneJson())},
             });
 
-            var scene = await new SceneSerializer(fileSystem, new Throttler()).DeserializeAsync(ScenePath);
+            var scene = await new SceneSerializer(fileSystem, new Throttler()).DeserializeAsync(_scenePath);
 
             Assert.That(scene.Atoms.SelectMany(a => a.Plugins).Select(p => p.Path), Is.EqualTo(new[] { "Saves/Script 1.cs" }));
         }
@@ -34,15 +34,15 @@ namespace Party.Shared
             var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
             {
                 {
-                     ScenePath,
+                     _scenePath,
                      new MockFileData(sceneJson)},
             });
 
             var serializer = new SceneSerializer(fileSystem, new Throttler());
-            var scene = await serializer.DeserializeAsync(ScenePath);
-            await serializer.SerializeAsync(scene, ScenePath);
+            var scene = await serializer.DeserializeAsync(_scenePath);
+            await serializer.SerializeAsync(scene, _scenePath);
 
-            Assert.That(fileSystem.File.ReadAllText(ScenePath), Is.EqualTo(sceneJson));
+            Assert.That(fileSystem.File.ReadAllText(_scenePath), Is.EqualTo(sceneJson));
         }
 
         [Test]
@@ -52,12 +52,12 @@ namespace Party.Shared
             var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
             {
                 {
-                     ScenePath,
+                     _scenePath,
                      new MockFileData(sceneJson)},
             });
 
             var serializer = new SceneSerializer(fileSystem, new Throttler());
-            var scripts = await serializer.FindScriptsFastAsync(ScenePath);
+            var scripts = await serializer.FindScriptsFastAsync(_scenePath);
 
             Assert.That(scripts, Is.EqualTo(new[]
             {
