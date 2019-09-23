@@ -28,11 +28,13 @@ namespace Party.Shared.Handlers
         private readonly IScriptListSerializer _scriptListSerializer;
         private readonly string[] _ignoredPaths;
         private readonly string _vamDirectory;
+        private readonly string[] _allowedSubfolder;
 
-        public ScanLocalFilesHandler(IFileSystem fs, ISceneSerializer sceneSerializer, IScriptListSerializer scriptListSerializer, string vamDirectory, string[] ignoredPaths)
+        public ScanLocalFilesHandler(IFileSystem fs, ISceneSerializer sceneSerializer, IScriptListSerializer scriptListSerializer, string vamDirectory, string[] allowedSubfolder, string[] ignoredPaths)
         {
             _fs = fs ?? throw new ArgumentNullException(nameof(fs));
             _vamDirectory = vamDirectory ?? throw new ArgumentNullException(nameof(vamDirectory));
+            _allowedSubfolder = allowedSubfolder ?? throw new ArgumentNullException(nameof(allowedSubfolder));
             _sceneSerializer = sceneSerializer ?? throw new ArgumentNullException(nameof(sceneSerializer));
             _scriptListSerializer = scriptListSerializer ?? throw new ArgumentNullException(nameof(scriptListSerializer));
             _ignoredPaths = ignoredPaths?.Select(path => _fs.Path.GetFullPath(path, vamDirectory)).ToArray() ?? new string[0];
@@ -92,6 +94,18 @@ namespace Party.Shared.Handlers
             };
         }
 
+        private IEnumerable<string> EnumerateFiles()
+        {
+            foreach (var subfolder in _allowedSubfolder)
+            {
+                var folder = Path.Combine(_vamDirectory, subfolder);
+                if (!_fs.Directory.Exists(folder))
+                    continue;
+                foreach (var file in _fs.Directory.EnumerateFiles(folder, "*.*", SearchOption.AllDirectories))
+                    yield return file;
+            }
+        }
+
         private async Task<SavesMap> ScanBySceneAsync(string sceneFile)
         {
             var scripts = new ConcurrentDictionary<string, LocalScriptFile>(StringComparer.InvariantCultureIgnoreCase);
@@ -126,7 +140,7 @@ namespace Party.Shared.Handlers
                 });
             }
 
-            foreach (var file in _fs.Directory.EnumerateFiles(directory ?? Path.Combine(_vamDirectory, "Saves"), "*.*", SearchOption.AllDirectories))
+            foreach (var file in EnumerateFiles())
             {
                 if (_ignoredPaths.Any(ignoredPath => file.StartsWith(ignoredPath))) continue;
 

@@ -6,7 +6,7 @@
             { 
                "id" : "PluginManager", 
                "plugins" : { 
-                  "plugin#0" : "Saves/Scripts/Dot Not Exist.cs"
+                  "plugin#0" : "Custom/Scripts/Dot Not Exist.cs"
                }
             }
          ]

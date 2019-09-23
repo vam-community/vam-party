@@ -33,7 +33,7 @@ Upgrade your scenes and scripts with up-to-date versions from creators:
 
 Publish your own scripts:
 
-    > party publish Saves\Scripts\My Script.cs
+    > party publish Custom\Scripts\My Script.cs
 
 ## Usage
 

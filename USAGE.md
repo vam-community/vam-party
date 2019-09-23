@@ -98,7 +98,7 @@ Prints the list of all installed scripts, identify the ones that are out of date
 You can also specify a script, a scene or a package name to show if you don't want to list everything in your Saves folder.
 
     > party status scripts/some-package
-    > party status "Saves\Scripts\Some Script.cs"
+    > party status "Custom\Scripts\Some Script.cs"
     > party status "Saves\scenes\Some Scene.json"
 
 Options:

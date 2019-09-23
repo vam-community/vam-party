@@ -58,6 +58,7 @@ namespace Party.Shared
                 new SceneSerializer(_fs, _throttler),
                 new ScriptListSerializer(_fs, _throttler),
                 _config.VirtAMate.VirtAMateInstallFolder,
+                _config.VirtAMate.AllowedSubfolders,
                 _config.VirtAMate.IgnoredFolders)
                     .ScanLocalFilesAsync(filter, reporter);
         }

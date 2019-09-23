@@ -6,7 +6,7 @@
             { 
                "id" : "PluginManager", 
                "plugins" : { 
-                  "plugin#0" : "Saves/Scripts/My Script 1.cs"
+                  "plugin#0" : "Custom/Scripts/My Script 1.cs"
                }
             }, 
             { 

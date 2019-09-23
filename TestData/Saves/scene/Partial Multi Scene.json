@@ -6,7 +6,7 @@
             { 
                "id" : "PluginManager", 
                "plugins" : { 
-                  "plugin#0" : "Saves/Scripts/Multi Plugin/Multi Script 2.cs"
+                  "plugin#0" : "Custom/Scripts/Multi Plugin/Multi Script 2.cs"
                }
             }
          ]

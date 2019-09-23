@@ -72,7 +72,7 @@ namespace Party.Shared
         {
             var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
             {
-                { @"C:\VaM\Saves\Script 1.cs", new MockFileData("using Unity;\npublic class MyScript {}") },
+                { @"C:\VaM\Custom\Scripts\Script 1.cs", new MockFileData("using Unity;\npublic class MyScript {}") },
             });
             var handler = Create(fileSystem);
 
@@ -80,7 +80,7 @@ namespace Party.Shared
 
             PartyAssertions.AreDeepEqual(
                 ResultFactory.SavesMap()
-                    .WithScript(new LocalScriptFile(@"C:\VaM\Saves\Script 1.cs", "90A449A3FC7A01DCF27C92090C05804BFF1EC887006A77F71E984D21F7B38CD4"), out var _)
+                    .WithScript(new LocalScriptFile(@"C:\VaM\Custom\Scripts\Script 1.cs", "90A449A3FC7A01DCF27C92090C05804BFF1EC887006A77F71E984D21F7B38CD4"), out var _)
                     .Build(),
                 result
             );
@@ -91,18 +91,18 @@ namespace Party.Shared
         {
             var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
             {
-                { @"C:\VaM\Saves\Scene 1.json", new MockFileData("{\"atoms\": [ { \"storables\": [ { \"id\": \"PluginManager\", \"plugins\": { \"plugin#0\": \"Saves/Script 1.cs\" } } ] } ] }") },
-                { @"C:\VaM\Saves\Script 1.cs", new MockFileData("using Unity;\npublic class MyScript {}") }
+                { @"C:\VaM\Saves\Scene 1.json", new MockFileData("{\"atoms\": [ { \"storables\": [ { \"id\": \"PluginManager\", \"plugins\": { \"plugin#0\": \"Custom/Scripts/Script 1.cs\" } } ] } ] }") },
+                { @"C:\VaM\Custom\Scripts\Script 1.cs", new MockFileData("using Unity;\npublic class MyScript {}") }
             });
             var handler = Create(fileSystem);
 
             var result = await handler.ScanLocalFilesAsync(null, new ProgressMock<ScanLocalFilesProgress>());
 
             AssertNoErrors(result);
-            Assert.That(result.Scripts.Select(s => s.FullPath), Is.EquivalentTo(new[] { @"C:\VaM\Saves\Script 1.cs" }));
+            Assert.That(result.Scripts.Select(s => s.FullPath), Is.EquivalentTo(new[] { @"C:\VaM\Custom\Scripts\Script 1.cs" }));
             Assert.That(result.Scenes.Select(s => s.FullPath), Is.EquivalentTo(new[] { @"C:\VaM\Saves\Scene 1.json" }));
             Assert.That(result.Scripts.First().Scenes.Select(s => s.FullPath), Is.EquivalentTo(new[] { @"C:\VaM\Saves\Scene 1.json" }));
-            Assert.That(result.Scenes.First().Scripts.Select(s => s.FullPath), Is.EquivalentTo(new[] { @"C:\VaM\Saves\Script 1.cs" }));
+            Assert.That(result.Scenes.First().Scripts.Select(s => s.FullPath), Is.EquivalentTo(new[] { @"C:\VaM\Custom\Scripts\Script 1.cs" }));
         }
 
         [Test]
@@ -129,8 +129,8 @@ namespace Party.Shared
         {
             var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
             {
-                { @"C:\VaM\Saves\My Script\Script 1.cs", new MockFileData("using Unity;\npublic class MyScript {}") },
-                { @"C:\VaM\Saves\My Script\Add Me.cslist", new MockFileData("Script 1.cs") },
+                { @"C:\VaM\Custom\Scripts\My Script\Script 1.cs", new MockFileData("using Unity;\npublic class MyScript {}") },
+                { @"C:\VaM\Custom\Scripts\My Script\Add Me.cslist", new MockFileData("Script 1.cs") },
             });
             var handler = Create(fileSystem);
 
@@ -138,8 +138,8 @@ namespace Party.Shared
 
             PartyAssertions.AreDeepEqual(
                 ResultFactory.SavesMap()
-                    .WithScript(new LocalScriptListFile(@"C:\VaM\Saves\My Script\Add Me.cslist", "3258C0B1D41C29CBC98B475EEEB5BF7609C9B4F290168A0E2158253DF044F325", new[] {
-                        new LocalScriptFile(@"C:\VaM\Saves\My Script\Script 1.cs", "90A449A3FC7A01DCF27C92090C05804BFF1EC887006A77F71E984D21F7B38CD4")
+                    .WithScript(new LocalScriptListFile(@"C:\VaM\Custom\Scripts\My Script\Add Me.cslist", "3258C0B1D41C29CBC98B475EEEB5BF7609C9B4F290168A0E2158253DF044F325", new[] {
+                        new LocalScriptFile(@"C:\VaM\Custom\Scripts\My Script\Script 1.cs", "90A449A3FC7A01DCF27C92090C05804BFF1EC887006A77F71E984D21F7B38CD4")
                     }), out var _)
                     .Build(),
                 result
@@ -174,13 +174,14 @@ namespace Party.Shared
                 new SceneSerializer(fileSystem, throttler),
                 new ScriptListSerializer(fileSystem, throttler),
                 @"C:\VaM",
+                new[] { "Saves", "Custom" },
                 ignoredPaths ?? new string[0]);
         }
 
         private void AssertNoErrors(SavesMap result)
         {
-            Assert.That(result.Scenes.SelectMany(s => s.Errors ?? new List<LocalFileError>()), Is.Empty);
-            Assert.That(result.Scripts.SelectMany(s => s.Errors ?? new List<LocalFileError>()), Is.Empty);
+            Assert.That(result.Scenes.SelectMany(s => s.Errors ?? new List<LocalFileError>()), Is.Empty, result.Scenes.FirstOrDefault()?.Errors?.FirstOrDefault()?.Error);
+            Assert.That(result.Scripts.SelectMany(s => s.Errors ?? new List<LocalFileError>()), Is.Empty, result.Scripts.FirstOrDefault()?.Errors?.FirstOrDefault().Error);
         }
     }
 }

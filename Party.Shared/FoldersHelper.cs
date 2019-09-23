@@ -42,13 +42,13 @@ namespace Party.Shared
         {
             return type switch
             {
-                RegistryPackageType.Scripts => _fs.Path.Combine(_vamDirectory, "Saves", "Scripts"),
-                RegistryPackageType.Clothing => _fs.Path.Combine(_vamDirectory, "Custom", "Clothing"),
                 RegistryPackageType.Scenes => _fs.Path.Combine(_vamDirectory, "Saves", "scene"),
-                RegistryPackageType.Textures => _fs.Path.Combine(_vamDirectory, "Textures"),
-                RegistryPackageType.Assets => _fs.Path.Combine(_vamDirectory, "Saves", "Assets"),
-                RegistryPackageType.FemaleMorphs => _fs.Path.Combine(_vamDirectory, "Import", "morphs", "female"),
-                RegistryPackageType.MaleMorphs => _fs.Path.Combine(_vamDirectory, "Import", "morphs", "male"),
+                RegistryPackageType.Scripts => _fs.Path.Combine(_vamDirectory, "Custom", "Scripts"),
+                RegistryPackageType.Clothing => _fs.Path.Combine(_vamDirectory, "Custom", "Clothing"),
+                RegistryPackageType.Textures => _fs.Path.Combine(_vamDirectory, "Custom", "Atom", "Person", "Textures"),
+                RegistryPackageType.Assets => _fs.Path.Combine(_vamDirectory, "Custom", "Assets"),
+                RegistryPackageType.FemaleMorphs => _fs.Path.Combine(_vamDirectory, "Custom", "Atoms", "Person", "Morphs", "female"),
+                RegistryPackageType.MaleMorphs => _fs.Path.Combine(_vamDirectory, "Custom", "Atoms", "Person", "Morphs", "male"),
                 _ => throw new NotImplementedException($"Type {type} is not currently handled by the folders helper."),
             };
         }
