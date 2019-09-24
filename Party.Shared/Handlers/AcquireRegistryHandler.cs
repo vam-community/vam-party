@@ -46,19 +46,18 @@ namespace Party.Shared.Handlers
         {
             foreach (var additionalPackage in additionalPackages)
             {
-                var script = registryPackages.FirstOrDefault(s => s.Name == additionalPackage.Name);
-                if (script == null)
+                var package = registryPackages.FirstOrDefault(s => s.Name == additionalPackage.Name);
+                if (package == null)
                 {
                     registryPackages.Add(additionalPackage);
+                    return;
                 }
-                else
+
+                foreach (var additionalVersion in additionalPackage.Versions)
                 {
-                    foreach (var additionalVersion in additionalPackage.Versions)
+                    if (!package.Versions.Any(v => v.Version.Equals(additionalVersion.Version)))
                     {
-                        if (!script.Versions.Any(v => v.Version.Equals(additionalVersion.Version)))
-                        {
-                            script.Versions.Add(additionalVersion);
-                        }
+                        package.Versions.Add(additionalVersion);
                     }
                 }
             }
