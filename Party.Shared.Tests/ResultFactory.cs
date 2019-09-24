@@ -3,6 +3,7 @@ using System.Linq;
 using Party.Shared.Models;
 using Party.Shared.Models.Local;
 using Party.Shared.Models.Registries;
+using Party.Shared.Utils;
 
 namespace Party.Shared
 {
@@ -19,10 +20,16 @@ namespace Party.Shared
 
         internal static RegistryPackage RegScript(string name, params RegistryPackageVersion[] versions)
         {
+            return RegScript(name, null, versions);
+        }
+
+        internal static RegistryPackage RegScript(string name, string author, params RegistryPackageVersion[] versions)
+        {
             return new RegistryPackage
             {
                 Type = RegistryPackageType.Scripts,
                 Name = name,
+                Author = author,
                 Versions = new SortedSet<RegistryPackageVersion>(versions)
             };
         }
@@ -43,6 +50,7 @@ namespace Party.Shared
                 Filename = filename,
                 Hash = new RegistryHash
                 {
+                    Type = Hashing.Type,
                     Value = hash
                 },
                 Url = url

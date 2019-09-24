@@ -5,6 +5,8 @@ namespace Party.Shared.Models.Registries
 {
     public struct RegistryVersionString : IComparable, IComparable<RegistryVersionString>, IEquatable<RegistryVersionString>
     {
+        public static RegistryVersionString Any => new RegistryVersionString("0.0.0-*");
+
         public RegistryVersionString(string version)
         {
             var result = RegistryPackageVersion.ValidVersionNameRegex.Match(version);

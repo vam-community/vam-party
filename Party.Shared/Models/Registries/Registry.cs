@@ -49,20 +49,25 @@ namespace Party.Shared.Models.Registries
 
         public bool TryGetDependency(RegistryPackageDependency dependency, out RegistryPackageVersionContext context)
         {
-            var package = Get(dependency.Type)?.FirstOrDefault(p => p.Name.Equals(dependency.Name, StringComparison.InvariantCultureIgnoreCase));
+            return TryGetPackageVersion(dependency.Type, dependency.Name, dependency.Version, out context);
+        }
+
+        public bool TryGetPackageVersion(RegistryPackageType type, string name, RegistryVersionString version, out RegistryPackageVersionContext context)
+        {
+            var package = Get(type)?.FirstOrDefault(p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
             if (package == null)
             {
                 context = null;
                 return false;
             }
-            var version = dependency.Version != null ? package.GetLatestVersion() : package.Versions.FirstOrDefault(v => v.Version.Equals(dependency.Version));
+            var packageVersion = version == RegistryVersionString.Any ? package.GetLatestVersion() : package.Versions.FirstOrDefault(v => v.Version.Equals(version));
             if (version == null)
             {
                 context = null;
                 return false;
             }
 
-            context = new RegistryPackageVersionContext(this, package, version);
+            context = new RegistryPackageVersionContext(this, package, packageVersion);
             return true;
         }
 
