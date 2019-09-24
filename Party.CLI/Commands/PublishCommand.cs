@@ -191,8 +191,8 @@ namespace Party.CLI.Commands
                     }
                     else
                     {
-                        file.Url = Renderer.Ask($"{file.Filename} URL: ", true);
-                        if (file.Url.EndsWith("/" + file.Filename.Replace(" ", "%20")))
+                        file.Url = Renderer.Ask($"{file.Filename} URL: ", false);
+                        if (file.Url != null && file.Url.EndsWith("/" + file.Filename.Replace(" ", "%20")))
                         {
                             baseUrl = file.Url.Substring(0, file.Url.LastIndexOf("/") + 1);
                         }
