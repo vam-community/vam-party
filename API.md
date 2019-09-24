@@ -5,7 +5,8 @@ You can use the NuGet package (not published yet) or download the zip file direc
 ```csharp
 var config = PartyConfigurationFactory.Create(vamFolder);
 var controllerFactory = new PartyControllerFactory();
-var controller = controllerFactory.Create(config);
+var checks = true; // Ensures operations are done in allowed folders
+var controller = controllerFactory.Create(config, checks);
 controller.HealthCheck();
 SavesMap saves;
 Registry registry;
