@@ -2,7 +2,7 @@ os: windows
 language: csharp
 mono: none
 env:
-  - VERSION_PREFIX="0.11.0" VERSION_SUFFIX="alpha"
+  - VERSION_PREFIX="0.11.2" VERSION_SUFFIX="alpha"
 script:
   - choco install dotnetcore-sdk --pre -y
   - choco install netfx-4.8-devpack --pre -y --ignore-package-exit-codes
@@ -17,6 +17,9 @@ script:
   - powershell "mv ./Party.CLI/bin/Release/net48/publish ./Party.CLI/bin/Release/net48/Party"
   - choco install 7zip -y
   - powershell "7z a ./Party.CLI/bin/Release/net48/party-$VERSION_PREFIX.$TRAVIS_BUILD_NUMBER-$VERSION_SUFFIX.zip ./Party.CLI/bin/Release/net48/Party"
+  - choco install Nuget.CommandLine -y
+  - powershell "if (Test-Path env:/TRAVIS_TAG) { nuget source Add -Name GitHub -Source https://nuget.pkg.github.com/vam-community/index.json -UserName vam-community -Password $env:GITHUB_TOKEN }"
+  - powershell "if (Test-Path env:/TRAVIS_TAG) { nuget push ./Party.Shared/bin/Release/Party.Shared.$VERSION_PREFIX.$TRAVIS_BUILD_NUMBER-$VERSION_SUFFIX.nupkg -Source GitHub }"
 deploy:
   provider: releases
   skip_cleanup: true
