@@ -1,8 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <PartyBuildMode Condition="'$(PartyBuildMode)' == ''">Normal</PartyBuildMode>
-    <TargetFramework Condition="'$(PartyBuildMode)' != 'Normal'">netstandard2.1</TargetFramework>
     <TargetFramework Condition="'$(PartyBuildMode)' == 'Normal'">netstandard2.0</TargetFramework>
+    <TargetFramework Condition="'$(PartyBuildMode)' != 'Normal'">netstandard2.1</TargetFramework>
     <LangVersion Condition="'$(PartyBuildMode)' == 'Normal'">preview</LangVersion>
   </PropertyGroup>
   <ItemGroup>
