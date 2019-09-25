@@ -67,6 +67,13 @@ namespace Party.Shared
         {
             var isFilterPackage = PackageFullName.TryParsePackage(filter, out var filterPackage);
             var pathFilter = !isFilterPackage && filter != null ? Path.GetFullPath(filter) : null;
+            if (pathFilter != null)
+            {
+                if (_fs.Directory.Exists(pathFilter))
+                    throw new UserInputException("The filter argument cannot be a folder");
+                if (!_fs.File.Exists(pathFilter))
+                    throw new ArgumentException($"The specified filter '{pathFilter}' is not a valid filename");
+            }
 
             Task<Registry> registryTask;
             Task<SavesMap> savesTask;

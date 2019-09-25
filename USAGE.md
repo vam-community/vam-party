@@ -71,10 +71,6 @@ Since this can affect lots of files, you might want to make a dry run first, see
 
     > party get upgrade --noop
 
-To avoid clutter, you can delete unused scripts after upgrading using `--clean`. So for an aggressive update:
-
-    > party get upgrade --get --fix --clean
-
 Options:
 
 - `--all` upgrade everything

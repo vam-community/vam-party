@@ -50,7 +50,7 @@ namespace Party.Shared.Handlers
             else if (filterExt == ".cs" || filterExt == ".cslist")
                 return ScanByScriptAsync(filter, reporter);
             else
-                throw new NotSupportedException($"Filter '{filter}' is not supported");
+                throw new NotSupportedException($"Filter extension '{filter}' is not supported");
         }
 
         private async Task<SavesMap> ScanByScriptAsync(string scriptFile, IProgress<ScanLocalFilesProgress> reporter)
