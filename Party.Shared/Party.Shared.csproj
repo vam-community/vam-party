@@ -12,7 +12,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.IO.Abstractions" Version="6.0.32" />
+    <PackageReference Include="System.IO.Abstractions" Version="6.0.36" />
   </ItemGroup>
 
   <PropertyGroup>
