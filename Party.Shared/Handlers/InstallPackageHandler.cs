@@ -27,39 +27,7 @@ namespace Party.Shared.Handlers
             var files = new List<InstalledFileInfo>();
             foreach (var file in info.Files.Where(f => !f.RegistryFile.Ignore))
             {
-                var directory = Path.GetDirectoryName(file.FullPath);
-                if (!_fs.Directory.Exists(directory))
-                {
-                    Directory.CreateDirectory(directory);
-                }
-                var fileResult = new InstalledFileInfo
-                {
-                    FullPath = file.FullPath,
-                    RegistryFile = file.RegistryFile
-                };
-                using var response = await _http.GetAsync(file.RegistryFile.Url).ConfigureAwait(false);
-                try
-                {
-                    response.EnsureSuccessStatusCode();
-                }
-                catch (Exception exc)
-                {
-                    throw new RegistryException($"Failed to download file from {file.RegistryFile.Url}", exc);
-                }
-                var content = await response.Content.ReadAsStringAsync();
-                var lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                var hash = Hashing.GetHash(lines);
-                if (!force && hash != file.RegistryFile.Hash.Value)
-                {
-                    fileResult.Status = FileStatus.HashMismatch;
-                    files.Add(fileResult);
-                }
-                else
-                {
-                    _fs.File.WriteAllText(file.FullPath, content);
-                    fileResult.Status = FileStatus.Installed;
-                    files.Add(fileResult);
-                }
+                files.Add(await InstallFileAsync(force, file).ConfigureAwait(false));
             }
             return new LocalPackageInfo
             {
@@ -69,6 +37,58 @@ namespace Party.Shared.Handlers
                 Installed = files.All(f => f.Status == FileStatus.Installed),
                 Installable = files.All(f => f.Status != FileStatus.NotDownloadable && f.Status != FileStatus.HashMismatch)
             };
+        }
+
+        private async Task<InstalledFileInfo> InstallFileAsync(bool force, InstalledFileInfo file)
+        {
+            var directory = Path.GetDirectoryName(file.FullPath);
+            if (!_fs.Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+            var fileResult = new InstalledFileInfo
+            {
+                FullPath = file.FullPath,
+                RegistryFile = file.RegistryFile
+            };
+            if (_fs.File.Exists(file.FullPath))
+            {
+                if (force)
+                    _fs.File.Delete(file.FullPath);
+                else
+                    return ValidateHash(force, file, fileResult, _fs.File.ReadAllText(file.FullPath));
+            }
+            var response = await _http.GetAsync(file.RegistryFile.Url).ConfigureAwait(false);
+            try
+            {
+                response.EnsureSuccessStatusCode();
+            }
+            catch (Exception exc)
+            {
+                fileResult.Status = FileStatus.NotDownloadable;
+                fileResult.Reason = $"Failed to download file from {file.RegistryFile.Url}: Received status {response.StatusCode}\n{exc.Message}";
+                return fileResult;
+            }
+            var content = await response.Content.ReadAsStringAsync();
+            return ValidateHash(force, file, fileResult, content);
+        }
+
+        private InstalledFileInfo ValidateHash(bool force, InstalledFileInfo file, InstalledFileInfo fileResult, string content)
+        {
+            var lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            var hash = Hashing.GetHash(lines);
+            if (!force && hash != file.RegistryFile.Hash.Value)
+            {
+                fileResult.Status = FileStatus.HashMismatch;
+                fileResult.Reason = $"Expected hash {file.RegistryFile.Hash.Value}, received {hash}. The file was either corrupted during download, or the wrong hash was pushed to the registry.";
+                return fileResult;
+            }
+            else
+            {
+                _fs.File.WriteAllText(file.FullPath, content);
+                fileResult.Status = FileStatus.Installed;
+                return fileResult;
+            }
         }
     }
 }

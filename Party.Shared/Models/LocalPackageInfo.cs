@@ -1,4 +1,3 @@
-using System.Linq;
 using Party.Shared.Models.Registries;
 
 namespace Party.Shared.Models
@@ -26,5 +25,6 @@ namespace Party.Shared.Models
         public string FullPath { get; set; }
         public FileStatus Status { get; set; }
         public RegistryFile RegistryFile { get; set; }
+        public string Reason { get; set; }
     }
 }

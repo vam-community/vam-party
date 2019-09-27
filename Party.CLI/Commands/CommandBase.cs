@@ -170,6 +170,8 @@ namespace Party.CLI.Commands
                         Renderer.Write($"[not downloadable]", ConsoleColor.Yellow);
                         break;
                 }
+                if (file.Reason != null)
+                    Renderer.Write($" {file.Reason}", ConsoleColor.DarkGray);
                 Renderer.WriteLine();
             }
         }
