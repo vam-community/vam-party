@@ -51,19 +51,23 @@ namespace Party.Shared.Handlers
                 var hash = Hashing.GetHash(lines);
                 if (!force && hash != file.RegistryFile.Hash.Value)
                 {
-                    throw new PackageInstallationException($"Hash mismatch between registry file '{file.RegistryFile.Filename}' ({file.RegistryFile.Hash.Value}) and downloaded file '{file.RegistryFile.Url}' ({hash})");
+                    fileResult.Status = FileStatus.HashMismatch;
+                    files.Add(fileResult);
                 }
-                _fs.File.WriteAllText(file.FullPath, content);
-                fileResult.Status = FileStatus.Installed;
-                files.Add(fileResult);
+                else
+                {
+                    _fs.File.WriteAllText(file.FullPath, content);
+                    fileResult.Status = FileStatus.Installed;
+                    files.Add(fileResult);
+                }
             }
             return new LocalPackageInfo
             {
                 PackageFolder = info.PackageFolder,
                 Files = files.ToArray(),
-                Installable = true,
-                Installed = true,
-                Corrupted = false
+                Corrupted = files.Any(f => f.Status == FileStatus.HashMismatch),
+                Installed = files.All(f => f.Status == FileStatus.Installed),
+                Installable = files.All(f => f.Status != FileStatus.NotDownloadable && f.Status != FileStatus.HashMismatch)
             };
         }
     }
