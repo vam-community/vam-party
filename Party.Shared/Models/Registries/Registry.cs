@@ -61,7 +61,7 @@ namespace Party.Shared.Models.Registries
                 return false;
             }
             var packageVersion = version == RegistryVersionString.Any ? package.GetLatestVersion() : package.Versions.FirstOrDefault(v => v.Version.Equals(version));
-            if (version == null)
+            if (packageVersion == null)
             {
                 context = null;
                 return false;
