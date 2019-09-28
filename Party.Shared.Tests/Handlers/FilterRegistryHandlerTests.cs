@@ -17,8 +17,8 @@ namespace Party.Shared.Handlers
         [Test]
         public void CanWorkWithoutQueryNorScenes()
         {
-            var script1 = ResultFactory.RegScript("script1", ResultFactory.RegVer("1.0.0", ResultFactory.RegFile("My Script.cs", "12345", "https://example.org/scripts/MyScript.cs")));
-            var registry = ResultFactory.Reg(script1);
+            var script1 = TestFactory.RegScript("script1", TestFactory.RegVer("1.0.0", TestFactory.RegFile("My Script.cs", "12345", "https://example.org/scripts/MyScript.cs")));
+            var registry = TestFactory.Reg(script1);
 
             var result = _handler.FilterRegistry(registry, "");
 
@@ -35,8 +35,8 @@ namespace Party.Shared.Handlers
         [Test]
         public void CanFlagUntrustedDownloads()
         {
-            var script1 = ResultFactory.RegScript("script1", ResultFactory.RegVer("1.0.0", ResultFactory.RegFile("My Script.cs", "12345", "https://example.com/scripts/MyScript.cs")));
-            var registry = ResultFactory.Reg(script1);
+            var script1 = TestFactory.RegScript("script1", TestFactory.RegVer("1.0.0", TestFactory.RegFile("My Script.cs", "12345", "https://example.com/scripts/MyScript.cs")));
+            var registry = TestFactory.Reg(script1);
 
             var result = _handler.FilterRegistry(registry, "");
 
@@ -56,12 +56,12 @@ namespace Party.Shared.Handlers
         [TestCase("magic")]
         public void CanFilterScriptsByKeywords(string query)
         {
-            var script1 = ResultFactory.RegScript("script1", ResultFactory.RegVer("1.0.0", ResultFactory.RegFile("My Script.cs", "12345", "https://example.org/scripts/MyScript.cs")));
-            var script2 = ResultFactory.RegScript("script2", ResultFactory.RegVer("1.0.0", ResultFactory.RegFile("Super Stuff.cs", "67890", "https://example.org/scripts/Super Stuff.cs")));
+            var script1 = TestFactory.RegScript("script1", TestFactory.RegVer("1.0.0", TestFactory.RegFile("My Script.cs", "12345", "https://example.org/scripts/MyScript.cs")));
+            var script2 = TestFactory.RegScript("script2", TestFactory.RegVer("1.0.0", TestFactory.RegFile("Super Stuff.cs", "67890", "https://example.org/scripts/Super Stuff.cs")));
             script2.Tags = new[] { "magic" }.ToList();
             script2.Author = "John Doe";
             script2.Description = "This is a script that makes stuff go boom!";
-            var registry = ResultFactory.Reg(script1, script2);
+            var registry = TestFactory.Reg(script1, script2);
 
             var result = _handler.FilterRegistry(registry, query);
 

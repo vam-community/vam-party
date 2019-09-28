@@ -15,9 +15,9 @@ namespace Party.Shared.Registries
 
         public void CanGetSpecificVersion()
         {
-            RegistryPackageVersion version = ResultFactory.RegVer("1.0.0");
-            RegistryPackage package = ResultFactory.RegScript("script1", version);
-            var registry = ResultFactory.Reg(package);
+            RegistryPackageVersion version = TestFactory.RegVer("1.0.0");
+            RegistryPackage package = TestFactory.RegScript("script1", version);
+            var registry = TestFactory.Reg(package);
 
             var success = registry.TryGetPackageVersion(RegistryPackageType.Scripts, "script1", "1.0.0", out var context);
 
@@ -29,9 +29,9 @@ namespace Party.Shared.Registries
 
         public void CanGetLatestVersion()
         {
-            RegistryPackageVersion version = ResultFactory.RegVer("1.0.0");
-            RegistryPackage package = ResultFactory.RegScript("script1", version);
-            var registry = ResultFactory.Reg(package);
+            RegistryPackageVersion version = TestFactory.RegVer("1.0.0");
+            RegistryPackage package = TestFactory.RegScript("script1", version);
+            var registry = TestFactory.Reg(package);
 
             var success = registry.TryGetPackageVersion(RegistryPackageType.Scripts, "script1", null, out var context);
 

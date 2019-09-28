@@ -19,7 +19,7 @@ namespace Party.Shared.Handlers
             using var httpStream = new MemoryStream(new byte[] { 123 });
             serializer
                 .Setup(x => x.Deserialize(It.Is<Stream>(s => s.ReadByte() == 123)))
-                .Returns(ResultFactory.Reg(ResultFactory.RegScript("my-script", ResultFactory.RegVer("1.0.0"))));
+                .Returns(TestFactory.Reg(TestFactory.RegScript("my-script", TestFactory.RegVer("1.0.0"))));
             var handler = new AcquireRegistryHandler(
                 new HttpClient(MockHandler(("https://example.org/registry/v1/index.json", httpStream))),
                 new[] { "https://example.org/registry/v1/index.json" },
@@ -28,7 +28,7 @@ namespace Party.Shared.Handlers
             var registry = await handler.AcquireRegistryAsync(null);
 
             PartyAssertions.AreDeepEqual(
-                ResultFactory.Reg(ResultFactory.RegScript("my-script", ResultFactory.RegVer("1.0.0"))),
+                TestFactory.Reg(TestFactory.RegScript("my-script", TestFactory.RegVer("1.0.0"))),
                 registry);
         }
 
@@ -39,7 +39,7 @@ namespace Party.Shared.Handlers
             using var httpStream = new MemoryStream(new byte[] { 123 });
             serializer
                 .Setup(x => x.Deserialize(It.Is<Stream>(s => s.ReadByte() == 123)))
-                .Returns(ResultFactory.Reg(ResultFactory.RegScript("my-script", ResultFactory.RegVer("1.0.0"))));
+                .Returns(TestFactory.Reg(TestFactory.RegScript("my-script", TestFactory.RegVer("1.0.0"))));
             var handler = new AcquireRegistryHandler(
                 new HttpClient(MockHandler(("https://overridden.example.org/registry/v1/index.json", httpStream))),
                 new[] { "https://example.org/registry/v1/index.json" },
@@ -48,7 +48,7 @@ namespace Party.Shared.Handlers
             var registry = await handler.AcquireRegistryAsync(new[] { "https://overridden.example.org/registry/v1/index.json" });
 
             PartyAssertions.AreDeepEqual(
-                ResultFactory.Reg(ResultFactory.RegScript("my-script", ResultFactory.RegVer("1.0.0"))),
+                TestFactory.Reg(TestFactory.RegScript("my-script", TestFactory.RegVer("1.0.0"))),
                 registry);
         }
 
@@ -60,14 +60,14 @@ namespace Party.Shared.Handlers
             using var httpStream2 = new MemoryStream(new byte[] { 2 });
             serializer
                 .Setup(x => x.Deserialize(It.Is<Stream>(s => s.ReadByte() == 1 || s.Seek(0, SeekOrigin.Begin) == -1)))
-                .Returns(ResultFactory.Reg(
-                    ResultFactory.RegScript("my-script", ResultFactory.RegVer("1.0.0"))
+                .Returns(TestFactory.Reg(
+                    TestFactory.RegScript("my-script", TestFactory.RegVer("1.0.0"))
                 ));
             serializer
                 .Setup(x => x.Deserialize(It.Is<Stream>(s => s.ReadByte() == 2 || s.Seek(0, SeekOrigin.Begin) == -1)))
-                .Returns(ResultFactory.Reg(
-                    ResultFactory.RegScript("my-script", ResultFactory.RegVer("2.0.0")),
-                    ResultFactory.RegScript("other-script", ResultFactory.RegVer("1.0.0"))
+                .Returns(TestFactory.Reg(
+                    TestFactory.RegScript("my-script", TestFactory.RegVer("2.0.0")),
+                    TestFactory.RegScript("other-script", TestFactory.RegVer("1.0.0"))
                 ));
             var client = new HttpClient(MockHandler(
                 ("https://source1.example.org/registry/v1/index.json", httpStream1),
@@ -81,12 +81,12 @@ namespace Party.Shared.Handlers
             var registry = await handler.AcquireRegistryAsync(null);
 
             PartyAssertions.AreDeepEqual(
-                ResultFactory.Reg(
-                    ResultFactory.RegScript("my-script",
-                        ResultFactory.RegVer("1.0.0"),
-                        ResultFactory.RegVer("2.0.0")),
-                    ResultFactory.RegScript("other-script",
-                        ResultFactory.RegVer("1.0.0"))),
+                TestFactory.Reg(
+                    TestFactory.RegScript("my-script",
+                        TestFactory.RegVer("1.0.0"),
+                        TestFactory.RegVer("2.0.0")),
+                    TestFactory.RegScript("other-script",
+                        TestFactory.RegVer("1.0.0"))),
                 registry);
         }
 

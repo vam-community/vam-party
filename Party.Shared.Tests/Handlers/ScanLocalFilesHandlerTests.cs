@@ -26,7 +26,7 @@ namespace Party.Shared
             var result = await handler.ScanLocalFilesAsync(null, new ProgressMock<ScanLocalFilesProgress>());
 
             PartyAssertions.AreDeepEqual(
-                ResultFactory.SavesMap().Build(),
+                TestFactory.SavesMap().Build(),
                 result
             );
         }
@@ -43,7 +43,7 @@ namespace Party.Shared
             var result = await handler.ScanLocalFilesAsync(null, new ProgressMock<ScanLocalFilesProgress>());
 
             PartyAssertions.AreDeepEqual(
-                ResultFactory.SavesMap().Build(),
+                TestFactory.SavesMap().Build(),
                 result
             );
         }
@@ -60,7 +60,7 @@ namespace Party.Shared
             var result = await handler.ScanLocalFilesAsync(null, new ProgressMock<ScanLocalFilesProgress>());
 
             PartyAssertions.AreDeepEqual(
-                ResultFactory.SavesMap()
+                TestFactory.SavesMap()
                     .WithScene(new LocalSceneFile(@"C:\VaM\Saves\Scene 1.json"))
                     .Build(),
                 result
@@ -79,7 +79,7 @@ namespace Party.Shared
             var result = await handler.ScanLocalFilesAsync(null, new ProgressMock<ScanLocalFilesProgress>());
 
             PartyAssertions.AreDeepEqual(
-                ResultFactory.SavesMap()
+                TestFactory.SavesMap()
                     .WithScript(new LocalScriptFile(@"C:\VaM\Custom\Scripts\Script 1.cs", "90A449A3FC7A01DCF27C92090C05804BFF1EC887006A77F71E984D21F7B38CD4"), out var _)
                     .Build(),
                 result
@@ -137,7 +137,7 @@ namespace Party.Shared
             var result = await handler.ScanLocalFilesAsync(null, new ProgressMock<ScanLocalFilesProgress>());
 
             PartyAssertions.AreDeepEqual(
-                ResultFactory.SavesMap()
+                TestFactory.SavesMap()
                     .WithScript(new LocalScriptListFile(@"C:\VaM\Custom\Scripts\My Script\Add Me.cslist", "3258C0B1D41C29CBC98B475EEEB5BF7609C9B4F290168A0E2158253DF044F325", new[] {
                         new LocalScriptFile(@"C:\VaM\Custom\Scripts\My Script\Script 1.cs", "90A449A3FC7A01DCF27C92090C05804BFF1EC887006A77F71E984D21F7B38CD4")
                     }), out var _)

@@ -18,7 +18,7 @@ namespace Party.Shared.Handlers
             GivenContext(
                 @"C:\VaM\Custom\Scripts\some-author\my-script\1.0.0\Script 1.cs",
                 "class Script1 {}",
-                new[] { ResultFactory.RegFile("Script 1.cs", "64816EFE9CCFED7730C8FCF412178C23E5FE94304B7317ED03FE1D005C490C66") },
+                new[] { TestFactory.RegFile("Script 1.cs", "64816EFE9CCFED7730C8FCF412178C23E5FE94304B7317ED03FE1D005C490C66") },
                 out var handler, out var context);
 
             var info = await handler.GetInstalledPackageInfoAsync(context);
@@ -115,7 +115,7 @@ namespace Party.Shared.Handlers
             GivenContext(
                 @"C:\VaM\Custom\Scripts\some-author\my-script\1.0.0\Script 1.cs",
                 "class Script1 {}",
-                new[] { ResultFactory.RegFile("Script 1.cs", "0000000000000000000000000000000000000000000000000000000000000000") },
+                new[] { TestFactory.RegFile("Script 1.cs", "0000000000000000000000000000000000000000000000000000000000000000") },
                 out var handler, out var context);
 
             var info = await handler.GetInstalledPackageInfoAsync(context);
@@ -147,9 +147,9 @@ namespace Party.Shared.Handlers
 
             handler = new GetInstalledPackageInfoHandler(fileSystem, folders);
 
-            var registry = ResultFactory.Reg(
-                ResultFactory.RegScript("my-script", "some-author",
-                    ResultFactory.RegVer("1.0.0", files)));
+            var registry = TestFactory.Reg(
+                TestFactory.RegScript("my-script", "some-author",
+                    TestFactory.RegVer("1.0.0", files)));
 
             context = registry.TryGetPackageVersion(RegistryPackageType.Scripts, "my-script", "1.0.0", out var x) ? x : throw new Exception("Could not get package context");
         }

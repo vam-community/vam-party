@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Party.Shared.Models;
 using Party.Shared.Models.Local;
@@ -7,7 +7,7 @@ using Party.Shared.Utils;
 
 namespace Party.Shared
 {
-    internal static class ResultFactory
+    internal static class TestFactory
     {
         #region Registry
         internal static Registry Reg(params RegistryPackage[] scripts)

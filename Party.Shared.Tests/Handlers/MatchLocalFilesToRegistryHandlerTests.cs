@@ -20,11 +20,11 @@ namespace Party.Shared
         [Test]
         public void CanMatchNothing()
         {
-            var saves = ResultFactory.SavesMap()
+            var saves = TestFactory.SavesMap()
                 .WithScript(new LocalScriptFile($"{_vam}1.cs", "1"), out var script1)
                 .Build();
-            var registry = ResultFactory.Reg(
-                ResultFactory.RegScript("my-script", ResultFactory.RegVer("1.0.0", ResultFactory.RegFile("2.cs", "2"))));
+            var registry = TestFactory.Reg(
+                TestFactory.RegScript("my-script", TestFactory.RegVer("1.0.0", TestFactory.RegFile("2.cs", "2"))));
 
             var result = _handler.MatchLocalFilesToRegistry(saves, registry);
 
@@ -39,13 +39,13 @@ namespace Party.Shared
         [Test]
         public void CanMatchByHash()
         {
-            var saves = ResultFactory.SavesMap()
+            var saves = TestFactory.SavesMap()
                 .WithScript(new LocalScriptFile($"{_vam}1.cs", "1"), out var local1)
                 .Build();
-            var file = ResultFactory.RegFile("2.cs", "1");
-            var version = ResultFactory.RegVer("1.0.0", file);
-            var package = ResultFactory.RegScript("my-script", version);
-            var registry = ResultFactory.Reg(package);
+            var file = TestFactory.RegFile("2.cs", "1");
+            var version = TestFactory.RegVer("1.0.0", file);
+            var package = TestFactory.RegScript("my-script", version);
+            var registry = TestFactory.Reg(package);
 
             var result = _handler.MatchLocalFilesToRegistry(saves, registry);
 
@@ -60,13 +60,13 @@ namespace Party.Shared
         [Test]
         public void CanMatchByFilename()
         {
-            var saves = ResultFactory.SavesMap()
+            var saves = TestFactory.SavesMap()
                 .WithScript(new LocalScriptFile($"{_vam}1.cs", "1"), out var local1)
                 .Build();
-            var file = ResultFactory.RegFile("1.cs", "2");
-            var version = ResultFactory.RegVer("1.0.0", file);
-            var package = ResultFactory.RegScript("my-script", version);
-            var registry = ResultFactory.Reg(package);
+            var file = TestFactory.RegFile("1.cs", "2");
+            var version = TestFactory.RegVer("1.0.0", file);
+            var package = TestFactory.RegScript("my-script", version);
+            var registry = TestFactory.Reg(package);
 
             var result = _handler.MatchLocalFilesToRegistry(saves, registry);
 
@@ -81,13 +81,13 @@ namespace Party.Shared
         [Test]
         public void DoesNotMatchByFilenameWhenMatchedByHash()
         {
-            var saves = ResultFactory.SavesMap()
+            var saves = TestFactory.SavesMap()
                 .WithScript(new LocalScriptFile($"{_vam}1.cs", "1"), out var local1)
                 .Build();
-            var file = ResultFactory.RegFile("1.cs", "1");
-            var version = ResultFactory.RegVer("1.0.0", file);
-            var package = ResultFactory.RegScript("my-script", version);
-            var registry = ResultFactory.Reg(package);
+            var file = TestFactory.RegFile("1.cs", "1");
+            var version = TestFactory.RegVer("1.0.0", file);
+            var package = TestFactory.RegScript("my-script", version);
+            var registry = TestFactory.Reg(package);
 
             var result = _handler.MatchLocalFilesToRegistry(saves, registry);
 
