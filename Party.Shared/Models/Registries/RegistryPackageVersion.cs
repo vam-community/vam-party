@@ -17,6 +17,11 @@ namespace Party.Shared.Models.Registries
         public SortedSet<RegistryPackageDependency> Dependencies { get; set; }
         public SortedSet<RegistryFile> Files { get => _files ?? (_files = new SortedSet<RegistryFile>()); set => _files = value; }
 
+        public override string ToString()
+        {
+            return Version.ToString();
+        }
+
         int IComparable<RegistryPackageVersion>.CompareTo(RegistryPackageVersion other)
         {
             return (Version as IComparable<RegistryVersionString>).CompareTo(other.Version);

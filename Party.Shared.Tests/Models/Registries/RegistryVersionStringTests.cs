@@ -10,7 +10,7 @@ namespace Party.Shared.Registries
         [TestCase("2.10.0-preview5", 2, 10, 0, "preview5")]
         public void CanCastFromToString(string version, int major, int minor, int revision, string extra)
         {
-            var versionStruct = new RegistryVersionString(version);
+            var versionStruct = RegistryVersionString.Parse(version);
 
             Assert.That(versionStruct.Major, Is.EqualTo(major));
             Assert.That(versionStruct.Minor, Is.EqualTo(minor));

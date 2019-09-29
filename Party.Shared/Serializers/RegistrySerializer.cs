@@ -84,7 +84,7 @@ namespace Party.Shared.Serializers
 
             public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
             {
-                return (RegistryVersionString)(string)reader.Value;
+                return RegistryVersionString.Parse((string)reader.Value);
             }
 
             public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

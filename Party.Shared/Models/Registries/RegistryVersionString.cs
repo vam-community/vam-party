@@ -5,26 +5,43 @@ namespace Party.Shared.Models.Registries
 {
     public struct RegistryVersionString : IComparable, IComparable<RegistryVersionString>, IEquatable<RegistryVersionString>
     {
-        public static RegistryVersionString Any => new RegistryVersionString("0.0.0-*");
+        public static bool IsEmpty(RegistryVersionString value)
+        {
+            return value.Extra == null;
+        }
 
-        public RegistryVersionString(string version)
+        public static RegistryVersionString Parse(string version)
         {
             var result = RegistryPackageVersion.ValidVersionNameRegex.Match(version);
             if (!result.Success) throw new RegistryException($"Invalid version number: '{version}'");
-            Major = int.Parse(result.Groups["Major"].Value);
-            Minor = int.Parse(result.Groups["Minor"].Value);
-            Revision = int.Parse(result.Groups["Revision"].Value);
-            Extra = result.Groups["Extra"].Value;
+            return new RegistryVersionString(
+                int.Parse(result.Groups["Major"].Value),
+                int.Parse(result.Groups["Minor"].Value),
+                int.Parse(result.Groups["Revision"].Value),
+                result.Groups["Extra"].Value);
         }
 
-        public int Major { get; set; }
-        public int Minor { get; set; }
-        public int Revision { get; set; }
-        public string Extra { get; set; }
+        public RegistryVersionString(int major, int minor, int revision, string extra)
+        {
+            Major = major;
+            Minor = minor;
+            Revision = revision;
+            Extra = extra ?? throw new ArgumentNullException(nameof(extra));
+        }
+
+        public int Major { get; }
+        public int Minor { get; }
+        public int Revision { get; }
+        public string Extra { get; }
 
         public override bool Equals(object obj)
         {
-            return obj is RegistryVersionString rvs && Major == rvs.Major && Minor == rvs.Minor && Revision == rvs.Revision && Extra == rvs.Extra;
+            if (obj is RegistryVersionString vStr)
+                return (this as IEquatable<RegistryVersionString>).Equals(vStr);
+            else if (obj is string str)
+                return (this as IEquatable<RegistryVersionString>).Equals(Parse(str));
+            else
+                return false;
         }
 
         public override int GetHashCode()
@@ -84,6 +101,6 @@ namespace Party.Shared.Models.Registries
         }
 
         public static implicit operator string(RegistryVersionString d) => d.ToString();
-        public static implicit operator RegistryVersionString(string b) => new RegistryVersionString(b);
+        public static implicit operator RegistryVersionString(string b) => Parse(b);
     }
 }
