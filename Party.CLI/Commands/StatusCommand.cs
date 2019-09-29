@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Invocation;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
@@ -120,7 +121,7 @@ namespace Party.CLI.Commands
 
             if (localFiles.Count > 0)
             {
-                var filesSummary = localFiles.Select(l => l.FullPath).Select(Controller.GetDisplayPath).OrderBy(p => p.Length).ToList();
+                var filesSummary = localFiles.Select(l => l.FullPath).Select(Path.GetFileName).OrderBy(p => p.Length).ToList();
                 Renderer.Write(" ");
                 if (filesSummary.Count == 1)
                 {
