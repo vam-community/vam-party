@@ -47,8 +47,8 @@ namespace Party.Shared
                 RegistryPackageType.Clothing => _fs.Path.Combine(_vamDirectory, "Custom", "Clothing"),
                 RegistryPackageType.Textures => _fs.Path.Combine(_vamDirectory, "Custom", "Atom", "Person", "Textures"),
                 RegistryPackageType.Assets => _fs.Path.Combine(_vamDirectory, "Custom", "Assets"),
-                RegistryPackageType.FemaleMorphs => _fs.Path.Combine(_vamDirectory, "Custom", "Atoms", "Person", "Morphs", "female"),
-                RegistryPackageType.MaleMorphs => _fs.Path.Combine(_vamDirectory, "Custom", "Atoms", "Person", "Morphs", "male"),
+                RegistryPackageType.FemaleMorphs => _fs.Path.Combine(_vamDirectory, "Custom", "Atom", "Person", "Morphs", "female"),
+                RegistryPackageType.MaleMorphs => _fs.Path.Combine(_vamDirectory, "Custom", "Atom", "Person", "Morphs", "male"),
                 _ => throw new NotImplementedException($"Type {type} is not currently handled by the folders helper."),
             };
         }
