@@ -71,11 +71,13 @@ namespace Party.CLI.Commands
                 await TryInstallUpdate(match, args, upgraded);
             }
 
-            if (updatedPackagesCounter > 0)
-                Renderer.WriteLine($"Finished upgrading {updatedPackagesCounter} packages");
-            else
+            if (updatedPackagesCounter == 0)
+            {
                 Renderer.WriteLine("No packages to update!");
+                return;
+            }
 
+            Renderer.WriteLine($"Finished upgrading {updatedPackagesCounter} packages");
             Renderer.WriteLine("Upgrading scenes...");
 
             var upgradedScenesCounter = 0;
