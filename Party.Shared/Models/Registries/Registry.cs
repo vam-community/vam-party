@@ -60,8 +60,6 @@ namespace Party.Shared.Models.Registries
                 context = null;
                 return false;
             }
-            Console.WriteLine(package.GetLatestVersion().Version.Extra == null);
-            Console.WriteLine(version.Extra == null);
             var packageVersion = RegistryVersionString.IsEmpty(version) ? package.GetLatestVersion() : package.Versions.FirstOrDefault(v => v.Version.Equals(version));
             if (packageVersion == null)
             {
