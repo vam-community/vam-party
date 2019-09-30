@@ -54,9 +54,30 @@ namespace Party.Shared.Handlers
             if (_fs.File.Exists(file.FullPath))
             {
                 if (force)
+                {
                     _fs.File.Delete(file.FullPath);
+                }
+                else if (string.IsNullOrEmpty(file.RegistryFile.Hash.Value))
+                {
+                    file.Status = FileStatus.Installed;
+                    return file;
+                }
                 else
+                {
                     return ValidateHash(force, file, fileResult, _fs.File.ReadAllText(file.FullPath));
+                }
+            }
+            if (string.IsNullOrEmpty(file.RegistryFile.Url))
+            {
+                file.Status = FileStatus.NotDownloadable;
+                file.Reason = $"Provided URL for file '{file.RegistryFile.Filename}' is missing.";
+                return file;
+            }
+            if (!Uri.IsWellFormedUriString(file.RegistryFile.Url, UriKind.Absolute))
+            {
+                file.Status = FileStatus.NotDownloadable;
+                file.Reason = $"Provided file URL '{file.RegistryFile.Url}' for file '{file.RegistryFile.Filename}' is not a valid url.";
+                return file;
             }
             var response = await _http.GetAsync(file.RegistryFile.Url).ConfigureAwait(false);
             try
