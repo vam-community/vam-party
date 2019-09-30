@@ -29,7 +29,7 @@ namespace Party.Shared.Handlers
             {
                 throw new ConfigurationException("At least one registry must be configured");
             }
-            return Merge(await Task.WhenAll(urls.Select(AcquireOne)).ConfigureAwait(false));
+            return Merge(await Task.WhenAll(urls.Distinct().Select(AcquireOne)).ConfigureAwait(false));
         }
 
         private Registry Merge(Registry[] registries)
