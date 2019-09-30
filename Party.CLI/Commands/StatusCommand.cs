@@ -94,7 +94,7 @@ namespace Party.CLI.Commands
                 {
                     Renderer.Write(script.FileName, ConsoleColor.Red);
                     Renderer.Write(" ");
-                    Renderer.Write($"\"{Controller.GetDisplayPath(script.FullPath)}\"", ConsoleColor.DarkGray);
+                    Renderer.Write($"\"{Path.GetFileName(script.FullPath)}\"", ConsoleColor.DarkGray);
                     Renderer.Write(" ");
                     Renderer.Write($"referenced by {Pluralize(script.Scenes?.Count() ?? 0, "scene", "scenes")}", ConsoleColor.DarkCyan);
                     Renderer.Write(Environment.NewLine);
