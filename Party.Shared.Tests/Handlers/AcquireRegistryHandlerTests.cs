@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -61,13 +62,14 @@ namespace Party.Shared.Handlers
             serializer
                 .Setup(x => x.Deserialize(It.Is<Stream>(s => s.ReadByte() == 1 || s.Seek(0, SeekOrigin.Begin) == -1)))
                 .Returns(TestFactory.Reg(
-                    TestFactory.RegScript("my-script", TestFactory.RegVer("1.0.0"))
+                    TestFactory.RegScript("common-script", TestFactory.RegVer("1.0.0")),
+                    TestFactory.RegScript("source1-script", TestFactory.RegVer("1.0.0"))
                 ));
             serializer
                 .Setup(x => x.Deserialize(It.Is<Stream>(s => s.ReadByte() == 2 || s.Seek(0, SeekOrigin.Begin) == -1)))
                 .Returns(TestFactory.Reg(
-                    TestFactory.RegScript("my-script", TestFactory.RegVer("2.0.0")),
-                    TestFactory.RegScript("other-script", TestFactory.RegVer("1.0.0"))
+                    TestFactory.RegScript("common-script", TestFactory.RegVer("2.0.0")),
+                    TestFactory.RegScript("source2-script", TestFactory.RegVer("1.0.0"))
                 ));
             var client = new HttpClient(MockHandler(
                 ("https://source1.example.org/registry/v1/index.json", httpStream1),
@@ -80,12 +82,15 @@ namespace Party.Shared.Handlers
 
             var registry = await handler.AcquireRegistryAsync(null);
 
+            Assert.That(registry.Packages.Select(p => p.Name), Is.EqualTo(new[] { "common-script", "source1-script", "source2-script" }));
             PartyAssertions.AreDeepEqual(
                 TestFactory.Reg(
-                    TestFactory.RegScript("my-script",
+                    TestFactory.RegScript("common-script",
                         TestFactory.RegVer("1.0.0"),
                         TestFactory.RegVer("2.0.0")),
-                    TestFactory.RegScript("other-script",
+                    TestFactory.RegScript("source1-script",
+                        TestFactory.RegVer("1.0.0")),
+                    TestFactory.RegScript("source2-script",
                         TestFactory.RegVer("1.0.0"))),
                 registry);
         }

@@ -50,7 +50,7 @@ namespace Party.Shared.Handlers
                 if (package == null)
                 {
                     registryPackages.Add(additionalPackage);
-                    return;
+                    continue;
                 }
 
                 foreach (var additionalVersion in additionalPackage.Versions)
