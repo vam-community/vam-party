@@ -49,3 +49,4 @@ If you want to take on an idea, please [create an issue](https://github.com/vam-
 - Review all controller namings, and move as much logic as possible out of commands (worst case provide a controller that handles steps)
 - Make the folder structure a setting (e.g. script can be `[author]/[name]/[version]` but can be configured to be `[name]/[version]`)
 - Revert a plugin, i.e. set a scene's plugin reference to a specific version (e.g. `party use some/scene.json some-plugin@1.0.0`)
+- Download everything (`party get --all`)
