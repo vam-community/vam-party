@@ -57,7 +57,7 @@ namespace Party.Shared.Handlers
                 {
                     _fs.File.Delete(file.FullPath);
                 }
-                else if (string.IsNullOrEmpty(file.RegistryFile.Hash.Value))
+                else if (string.IsNullOrEmpty(file.RegistryFile.Hash?.Value))
                 {
                     file.Status = FileStatus.Installed;
                     return file;
