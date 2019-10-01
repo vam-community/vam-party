@@ -175,7 +175,8 @@ namespace Party.CLI.Commands
 
             Renderer.WriteLine($"  Downloading... ");
             info = await Controller.InstallPackageAsync(info, args.Force);
-            upgraded.Add(match.Remote, info);
+            if (!upgraded.ContainsKey(match.Remote))
+                upgraded.Add(match.Remote, info);
             Renderer.WriteLine($"  Installed in {Controller.GetDisplayPath(info.PackageFolder)}:", ConsoleColor.Green);
             return info;
         }
