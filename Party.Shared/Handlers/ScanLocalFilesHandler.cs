@@ -230,6 +230,7 @@ namespace Party.Shared.Handlers
                     {
                         fullPath = _fs.Path.GetFullPath(scriptRefRelativePath, Path.GetDirectoryName(sceneFile));
                     }
+
                     if (scripts.TryGetValue(fullPath, out var scriptRef))
                     {
                         scene.References(scriptRef);

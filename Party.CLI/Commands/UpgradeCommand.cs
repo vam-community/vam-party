@@ -169,14 +169,21 @@ namespace Party.CLI.Commands
                 return info;
             }
 
-            if (!args.Force && (info.Corrupted || !info.Installable))
+            if (!args.Force && !info.Installable)
             {
-                Renderer.WriteLine("  Cannot upgrade; at least one file is broken or cannot be downloaded.");
-                Renderer.WriteLine($"  You can instead download at {match.Remote.Version.DownloadUrl ?? match.Remote.Package.Homepage ?? match.Remote.Package.Repository ?? "(no link provided)"}");
+                Renderer.WriteLine("  This plugin cannot be installed automatically.", ConsoleColor.Yellow);
+                Renderer.WriteLine($"  You can instead download at {match.Remote.Version.DownloadUrl ?? match.Remote.Package.Homepage ?? match.Remote.Package.Repository ?? "(no download link provided)"}");
                 Renderer.WriteLine("  Files:");
                 PrintInstalledFiles(info, "  ");
-                if (!args.Force)
-                    return null;
+                return null;
+            }
+            if (!args.Force && info.Corrupted)
+            {
+                Renderer.WriteLine("  Locally installed version does not match the registry.", ConsoleColor.Red);
+                Renderer.WriteLine($"  You can instead download at {match.Remote.Version.DownloadUrl ?? match.Remote.Package.Homepage ?? match.Remote.Package.Repository ?? "(no download link provided)"}");
+                Renderer.WriteLine("  Files:");
+                PrintInstalledFiles(info, "  ");
+                return null;
             }
 
             if (args.Noop)
@@ -191,10 +198,18 @@ namespace Party.CLI.Commands
             {
                 Renderer.WriteLine($"  Installed in {Controller.GetDisplayPath(info.PackageFolder)}:", ConsoleColor.Green);
             }
-            if (info.Corrupted || !info.Installable)
+            if (!args.Force && !info.Installable)
             {
-                Renderer.WriteLine("  Cannot upgrade because at least one file is either broken or not downloadable.");
-                Renderer.WriteLine($"  You can instead download it at {match.Remote.Version.DownloadUrl ?? match.Remote.Package.Homepage ?? match.Remote.Package.Repository ?? "(no link provided)"}");
+                Renderer.WriteLine("  This plugin could be installed automatically.", ConsoleColor.Yellow);
+                Renderer.WriteLine($"  You can instead download at {match.Remote.Version.DownloadUrl ?? match.Remote.Package.Homepage ?? match.Remote.Package.Repository ?? "(no download link provided)"}");
+                Renderer.WriteLine("  Files:");
+                PrintInstalledFiles(info, "  ");
+                return null;
+            }
+            if (!args.Force && info.Corrupted)
+            {
+                Renderer.WriteLine("  The download files did not match the registry hash.", ConsoleColor.Red);
+                Renderer.WriteLine($"  You can instead download at {match.Remote.Version.DownloadUrl ?? match.Remote.Package.Homepage ?? match.Remote.Package.Repository ?? "(no download link provided)"}");
                 Renderer.WriteLine("  Files:");
                 PrintInstalledFiles(info, "  ");
                 return null;
