@@ -68,7 +68,8 @@ namespace Party.CLI.Commands
 
             foreach (var match in matches.HashMatches)
             {
-                await TryInstallUpdate(match, args, upgraded);
+                if (await TryInstallUpdate(match, args, upgraded) != null)
+                    updatedPackagesCounter++;
             }
 
             if (updatedPackagesCounter == 0)
@@ -129,6 +130,12 @@ namespace Party.CLI.Commands
                 return null;
             }
 
+            if (upgraded.ContainsKey(match.Remote))
+            {
+                Renderer.WriteLine("  Handled in a previous upgrade");
+                return null;
+            }
+
             var latestCompatVersion = match.Remote.Package.GetLatestVersionCompatibleWith(match.Remote.Version.Version);
             var latestVersion = match.Remote.Package.GetLatestVersion();
             var updateToVersion = args.Force
@@ -175,9 +182,19 @@ namespace Party.CLI.Commands
 
             Renderer.WriteLine($"  Downloading... ");
             info = await Controller.InstallPackageAsync(info, args.Force);
-            if (!upgraded.ContainsKey(match.Remote))
-                upgraded.Add(match.Remote, info);
-            Renderer.WriteLine($"  Installed in {Controller.GetDisplayPath(info.PackageFolder)}:", ConsoleColor.Green);
+            upgraded.Add(match.Remote, info);
+            if (info.Installed)
+            {
+                Renderer.WriteLine($"  Installed in {Controller.GetDisplayPath(info.PackageFolder)}:", ConsoleColor.Green);
+            }
+            if (info.Corrupted || !info.Installable)
+            {
+                Renderer.WriteLine("  Cannot upgrade because at least one file is either broken or not downloadable.");
+                Renderer.WriteLine($"  You can instead download it at {match.Remote.Version.DownloadUrl ?? match.Remote.Package.Homepage ?? match.Remote.Package.Repository ?? "(no link provided)"}");
+                Renderer.WriteLine("  Files:");
+                PrintInstalledFiles(info, "  ");
+                return null;
+            }
             return info;
         }
     }
