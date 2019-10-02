@@ -5,7 +5,6 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Party.Shared.Exceptions;
 using Party.Shared.Models;
 using Party.Shared.Utils;
 
