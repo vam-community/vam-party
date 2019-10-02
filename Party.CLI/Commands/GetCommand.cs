@@ -89,10 +89,11 @@ namespace Party.CLI.Commands
 
             if (installedStatus.Installed && !args.Force)
             {
-                Renderer.WriteLine($"  Plugin already installed at {installedStatus.PackageFolder}", ConsoleColor.Red);
+                Renderer.WriteLine($"  Plugin already installed at {installedStatus.PackageFolder}", ConsoleColor.Yellow);
                 PrintInstalledFiles(installedStatus);
                 return;
             }
+
             if (installedStatus.Installable || args.Force)
             {
                 if (!args.Noop)
@@ -112,13 +113,12 @@ namespace Party.CLI.Commands
                         Renderer.WriteLine($"    Url:  {file.RegistryFile.Url}");
                     }
                 }
-            }
-            else
-            {
-                Renderer.WriteLine($"  Some files are not available for download or invalid, you can instead download it at {context.Version.DownloadUrl ?? context.Package.Homepage ?? context.Package.Repository ?? "(no link provided)"}");
-                PrintInstalledFiles(installedStatus, "  ");
                 return;
             }
+
+            Renderer.WriteLine($"  Some files are not available for download or invalid, you can instead download at {context.Version.DownloadUrl ?? context.Package.Homepage ?? context.Package.Repository ?? "(no link provided)"}", ConsoleColor.Yellow);
+            PrintInstalledFiles(installedStatus, "  ");
+            return;
         }
     }
 }
