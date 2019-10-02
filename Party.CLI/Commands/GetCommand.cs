@@ -99,7 +99,6 @@ namespace Party.CLI.Commands
                 {
                     var installResult = await Controller.InstallPackageAsync(installedStatus, args.Force);
 
-                    Renderer.WriteLine($"  Installed package {context.Package.Name} v{context.Version.Version} by {context.Package.Author ?? "?"}");
                     Renderer.WriteLine($"  Files downloaded in {installedStatus.PackageFolder}:");
                     PrintInstalledFiles(installResult, "  ");
                 }
