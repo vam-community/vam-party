@@ -18,7 +18,7 @@ namespace Party.CLI.Commands
             AddCommonOptions(command);
             command.AddArgument(new Argument<string>("package", null) { Description = "The package, in the format scripts/name or scripts/name@1.0.0", Arity = ArgumentArity.ZeroOrOne });
             command.AddOption(new Option("--noop", "Do not install, just check what it will do"));
-            command.AddOption(new Option("--all", "Install the latest version of everything"));
+            command.AddOption(new Option("--all", "Install the latest version of everything").WithAlias("-a"));
 
             command.Handler = CommandHandler.Create<GetArguments>(async args =>
             {
