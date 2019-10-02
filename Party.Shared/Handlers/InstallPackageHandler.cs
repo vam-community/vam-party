@@ -70,13 +70,13 @@ namespace Party.Shared.Handlers
             if (string.IsNullOrEmpty(file.RegistryFile.Url))
             {
                 file.Status = FileStatus.NotDownloadable;
-                file.Reason = $"Provided URL for file '{file.RegistryFile.Filename}' is missing.";
+                file.Reason = $"No URL provided.";
                 return file;
             }
             if (!Uri.IsWellFormedUriString(file.RegistryFile.Url, UriKind.Absolute))
             {
                 file.Status = FileStatus.NotDownloadable;
-                file.Reason = $"Provided file URL '{file.RegistryFile.Url}' for file '{file.RegistryFile.Filename}' is not a valid url.";
+                file.Reason = $"Provided file URL '{file.RegistryFile.Url}' is not a valid url.";
                 return file;
             }
             var response = await _http.GetAsync(file.RegistryFile.Url).ConfigureAwait(false);
@@ -87,7 +87,7 @@ namespace Party.Shared.Handlers
             catch (Exception exc)
             {
                 fileResult.Status = FileStatus.NotDownloadable;
-                fileResult.Reason = $"Failed to download file from {file.RegistryFile.Url}: Received status {response.StatusCode}\n{exc.Message}";
+                fileResult.Reason = $"Failed to download file from {file.RegistryFile.Url}: Received status {response.StatusCode}.\n{exc.Message}";
                 return fileResult;
             }
             var content = await response.Content.ReadAsStringAsync();

@@ -67,35 +67,41 @@ namespace Party.Shared.Handlers
                 ? Path.Combine(_folders.FromRelativeToVam(file.Filename.Substring(1)))
                 : Path.Combine(packagePath, file.Filename);
 
-            return new InstalledFileInfo
+            var info = new InstalledFileInfo
             {
                 FullPath = fullPath,
-                RegistryFile = file,
-                Status = await GetFileStatusAsync(file, fullPath).ConfigureAwait(false)
+                RegistryFile = file
             };
+
+            var (status, reason) = await GetFileStatusAsync(file, fullPath).ConfigureAwait(false);
+
+            info.Status = status;
+            info.Reason = reason;
+
+            return info;
         }
 
-        private async Task<FileStatus> GetFileStatusAsync(RegistryFile file, string fullPath)
+        private async Task<(FileStatus status, string reason)> GetFileStatusAsync(RegistryFile file, string fullPath)
         {
             if (!_fs.File.Exists(fullPath))
             {
                 if (file.Ignore)
-                    return FileStatus.Ignored;
+                    return (FileStatus.Ignored, null);
                 if (file.Url == null)
-                    return FileStatus.NotDownloadable;
-                return FileStatus.NotInstalled;
+                    return (FileStatus.NotDownloadable, $"No URL provided.");
+                return (FileStatus.NotInstalled, null);
             }
 
             if (file.Hash?.Type == null)
-                return FileStatus.Installed;
+                return (FileStatus.Installed, null);
 
             if (file.Hash.Type != Hashing.Type)
-                throw new InvalidOperationException($"Unsupported hash type: {file.Hash.Type}");
+                throw new InvalidOperationException($"Unsupported hash type: {file.Hash.Type}.");
 
             var hash = await Hashing.GetHashAsync(_fs, fullPath);
             return hash == file.Hash.Value
-                ? FileStatus.Installed
-                : FileStatus.HashMismatch;
+                ? (FileStatus.Installed, (string)null)
+                : (FileStatus.HashMismatch, $"Expected hash {file.Hash.Value}, file on disk was {hash}.");
         }
     }
 }

@@ -103,7 +103,8 @@ namespace Party.Shared.Handlers
                     new InstalledFileInfo{
                         FullPath = @"C:\VaM\Custom\Scripts\some-author\my-script\1.0.0\Script 1.cs",
                         RegistryFile = context.Version.Files.First(),
-                        Status = FileStatus.NotDownloadable
+                        Status = FileStatus.NotDownloadable,
+                        Reason = "No URL provided."
                     }
                 }
             }, info);
@@ -130,7 +131,8 @@ namespace Party.Shared.Handlers
                     new InstalledFileInfo{
                         FullPath = @"C:\VaM\Custom\Scripts\some-author\my-script\1.0.0\Script 1.cs",
                         RegistryFile = context.Version.Files.First(),
-                        Status = FileStatus.HashMismatch
+                        Status = FileStatus.HashMismatch,
+                        Reason = "Expected hash 0000000000000000000000000000000000000000000000000000000000000000, file on disk was 64816EFE9CCFED7730C8FCF412178C23E5FE94304B7317ED03FE1D005C490C66."
                     }
                 }
             }, info);
