@@ -70,8 +70,11 @@ namespace Party.CLI.Commands
 
             foreach (var match in matches.HashMatches)
             {
-                if (await TryInstallUpdate(match, args, upgraded) != null)
-                    updatedPackagesCounter++;
+                var info = await TryInstallUpdate(match, args, upgraded);
+                if (info == null) continue;
+                if (!upgraded.ContainsKey(match.Remote))
+                    upgraded.Add(match.Remote, info);
+                updatedPackagesCounter++;
             }
 
             if (updatedPackagesCounter == 0)
@@ -127,7 +130,7 @@ namespace Party.CLI.Commands
                 {
                     PrintScriptToPackage(match, null, null);
                     PrintScanErrors(args.Errors, match.Local);
-                    Renderer.WriteLine($"  Skipping because unused", ConsoleColor.DarkGray);
+                    Renderer.WriteLine($"  Skipping unused package", ConsoleColor.DarkGray);
                 }
                 return null;
             }
@@ -135,7 +138,7 @@ namespace Party.CLI.Commands
             if (upgraded.ContainsKey(match.Remote))
             {
                 Renderer.WriteLine("  Handled in a previous upgrade");
-                return null;
+                return upgraded[match.Remote];
             }
 
             var latestCompatVersion = match.Remote.Package.GetLatestVersionCompatibleWith(match.Remote.Version.Version);
@@ -150,7 +153,7 @@ namespace Party.CLI.Commands
                 {
                     PrintScriptToPackage(match, null, null);
                     PrintScanErrors(args.Errors, match.Local);
-                    Renderer.WriteLine($"  Skipping because no updates are available", ConsoleColor.DarkGray);
+                    Renderer.WriteLine($"  No updates available", ConsoleColor.DarkGray);
                 }
                 return null;
             }
@@ -163,13 +166,13 @@ namespace Party.CLI.Commands
             if (info.Installed)
             {
                 Renderer.WriteLine("  Already installed");
-                return null;
+                return info;
             }
 
             if (!args.Force && (info.Corrupted || !info.Installable))
             {
-                Renderer.WriteLine("  Cannot upgrade because at least one file is either broken or not downloadable.");
-                Renderer.WriteLine($"  You can instead download it at {match.Remote.Version.DownloadUrl ?? match.Remote.Package.Homepage ?? match.Remote.Package.Repository ?? "(no link provided)"}");
+                Renderer.WriteLine("  Cannot upgrade; at least one file is broken or cannot be downloaded.");
+                Renderer.WriteLine($"  You can instead download at {match.Remote.Version.DownloadUrl ?? match.Remote.Package.Homepage ?? match.Remote.Package.Repository ?? "(no link provided)"}");
                 Renderer.WriteLine("  Files:");
                 PrintInstalledFiles(info, "  ");
                 if (!args.Force)
@@ -184,7 +187,6 @@ namespace Party.CLI.Commands
 
             Renderer.WriteLine($"  Downloading... ");
             info = await Controller.InstallPackageAsync(info, args.Force);
-            upgraded.Add(match.Remote, info);
             if (info.Installed)
             {
                 Renderer.WriteLine($"  Installed in {Controller.GetDisplayPath(info.PackageFolder)}:", ConsoleColor.Green);
