@@ -75,6 +75,7 @@ Options:
 
 - `--all` upgrade everything
 - `--errors` show warnings such as broken scenes or missing scripts
+- `--major` upgrades even with breaking changes
 - `--noop` prints what the script will do, but won't actually do anything
 - `--verbose` prints every change that will be done on every scene
 

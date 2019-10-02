@@ -20,6 +20,7 @@ namespace Party.CLI.Commands
             AddCommonOptions(command);
             command.AddArgument(new Argument<string>("filter") { Arity = ArgumentArity.ZeroOrOne });
             command.AddOption(new Option("--all", "Upgrade everything").WithAlias("-a"));
+            command.AddOption(new Option("--major", "Allows upgrading even with major versions").WithAlias("-m"));
             command.AddOption(new Option("--errors", "Show warnings such as broken scenes or missing scripts").WithAlias("-e"));
             command.AddOption(new Option("--noop", "Prints what the script will do, but won't actually do anything"));
             command.AddOption(new Option("--verbose", "Prints every change that will be done on every scene").WithAlias("-v"));
@@ -35,6 +36,7 @@ namespace Party.CLI.Commands
         {
             public string Filter { get; set; }
             public bool All { get; set; }
+            public bool Major { get; set; }
             public bool Errors { get; set; }
             public bool Noop { get; set; }
             public bool Verbose { get; set; }
@@ -138,7 +140,7 @@ namespace Party.CLI.Commands
 
             var latestCompatVersion = match.Remote.Package.GetLatestVersionCompatibleWith(match.Remote.Version.Version);
             var latestVersion = match.Remote.Package.GetLatestVersion();
-            var updateToVersion = args.Force
+            var updateToVersion = args.Major
                 ? (latestVersion.Version.Equals(match.Remote.Version.Version) ? null : latestVersion)
                 : (latestCompatVersion.Version.Equals(match.Remote.Version.Version) ? null : latestCompatVersion);
 
