@@ -217,9 +217,19 @@ namespace Party.Shared.Handlers
                 var scriptRefs = await _sceneSerializer.FindScriptsFastAsync(sceneFile).ConfigureAwait(false);
                 foreach (var scriptRefRelativePath in scriptRefs.Distinct())
                 {
-                    var fullPath = scriptRefRelativePath.Contains('/')
-                        ? _fs.Path.GetFullPath(scriptRefRelativePath, _vamDirectory)
-                        : _fs.Path.GetFullPath(scriptRefRelativePath, Path.GetDirectoryName(sceneFile));
+                    string fullPath;
+                    if (scriptRefRelativePath.Contains('/'))
+                    {
+                        // VaM 1.18 path changed, but old paths are still supported
+                        var fixedPath = scriptRefRelativePath.StartsWith("Saves/Scripts/")
+                            ? "Custom/Scripts/" + scriptRefRelativePath.Substring("Saves/Scripts/".Length)
+                            : scriptRefRelativePath;
+                        fullPath = _fs.Path.GetFullPath(fixedPath, _vamDirectory);
+                    }
+                    else
+                    {
+                        fullPath = _fs.Path.GetFullPath(scriptRefRelativePath, Path.GetDirectoryName(sceneFile));
+                    }
                     if (scripts.TryGetValue(fullPath, out var scriptRef))
                     {
                         scene.References(scriptRef);

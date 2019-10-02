@@ -55,7 +55,7 @@ namespace Party.CLI.Commands
 
             if (matches.HashMatches.Length == 0)
             {
-                Renderer.WriteLine("No scripts where found", ConsoleColor.Red);
+                Renderer.WriteLine("No matching packages were found", ConsoleColor.Red);
             }
             else
             {

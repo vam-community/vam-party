@@ -21,7 +21,7 @@ namespace Party.Shared
             .Setup(x => x.ToRelativeToVam(It.IsAny<string>()))
             .Returns((string path) => path.Replace(@"C:\VaM\", ""));
             var scene = new LocalSceneFile(@"C:\VaM\Saves\My Scene.json");
-            var script = new LocalScriptFile(@"C:\VaM\Saves\My Script.cs", "SOMEHASH");
+            var script = new LocalScriptFile(@"C:\VaM\Custom\Scripts\My Script.cs", "SOMEHASH");
             var info = new LocalPackageInfo
             {
                 Files = new[]
@@ -35,19 +35,20 @@ namespace Party.Shared
                                 Value = "SOMEHASH"
                             }
                         },
-                        FullPath = @"C:\VaM\Saves\party\some-package\1.0.0\My Script.cs"
+                        FullPath = @"C:\VaM\Custom\Scripts\author\some-package\1.0.0\My Script.cs"
                     }
                 }
             };
             var serializer = new Mock<ISceneSerializer>(MockBehavior.Strict);
             var updates = new List<(string before, string after)>{
-                (@"Saves/My Script.cs", @"Saves/party/some-package/1.0.0/My Script.cs"),
-                (@"My Script.cs", @"Saves/party/some-package/1.0.0/My Script.cs")
+                (@"Custom/Scripts/My Script.cs", @"Custom/Scripts/author/some-package/1.0.0/My Script.cs"),
+                (@"Saves/Scripts/My Script.cs", @"Custom/Scripts/author/some-package/1.0.0/My Script.cs"),
+                (@"My Script.cs", @"Custom/Scripts/author/some-package/1.0.0/My Script.cs")
             };
             var effectiveUpdates = new List<(string before, string after)>{
-                (@"Saves/My Script.cs", @"Saves/party/some-package/1.0.0/My Script.cs")
+                (@"Custom/Scripts/My Script.cs", @"Custom/Scripts/author/some-package/1.0.0/My Script.cs")
             };
-            var json = new SceneJsonMock(new AtomJsonMock(new PluginJsonMock(@"Saves/My Script.cs")));
+            var json = new SceneJsonMock(new AtomJsonMock(new PluginJsonMock(@"Custom/Scripts/My Script.cs")));
             serializer
                 .Setup(s => s.DeserializeAsync(@"C:\VaM\Saves\My Scene.json"))
                 .ReturnsAsync(json);
@@ -59,7 +60,7 @@ namespace Party.Shared
             var result = await handler.UpgradeSceneAsync(scene, script, info);
 
             Assert.That(result, Is.EqualTo(1));
-            Assert.That(json.Atoms.First().Plugins.First().Path, Is.EqualTo("Saves/party/some-package/1.0.0/My Script.cs"));
+            Assert.That(json.Atoms.First().Plugins.First().Path, Is.EqualTo("Custom/Scripts/author/some-package/1.0.0/My Script.cs"));
         }
     }
 }

@@ -1,0 +1,15 @@
+{ 
+   "atoms" : [ 
+      { 
+         "id" : "My Atom", 
+         "storables" : [ 
+            { 
+               "id" : "PluginManager", 
+               "plugins" : { 
+                  "plugin#0" : "Saves/Scripts/Simple Script 1.cs"
+               }
+            }
+         ]
+      }
+   ]
+}
