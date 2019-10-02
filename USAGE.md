@@ -46,12 +46,12 @@ Downloads a script locally. This will also validate hashes to make sure there wa
 
 You can also install a specific version:
 
-    > party get some-package --version 1.0.0
+    > party get some-package@1.0.0
 
 Options:
 
-- `--version` choose a specific version to install (defaults to the latest version)
 - `--noop` do not install, just print what will happen when you do
+- `--all` install the latest version of everything
 
 ### `upgrade`
 

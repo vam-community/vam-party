@@ -11,7 +11,7 @@
                   "plugin#2" : "Custom/Scripts/Multi Plugin/Multi Script 1.cs", 
                   "plugin#3" : "Custom/Scripts/Multi Plugin/Multi Script 2.cs", 
                   "plugin#4" : "Custom/Scripts/Unregistered Script 1.cs", 
-                  "plugin#5" : "Match By Filename Script 1.cs"
+                  "plugin#5" : "Custom/Scripts/Match By Filename Script 1.cs"
                }
             }, 
             { 
