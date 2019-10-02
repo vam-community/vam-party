@@ -2,7 +2,7 @@ os: windows
 language: csharp
 mono: none
 env:
-  - VERSION_PREFIX="0.11.6" VERSION_SUFFIX="alpha"
+  - VERSION_PREFIX="0.12.0" VERSION_SUFFIX="alpha"
 script:
   - choco install dotnetcore-sdk --pre -y
   - choco install netfx-4.8-devpack --pre -y --ignore-package-exit-codes
