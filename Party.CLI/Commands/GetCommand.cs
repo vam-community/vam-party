@@ -16,7 +16,7 @@ namespace Party.CLI.Commands
         {
             var command = new Command("get", "Downloads a package (script, morph or scene) into the saves folder");
             AddCommonOptions(command);
-            command.AddArgument(new Argument<string>("package", null) { Description = "The package, in the format scripts/name or scripts/name@1.0.0", Arity = ArgumentArity.ZeroOrOne });
+            command.AddArgument(new Argument<string>("packages", null) { Description = "The package, in the format scripts/name or scripts/name@1.0.0", Arity = ArgumentArity.ZeroOrMore });
             command.AddOption(new Option("--noop", "Do not install, just check what it will do"));
             command.AddOption(new Option("--all", "Install the latest version of everything").WithAlias("-a"));
 
@@ -29,7 +29,7 @@ namespace Party.CLI.Commands
 
         public class GetArguments : CommonArguments
         {
-            public string Package { get; set; }
+            public string[] Packages { get; set; }
             public bool Noop { get; set; }
             public bool All { get; set; }
         }
@@ -41,12 +41,14 @@ namespace Party.CLI.Commands
 
         private async Task ExecuteAsync(GetArguments args)
         {
-            ValidateArguments(args.Package);
+            ValidateArguments(args.Packages);
             Controller.HealthCheck();
 
-            if (args.All && args.Package != null)
+            var packages = args.Packages ?? new string[0];
+
+            if (args.All && packages.Length > 0)
                 throw new UserInputException("You cannot specify --all and an item to get at the same time");
-            else if (!args.All && args.Package == null)
+            else if (!args.All && packages.Length == 0)
                 throw new UserInputException("You must specify what to get, or pass --all to get everything");
 
             var registry = await Controller.AcquireRegistryAsync().ConfigureAwait(false);
@@ -60,22 +62,25 @@ namespace Party.CLI.Commands
             }
             else
             {
-                if (!PackageFullName.TryParsePackage(args.Package, out var packageName))
-                    throw new UserInputException("Invalid package name. Example: 'scripts/my-script'");
+                foreach (var p in packages)
+                {
+                    if (!PackageFullName.TryParsePackage(p, out var packageName))
+                        throw new UserInputException("Invalid package name. Example: 'scripts/my-script'");
 
-                var package = registry.GetPackage(packageName);
-                if (package == null)
-                    throw new RegistryException($"Package not found: '{packageName}'");
+                    var package = registry.GetPackage(packageName);
+                    if (package == null)
+                        throw new RegistryException($"Package not found: '{packageName}'");
 
-                var version = packageName.Version != null
-                    ? package.GetVersion(packageName.Version)
-                    : package.GetLatestVersion();
-                if (version == null)
-                    throw new RegistryException($"Package version not found: '{packageName}'");
+                    var version = packageName.Version != null
+                        ? package.GetVersion(packageName.Version)
+                        : package.GetLatestVersion();
+                    if (version == null)
+                        throw new RegistryException($"Package version not found: '{packageName}'");
 
-                var context = new RegistryPackageVersionContext(registry, package, version);
+                    var context = new RegistryPackageVersionContext(registry, package, version);
 
-                await GetOneAsync(args, context);
+                    await GetOneAsync(args, context);
+                }
             }
         }
 
