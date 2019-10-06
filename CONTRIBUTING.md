@@ -49,4 +49,7 @@ If you want to take on an idea, please [create an issue](https://github.com/vam-
 - Review all controller namings, and move as much logic as possible out of commands (worst case provide a controller that handles steps)
 - Make the folder structure a setting (e.g. script can be `[author]/[name]/[version]` but can be configured to be `[name]/[version]`)
 - Revert a plugin, i.e. set a scene's plugin reference to a specific version (e.g. `party use some/scene.json some-plugin@1.0.0`)
-- Download everything (`party get --all`)
+- Enable System.CommandLine autocomplete, query the registry to get the available package names
+- When scanning scenes, extract information about the scene
+- Allow creating scene packages (i.e. make hash of scenes too, or bundle version numbers inside instead using a scene script)
+- Do not assume "scripts" when getting package. If a package match, download it.
