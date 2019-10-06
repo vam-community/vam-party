@@ -218,6 +218,7 @@ namespace Party.Shared.Handlers
                 foreach (var scriptRefRelativePath in scriptRefs.Distinct())
                 {
                     string fullPath;
+                    // TODO: Looks like the './' prefix is also supported (E.g. Driftdawg's Jack and Freya)
                     if (scriptRefRelativePath.Contains('/'))
                     {
                         // VaM 1.18 path changed, but old paths are still supported
