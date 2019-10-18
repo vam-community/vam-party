@@ -67,7 +67,7 @@ namespace Party.Shared.Handlers
                 });
             }
 
-            foreach (var file in _fs.Directory.EnumerateFiles(Path.Combine(_vamDirectory, "Saves"), "*.json", SearchOption.AllDirectories))
+            foreach (var file in _fs.Directory.EnumerateFiles(_fs.Path.Combine(_vamDirectory, "Saves"), "*.json", SearchOption.AllDirectories))
             {
                 if (_ignoredPaths.Any(ignoredPath => file.StartsWith(ignoredPath))) continue;
 
@@ -98,7 +98,7 @@ namespace Party.Shared.Handlers
         {
             foreach (var subfolder in _allowedSubfolder)
             {
-                var folder = Path.Combine(_vamDirectory, subfolder);
+                var folder = _fs.Path.Combine(_vamDirectory, subfolder);
                 if (!_fs.Directory.Exists(folder))
                     continue;
                 foreach (var file in _fs.Directory.EnumerateFiles(folder, "*.*", SearchOption.AllDirectories))
@@ -143,10 +143,12 @@ namespace Party.Shared.Handlers
             foreach (var file in EnumerateFiles())
             {
                 if (_ignoredPaths.Any(ignoredPath => file.StartsWith(ignoredPath))) continue;
+                var savesFolder = _fs.Path.GetFullPath("Saves", _vamDirectory);
 
-                switch (Path.GetExtension(file))
+                switch (_fs.Path.GetExtension(file))
                 {
                     case ".json":
+                        if (!file.StartsWith(savesFolder)) continue;
                         Interlocked.Increment(ref scenesCount);
                         sceneFiles.Enqueue(file);
                         break;
@@ -329,7 +331,7 @@ namespace Party.Shared.Handlers
         private string GetReferenceFullPath(string containerFile, string scriptRefRelativePath)
         {
             if (scriptRefRelativePath.StartsWith("./"))
-                return _fs.Path.GetFullPath(scriptRefRelativePath, Path.GetDirectoryName(containerFile));
+                return _fs.Path.GetFullPath(scriptRefRelativePath, _fs.Path.GetDirectoryName(containerFile));
 
             // VaM 1.18 path changed, but old paths are still supported
             if (scriptRefRelativePath.StartsWith("Saves/Scripts/"))
@@ -338,7 +340,7 @@ namespace Party.Shared.Handlers
             if (scriptRefRelativePath.StartsWith("Custom/") || scriptRefRelativePath.StartsWith("Saves/"))
                 return _fs.Path.GetFullPath(scriptRefRelativePath, _vamDirectory);
 
-            return _fs.Path.GetFullPath(scriptRefRelativePath, Path.GetDirectoryName(containerFile));
+            return _fs.Path.GetFullPath(scriptRefRelativePath, _fs.Path.GetDirectoryName(containerFile));
         }
     }
 }
