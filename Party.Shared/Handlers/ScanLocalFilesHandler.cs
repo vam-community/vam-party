@@ -217,9 +217,14 @@ namespace Party.Shared.Handlers
                 var scriptRefs = await _sceneSerializer.FindScriptsFastAsync(sceneFile).ConfigureAwait(false);
                 foreach (var scriptRefRelativePath in scriptRefs.Distinct())
                 {
-                    string fullPath = GetSceneReferenceFullPath(sceneFile, scriptRefRelativePath);
+                    string fullPath = GetReferenceFullPath(sceneFile, scriptRefRelativePath);
 
-                    if (scripts.TryGetValue(fullPath, out var scriptRef))
+                    if (scripts.TryGetValue(_fs.Path.GetFullPath(_fs.Path.GetFileName(fullPath), _fs.Path.GetDirectoryName(sceneFile)), out var localScriptRef))
+                    {
+                        scene.References(localScriptRef);
+                        localScriptRef.ReferencedBy(scene);
+                    }
+                    else if (scripts.TryGetValue(fullPath, out var scriptRef))
                     {
                         scene.References(scriptRef);
                         scriptRef.ReferencedBy(scene);
@@ -256,25 +261,6 @@ namespace Party.Shared.Handlers
             return scene;
         }
 
-        private string GetSceneReferenceFullPath(string sceneFile, string scriptRefRelativePath)
-        {
-            if (scriptRefRelativePath.StartsWith("./"))
-            {
-                return _fs.Path.GetFullPath(scriptRefRelativePath, Path.GetDirectoryName(sceneFile));
-            }
-
-            if (scriptRefRelativePath.Contains('/'))
-            {
-                // VaM 1.18 path changed, but old paths are still supported
-                var fixedPath = scriptRefRelativePath.StartsWith("Saves/Scripts/")
-                    ? "Custom/Scripts/" + scriptRefRelativePath.Substring("Saves/Scripts/".Length)
-                    : scriptRefRelativePath;
-                return _fs.Path.GetFullPath(fixedPath, _vamDirectory);
-            }
-
-            return _fs.Path.GetFullPath(scriptRefRelativePath, Path.GetDirectoryName(sceneFile));
-        }
-
         private async Task<LocalScriptListFile> LoadScriptListAsync(IDictionary<string, LocalScriptFile> scripts, string scriptListFile, bool shouldTryLoadingReferences)
         {
             var scriptRefs = new List<LocalScriptFile>();
@@ -283,7 +269,7 @@ namespace Party.Shared.Handlers
                 var scriptRefPaths = await _scriptListSerializer.GetScriptsAsync(scriptListFile);
                 foreach (var scriptRefRelativePath in scriptRefPaths)
                 {
-                    string fullPath = GetScriptListReferenceFullPath(scriptListFile, scriptRefRelativePath);
+                    string fullPath = GetReferenceFullPath(scriptListFile, scriptRefRelativePath);
                     if (scripts.TryGetValue(fullPath, out var scriptRef))
                     {
                         scripts.Remove(fullPath);
@@ -340,9 +326,19 @@ namespace Party.Shared.Handlers
             }
         }
 
-        private string GetScriptListReferenceFullPath(string scriptListFile, string scriptRefRelativePath)
+        private string GetReferenceFullPath(string containerFile, string scriptRefRelativePath)
         {
-            return _fs.Path.GetFullPath(scriptRefRelativePath, Path.GetDirectoryName(scriptListFile));
+            if (scriptRefRelativePath.StartsWith("./"))
+                return _fs.Path.GetFullPath(scriptRefRelativePath, Path.GetDirectoryName(containerFile));
+
+            // VaM 1.18 path changed, but old paths are still supported
+            if (scriptRefRelativePath.StartsWith("Saves/Scripts/"))
+                return _fs.Path.GetFullPath("Custom/Scripts/" + scriptRefRelativePath.Substring("Saves/Scripts/".Length), _vamDirectory);
+
+            if (scriptRefRelativePath.StartsWith("Custom/") || scriptRefRelativePath.StartsWith("Saves/"))
+                return _fs.Path.GetFullPath(scriptRefRelativePath, _vamDirectory);
+
+            return _fs.Path.GetFullPath(scriptRefRelativePath, Path.GetDirectoryName(containerFile));
         }
     }
 }
