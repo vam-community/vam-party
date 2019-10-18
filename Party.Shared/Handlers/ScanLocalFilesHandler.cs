@@ -217,23 +217,7 @@ namespace Party.Shared.Handlers
                 var scriptRefs = await _sceneSerializer.FindScriptsFastAsync(sceneFile).ConfigureAwait(false);
                 foreach (var scriptRefRelativePath in scriptRefs.Distinct())
                 {
-                    string fullPath;
-                    if (scriptRefRelativePath.StartsWith("./"))
-                    {
-                        fullPath = _fs.Path.GetFullPath(scriptRefRelativePath, Path.GetDirectoryName(sceneFile));
-                    }
-                    else if (scriptRefRelativePath.Contains('/'))
-                    {
-                        // VaM 1.18 path changed, but old paths are still supported
-                        var fixedPath = scriptRefRelativePath.StartsWith("Saves/Scripts/")
-                            ? "Custom/Scripts/" + scriptRefRelativePath.Substring("Saves/Scripts/".Length)
-                            : scriptRefRelativePath;
-                        fullPath = _fs.Path.GetFullPath(fixedPath, _vamDirectory);
-                    }
-                    else
-                    {
-                        fullPath = _fs.Path.GetFullPath(scriptRefRelativePath, Path.GetDirectoryName(sceneFile));
-                    }
+                    string fullPath = GetSceneReferenceFullPath(sceneFile, scriptRefRelativePath);
 
                     if (scripts.TryGetValue(fullPath, out var scriptRef))
                     {
@@ -270,6 +254,25 @@ namespace Party.Shared.Handlers
                 scene.AddError(exc.Message, LocalFileErrorLevel.Error);
             }
             return scene;
+        }
+
+        private string GetSceneReferenceFullPath(string sceneFile, string scriptRefRelativePath)
+        {
+            if (scriptRefRelativePath.StartsWith("./"))
+            {
+                return _fs.Path.GetFullPath(scriptRefRelativePath, Path.GetDirectoryName(sceneFile));
+            }
+
+            if (scriptRefRelativePath.Contains('/'))
+            {
+                // VaM 1.18 path changed, but old paths are still supported
+                var fixedPath = scriptRefRelativePath.StartsWith("Saves/Scripts/")
+                    ? "Custom/Scripts/" + scriptRefRelativePath.Substring("Saves/Scripts/".Length)
+                    : scriptRefRelativePath;
+                return _fs.Path.GetFullPath(fixedPath, _vamDirectory);
+            }
+
+            return _fs.Path.GetFullPath(scriptRefRelativePath, Path.GetDirectoryName(sceneFile));
         }
 
         private async Task<LocalScriptListFile> LoadScriptListAsync(IDictionary<string, LocalScriptFile> scripts, string scriptListFile, bool shouldTryLoadingReferences)
