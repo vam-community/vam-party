@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Party.Shared.Handlers;
+using Party.Shared.Logging;
 using Party.Shared.Models;
 using Party.Shared.Models.Local;
 using Party.Shared.Serializers;
@@ -169,8 +170,10 @@ namespace Party.Shared
         private ScanLocalFilesHandler Create(IFileSystem fileSystem, string[] ignoredPaths = null)
         {
             var throttler = new Throttler();
+            var logger = new NullLogger();
             return new ScanLocalFilesHandler(
                 fileSystem,
+                logger,
                 new SceneSerializer(fileSystem, throttler),
                 new ScriptListSerializer(fileSystem, throttler),
                 @"C:\VaM",

@@ -6,7 +6,7 @@ using Party.Shared;
 
 namespace Party.CLI.Commands
 {
-    public class SearchCommand : CommandBase
+    public class SearchCommand : CommandBase<SearchArguments>
     {
         public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory)
         {
@@ -21,19 +21,12 @@ namespace Party.CLI.Commands
             return command;
         }
 
-        public class SearchArguments : CommonArguments
-        {
-            public string Query { get; set; }
-            public bool NoUsage { get; set; }
-            public bool Errors { get; set; }
-        }
-
         public SearchCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory, CommonArguments args)
             : base(renderer, config, controllerFactory, args)
         {
         }
 
-        private async Task ExecuteAsync(SearchArguments args)
+        protected override async Task ExecuteImplAsync(SearchArguments args)
         {
             ValidateArguments(args.Query);
             Controller.HealthCheck();
@@ -58,5 +51,12 @@ namespace Party.CLI.Commands
                 Renderer.WriteLine();
             }
         }
+    }
+
+    public class SearchArguments : CommonArguments
+    {
+        public string Query { get; set; }
+        public bool NoUsage { get; set; }
+        public bool Errors { get; set; }
     }
 }

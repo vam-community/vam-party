@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Party.Shared.Exceptions;
+using Party.Shared.Logging;
 using Party.Shared.Models;
 using Party.Shared.Models.Local;
 using Party.Shared.Serializers;
@@ -24,15 +25,17 @@ namespace Party.Shared.Handlers
         }
 
         private readonly IFileSystem _fs;
+        private readonly ILogger _logger;
         private readonly ISceneSerializer _sceneSerializer;
         private readonly IScriptListSerializer _scriptListSerializer;
         private readonly string[] _ignoredPaths;
         private readonly string _vamDirectory;
         private readonly string[] _allowedSubfolder;
 
-        public ScanLocalFilesHandler(IFileSystem fs, ISceneSerializer sceneSerializer, IScriptListSerializer scriptListSerializer, string vamDirectory, string[] allowedSubfolder, string[] ignoredPaths)
+        public ScanLocalFilesHandler(IFileSystem fs, ILogger logger, ISceneSerializer sceneSerializer, IScriptListSerializer scriptListSerializer, string vamDirectory, string[] allowedSubfolder, string[] ignoredPaths)
         {
             _fs = fs ?? throw new ArgumentNullException(nameof(fs));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _vamDirectory = vamDirectory ?? throw new ArgumentNullException(nameof(vamDirectory));
             _allowedSubfolder = allowedSubfolder ?? throw new ArgumentNullException(nameof(allowedSubfolder));
             _sceneSerializer = sceneSerializer ?? throw new ArgumentNullException(nameof(sceneSerializer));
@@ -220,6 +223,7 @@ namespace Party.Shared.Handlers
                 foreach (var scriptRefRelativePath in scriptRefs.Distinct())
                 {
                     string fullPath = GetReferenceFullPath(sceneFile, scriptRefRelativePath);
+                    _logger.Verbose($"{sceneFile}: Mapping reference {scriptRefRelativePath} to {fullPath}");
 
                     if (scripts.TryGetValue(_fs.Path.GetFullPath(_fs.Path.GetFileName(fullPath), _fs.Path.GetDirectoryName(sceneFile)), out var localScriptRef))
                     {

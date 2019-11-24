@@ -11,7 +11,7 @@ using Party.Shared.Models.Registries;
 
 namespace Party.CLI.Commands
 {
-    public class StatusCommand : CommandBase
+    public class StatusCommand : CommandBase<StatusArguments>
     {
         public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory)
         {
@@ -29,20 +29,12 @@ namespace Party.CLI.Commands
             return command;
         }
 
-        public class StatusArguments : CommonArguments
-        {
-            public string Filter { get; set; }
-            public bool Breakdown { get; set; }
-            public bool Errors { get; set; }
-            public bool Unregistered { get; set; }
-        }
-
         public StatusCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory, CommonArguments args)
             : base(renderer, config, controllerFactory, args)
         {
         }
 
-        private async Task ExecuteAsync(StatusArguments args)
+        protected override async Task ExecuteImplAsync(StatusArguments args)
         {
             ValidateArguments(args.Filter);
             Controller.HealthCheck();
@@ -159,5 +151,13 @@ namespace Party.CLI.Commands
                 Renderer.WriteLine($"{indent}{Controller.GetDisplayPath(scene.FullPath)}");
             }
         }
+    }
+
+    public class StatusArguments : CommonArguments
+    {
+        public string Filter { get; set; }
+        public bool Breakdown { get; set; }
+        public bool Errors { get; set; }
+        public bool Unregistered { get; set; }
     }
 }

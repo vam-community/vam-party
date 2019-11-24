@@ -14,7 +14,8 @@ using Party.Shared.Models.Registries;
 
 namespace Party.CLI.Commands
 {
-    public abstract class CommandBase
+    public abstract class CommandBase<T>
+        where T : CommonArguments
     {
         private static PartyConfiguration GetConfig(PartyConfiguration config, DirectoryInfo vam)
         {
@@ -38,6 +39,11 @@ namespace Party.CLI.Commands
             Controller = controllerFactory.Create(Config, Logger, !args.Force);
         }
 
+        public async Task ExecuteAsync(T args)
+        {
+            await ExecuteImplAsync(args);
+        }
+
         protected static void AddCommonOptions(Command command)
         {
             command.AddOption(new Option("--vam", "Specify the Virt-A-Mate install folder") { Argument = new Argument<DirectoryInfo>().ExistingOnly() });
@@ -45,12 +51,7 @@ namespace Party.CLI.Commands
             command.AddOption(new Option("--log", "Output log information") { Argument = new Argument<LogLevel>() });
         }
 
-        public abstract class CommonArguments
-        {
-            public DirectoryInfo VaM { get; set; }
-            public bool Force { get; set; }
-            public LogLevel Log { get; set; }
-        }
+        protected abstract Task ExecuteImplAsync(T args);
 
         protected void ValidateArguments(params string[] values)
         {
@@ -246,5 +247,12 @@ namespace Party.CLI.Commands
         {
             Console.CursorVisible = false;
         }
+    }
+
+    public abstract class CommonArguments
+    {
+        public DirectoryInfo VaM { get; set; }
+        public bool Force { get; set; }
+        public LogLevel Log { get; set; }
     }
 }

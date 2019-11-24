@@ -6,19 +6,15 @@ using Party.Shared;
 
 namespace Party.CLI.Commands
 {
-    public class HelpCommand : CommandBase
+    public class HelpCommand : CommandBase<HelpArguments>
     {
         public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory)
         {
-            var command = new Command("help", "Show useful information about party")
+            return new Command("help", "Show useful information about party")
             {
-                Handler = CommandHandler.Create<HelpArguments>(args => new HelpCommand(renderer, config, controllerFactory, args).ExecuteAsync())
+                Handler = CommandHandler.Create<HelpArguments>(args =>
+                    new HelpCommand(renderer, config, controllerFactory, args).ExecuteAsync(args))
             };
-            return command;
-        }
-
-        public class HelpArguments : CommonArguments
-        {
         }
 
         public HelpCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory, CommonArguments args)
@@ -26,7 +22,7 @@ namespace Party.CLI.Commands
         {
         }
 
-        private async Task ExecuteAsync()
+        protected override async Task ExecuteImplAsync(HelpArguments args)
         {
             var current = $"v{typeof(HelpCommand).Assembly.GetName().Version}";
             var latest = await Controller.GetPartyUpdatesAvailableAsync();
@@ -40,5 +36,9 @@ namespace Party.CLI.Commands
             Renderer.WriteLine("For instructions on publishing to the registry, see: https://github.com/vam-community/vam-registry/blob/master/PUBLISHING.md");
             Renderer.WriteLine("To report a bug, please file an issue here: https://github.com/vam-community/vam-party/issues");
         }
+    }
+
+    public class HelpArguments : CommonArguments
+    {
     }
 }

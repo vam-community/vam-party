@@ -13,7 +13,7 @@ using Party.Shared.Serializers;
 
 namespace Party.CLI.Commands
 {
-    public class PublishCommand : CommandBase
+    public class PublishCommand : CommandBase<PublishArguments>
     {
         public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory)
         {
@@ -35,18 +35,6 @@ namespace Party.CLI.Commands
             return command;
         }
 
-        public class PublishArguments : CommonArguments
-        {
-            public string[] Input { get; set; }
-            public string PackageName { get; set; }
-            public string PackageVersion { get; set; }
-            public string PackageAuthor { get; set; }
-            public string PackageVersionDownloadUrl { get; set; }
-            public FileInfo Registry { get; set; }
-            public bool Quiet { get; set; }
-            public bool Format { get; set; }
-        }
-
         private readonly IRegistrySerializer _serializer = new RegistrySerializer();
 
         public PublishCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory, CommonArguments args)
@@ -54,7 +42,7 @@ namespace Party.CLI.Commands
         {
         }
 
-        private async Task ExecuteAsync(PublishArguments args)
+        protected override async Task ExecuteImplAsync(PublishArguments args)
         {
             ValidateArguments(args.Input);
             Controller.HealthCheck();
@@ -212,5 +200,17 @@ namespace Party.CLI.Commands
                 Renderer.WriteLine(_serializer.Serialize(package));
             }
         }
+    }
+
+    public class PublishArguments : CommonArguments
+    {
+        public string[] Input { get; set; }
+        public string PackageName { get; set; }
+        public string PackageVersion { get; set; }
+        public string PackageAuthor { get; set; }
+        public string PackageVersionDownloadUrl { get; set; }
+        public FileInfo Registry { get; set; }
+        public bool Quiet { get; set; }
+        public bool Format { get; set; }
     }
 }

@@ -10,7 +10,7 @@ using Party.Shared.Models.Local;
 
 namespace Party.CLI.Commands
 {
-    public class CleanCommand : CommandBase
+    public class CleanCommand : CommandBase<CleanArguments>
     {
         public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory)
         {
@@ -30,22 +30,12 @@ namespace Party.CLI.Commands
             return command;
         }
 
-        public class CleanArguments : CommonArguments
-        {
-            public string Filter { get; set; }
-            public bool All { get; set; }
-            public bool Errors { get; set; }
-            public bool DeleteUnused { get; set; }
-            public bool Noop { get; set; }
-            public bool Verbose { get; set; }
-        }
-
         public CleanCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory, CommonArguments args)
             : base(renderer, config, controllerFactory, args)
         {
         }
 
-        private async Task ExecuteAsync(CleanArguments args)
+        protected override async Task ExecuteImplAsync(CleanArguments args)
         {
             Controller.HealthCheck();
 
@@ -178,5 +168,15 @@ namespace Party.CLI.Commands
                 }
             }
         }
+    }
+
+    public class CleanArguments : CommonArguments
+    {
+        public string Filter { get; set; }
+        public bool All { get; set; }
+        public bool Errors { get; set; }
+        public bool DeleteUnused { get; set; }
+        public bool Noop { get; set; }
+        public bool Verbose { get; set; }
     }
 }

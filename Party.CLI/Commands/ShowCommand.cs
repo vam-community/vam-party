@@ -9,7 +9,7 @@ using Party.Shared.Models.Registries;
 
 namespace Party.CLI.Commands
 {
-    public class ShowCommand : CommandBase
+    public class ShowCommand : CommandBase<ShowArguments>
     {
         public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory)
         {
@@ -24,17 +24,12 @@ namespace Party.CLI.Commands
             return command;
         }
 
-        public class ShowArguments : CommonArguments
-        {
-            public string Package { get; set; }
-        }
-
         public ShowCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory, CommonArguments args)
             : base(renderer, config, controllerFactory, args)
         {
         }
 
-        private async Task ExecuteAsync(ShowArguments args)
+        protected override async Task ExecuteImplAsync(ShowArguments args)
         {
             ValidateArguments(args.Package);
             Controller.HealthCheck();
@@ -105,5 +100,10 @@ namespace Party.CLI.Commands
             var info = await Controller.GetInstalledPackageInfoAsync(context);
             PrintInstalledFiles(info, "");
         }
+    }
+
+    public class ShowArguments : CommonArguments
+    {
+        public string Package { get; set; }
     }
 }

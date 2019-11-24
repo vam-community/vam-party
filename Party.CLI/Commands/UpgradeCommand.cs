@@ -12,7 +12,7 @@ using Party.Shared.Models.Registries;
 
 namespace Party.CLI.Commands
 {
-    public class UpgradeCommand : CommandBase
+    public class UpgradeCommand : CommandBase<UpgradeArguments>
     {
         public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory)
         {
@@ -32,22 +32,12 @@ namespace Party.CLI.Commands
             return command;
         }
 
-        public class UpgradeArguments : CommonArguments
-        {
-            public string Filter { get; set; }
-            public bool All { get; set; }
-            public bool Major { get; set; }
-            public bool Errors { get; set; }
-            public bool Noop { get; set; }
-            public bool Verbose { get; set; }
-        }
-
         public UpgradeCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory, CommonArguments args)
             : base(renderer, config, controllerFactory, args)
         {
         }
 
-        private async Task ExecuteAsync(UpgradeArguments args)
+        protected override async Task ExecuteImplAsync(UpgradeArguments args)
         {
             ValidateArguments(args.Filter);
             Controller.HealthCheck();
@@ -216,5 +206,15 @@ namespace Party.CLI.Commands
             }
             return info;
         }
+    }
+
+    public class UpgradeArguments : CommonArguments
+    {
+        public string Filter { get; set; }
+        public bool All { get; set; }
+        public bool Major { get; set; }
+        public bool Errors { get; set; }
+        public bool Noop { get; set; }
+        public bool Verbose { get; set; }
     }
 }

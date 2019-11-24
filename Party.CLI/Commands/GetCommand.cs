@@ -10,7 +10,7 @@ using Party.Shared.Models.Registries;
 
 namespace Party.CLI.Commands
 {
-    public class GetCommand : CommandBase
+    public class GetCommand : CommandBase<GetArguments>
     {
         public static Command CreateCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory)
         {
@@ -27,19 +27,12 @@ namespace Party.CLI.Commands
             return command;
         }
 
-        public class GetArguments : CommonArguments
-        {
-            public string[] Packages { get; set; }
-            public bool Noop { get; set; }
-            public bool All { get; set; }
-        }
-
         public GetCommand(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory, CommonArguments args)
             : base(renderer, config, controllerFactory, args)
         {
         }
 
-        private async Task ExecuteAsync(GetArguments args)
+        protected override async Task ExecuteImplAsync(GetArguments args)
         {
             ValidateArguments(args.Packages);
             Controller.HealthCheck();
@@ -125,5 +118,12 @@ namespace Party.CLI.Commands
             PrintInstalledFiles(installedStatus, "  ");
             return;
         }
+    }
+
+    public class GetArguments : CommonArguments
+    {
+        public string[] Packages { get; set; }
+        public bool Noop { get; set; }
+        public bool All { get; set; }
     }
 }
