@@ -229,14 +229,17 @@ namespace Party.Shared.Handlers
                     {
                         scene.References(localScriptRef);
                         localScriptRef.ReferencedBy(scene);
+                        _logger.Verbose($"{sceneFile}: Script {fullPath} was found in the same folder, and was already loaded by earlier scan");
                     }
                     else if (scripts.TryGetValue(fullPath, out var scriptRef))
                     {
                         scene.References(scriptRef);
                         scriptRef.ReferencedBy(scene);
+                        _logger.Verbose($"{sceneFile}: Script {fullPath} was already loaded by earlier scan");
                     }
                     else if (_ignoredPaths.Any(p => fullPath.StartsWith(p)))
                     {
+                        _logger.Verbose($"{sceneFile}: Script {fullPath} was in an ignored path");
                         continue;
                     }
                     else if (shouldTryLoadingReferences)
@@ -250,19 +253,27 @@ namespace Party.Shared.Handlers
                         scriptRef.ReferencedBy(scene);
 
                         if (scriptRef.Status > LocalFileErrorLevel.None)
+                        {
                             scene.AddError($"Script does not exist or is invalid: '{fullPath}'", LocalFileErrorLevel.Warning);
+                            _logger.Warning($"{sceneFile}: Script {fullPath} could not be loaded: {string.Join(", ", scriptRef.Errors)}.");
+                        }
                         else
+                        {
                             scripts.TryAdd(fullPath, scriptRef);
+                            _logger.Verbose($"{sceneFile}: Script {fullPath} exists and has been loaded");
+                        }
                     }
                     else
                     {
                         scene.AddError($"Script does not exist: '{fullPath}'", LocalFileErrorLevel.Warning);
+                        _logger.Warning($"{sceneFile}: Reference {scriptRefRelativePath} mapped to {fullPath} does not exist.");
                     }
                 }
             }
             catch (Exception exc)
             {
                 scene.AddError(exc.Message, LocalFileErrorLevel.Error);
+                _logger.Error($"{sceneFile}: {exc.Message}");
             }
             return scene;
         }

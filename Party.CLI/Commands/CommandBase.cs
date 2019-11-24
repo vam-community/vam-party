@@ -41,7 +41,38 @@ namespace Party.CLI.Commands
 
         public async Task ExecuteAsync(T args)
         {
-            await ExecuteImplAsync(args);
+            try
+            {
+                await ExecuteImplAsync(args);
+            }
+            finally
+            {
+                if (args.Log != LogLevel.Disabled)
+                {
+                    Renderer.WriteLine($"===== LOGS ({args.Log}) =====", ConsoleColor.White);
+                    while (Logger.Dequeue(out var log))
+                    {
+                        switch (log.Level)
+                        {
+                            case LogLevel.Verbose:
+                                Renderer.WriteLine(log.Message, ConsoleColor.DarkGray);
+                                break;
+                            case LogLevel.Info:
+                                Renderer.WriteLine(log.Message, ConsoleColor.Gray);
+                                break;
+                            case LogLevel.Warning:
+                                Renderer.WriteLine(log.Message, ConsoleColor.Yellow);
+                                break;
+                            case LogLevel.Error:
+                                Renderer.WriteLine(log.Message, ConsoleColor.Red);
+                                break;
+                            default:
+                                Renderer.WriteLine(log.Message, ConsoleColor.DarkMagenta);
+                                break;
+                        }
+                    }
+                }
+            }
         }
 
         protected static void AddCommonOptions(Command command)
