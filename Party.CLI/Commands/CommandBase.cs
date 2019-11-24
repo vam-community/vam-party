@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Party.Shared;
 using Party.Shared.Exceptions;
+using Party.Shared.Logging;
 using Party.Shared.Models;
 using Party.Shared.Models.Local;
 using Party.Shared.Models.Registries;
@@ -26,25 +27,29 @@ namespace Party.CLI.Commands
 
         protected IConsoleRenderer Renderer { get; }
         protected PartyConfiguration Config { get; }
+        protected ILogger Logger { get; }
         protected IPartyController Controller { get; }
 
         protected CommandBase(IConsoleRenderer renderer, PartyConfiguration config, IPartyControllerFactory controllerFactory, CommonArguments args)
         {
             Renderer = renderer;
             Config = GetConfig(config, args.VaM);
-            Controller = controllerFactory.Create(Config, !args.Force);
+            Logger = args.Log == LogLevel.Disabled ? (ILogger)new NullLogger() : new AccumulatorLogger(args.Log);
+            Controller = controllerFactory.Create(Config, Logger, !args.Force);
         }
 
         protected static void AddCommonOptions(Command command)
         {
             command.AddOption(new Option("--vam", "Specify the Virt-A-Mate install folder") { Argument = new Argument<DirectoryInfo>().ExistingOnly() });
             command.AddOption(new Option("--force", "Ignores most security checks and health checks").WithAlias("-f"));
+            command.AddOption(new Option("--log", "Output log information") { Argument = new Argument<LogLevel>() });
         }
 
         public abstract class CommonArguments
         {
             public DirectoryInfo VaM { get; set; }
             public bool Force { get; set; }
+            public LogLevel Log { get; set; }
         }
 
         protected void ValidateArguments(params string[] values)

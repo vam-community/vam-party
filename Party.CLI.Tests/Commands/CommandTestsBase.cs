@@ -1,6 +1,7 @@
 using Moq;
 using NUnit.Framework;
 using Party.Shared;
+using Party.Shared.Logging;
 using System;
 using System.CommandLine;
 using System.IO;
@@ -34,7 +35,7 @@ namespace Party.CLI
             _controller = new Mock<IPartyController>(MockBehavior.Strict);
             var config = PartyConfigurationFactory.Create(@"C:\VaM");
             var factory = new Mock<IPartyControllerFactory>(MockBehavior.Strict);
-            factory.Setup(x => x.Create(config, true)).Returns(_controller.Object);
+            factory.Setup(x => x.Create(config, It.IsAny<ILogger>(), true)).Returns(_controller.Object);
             _program = new Program(_renderer.Object, config, factory.Object);
         }
 

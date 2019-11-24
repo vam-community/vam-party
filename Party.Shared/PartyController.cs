@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Party.Shared.Exceptions;
 using Party.Shared.Handlers;
+using Party.Shared.Logging;
 using Party.Shared.Models;
 using Party.Shared.Models.Local;
 using Party.Shared.Models.Registries;
@@ -22,20 +23,20 @@ namespace Party.Shared
     public class PartyController : IPartyController
     {
         private static string Version { get; } = typeof(PartyController).Assembly.GetName().Version.ToString();
-        private readonly bool _checksEnabled;
         private readonly Throttler _throttler = new Throttler();
         private readonly PartyConfiguration _config;
+        private readonly ILogger _logger;
         private readonly HttpClient _http;
         private readonly IFileSystem _fs;
         private readonly IFoldersHelper _folders;
 
-        public PartyController(PartyConfiguration config, bool checksEnabled)
+        public PartyController(PartyConfiguration config, ILogger logger, bool checksEnabled)
         {
-            _config = config;
+            _config = config ?? throw new ArgumentNullException(nameof(config));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _fs = new FileSystem();
             _http = new HttpClient();
             _http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Party", Version));
-            _checksEnabled = checksEnabled;
             _folders = new FoldersHelper(_fs, _config.VirtAMate.VirtAMateInstallFolder, _config.VirtAMate.AllowedSubfolders, checksEnabled);
         }
 
