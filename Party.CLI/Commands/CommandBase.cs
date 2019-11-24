@@ -49,28 +49,7 @@ namespace Party.CLI.Commands
             {
                 if (args.Log != LogLevel.Disabled)
                 {
-                    Renderer.WriteLine($"===== LOGS ({args.Log}) =====", ConsoleColor.White);
-                    while (Logger.Dequeue(out var log))
-                    {
-                        switch (log.Level)
-                        {
-                            case LogLevel.Verbose:
-                                Renderer.WriteLine(log.Message, ConsoleColor.DarkGray);
-                                break;
-                            case LogLevel.Info:
-                                Renderer.WriteLine(log.Message, ConsoleColor.Gray);
-                                break;
-                            case LogLevel.Warning:
-                                Renderer.WriteLine(log.Message, ConsoleColor.Yellow);
-                                break;
-                            case LogLevel.Error:
-                                Renderer.WriteLine(log.Message, ConsoleColor.Red);
-                                break;
-                            default:
-                                Renderer.WriteLine(log.Message, ConsoleColor.DarkMagenta);
-                                break;
-                        }
-                    }
+                    WriteLogs(args);
                 }
             }
         }
@@ -260,6 +239,32 @@ namespace Party.CLI.Commands
             else
             {
                 return $"{count} {plural}";
+            }
+        }
+
+        private void WriteLogs(T args)
+        {
+            Renderer.WriteLine($"===== LOGS ({args.Log}) =====", ConsoleColor.White);
+            while (Logger.Dequeue(out var log))
+            {
+                switch (log.Level)
+                {
+                    case LogLevel.Verbose:
+                        Renderer.WriteLine(log.Message, ConsoleColor.DarkGray);
+                        break;
+                    case LogLevel.Info:
+                        Renderer.WriteLine(log.Message, ConsoleColor.Gray);
+                        break;
+                    case LogLevel.Warning:
+                        Renderer.WriteLine(log.Message, ConsoleColor.Yellow);
+                        break;
+                    case LogLevel.Error:
+                        Renderer.WriteLine(log.Message, ConsoleColor.Red);
+                        break;
+                    default:
+                        Renderer.WriteLine(log.Message, ConsoleColor.DarkMagenta);
+                        break;
+                }
             }
         }
 

@@ -1,5 +1,5 @@
+using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 
 namespace Party.Shared.Logging
 {
@@ -13,10 +13,15 @@ namespace Party.Shared.Logging
             _level = level;
         }
 
+        public ILogger For(string name)
+        {
+            return new LoggerDecorator(this, name);
+        }
+
         public void Log(LogLevel level, string message)
         {
             if (level >= _level)
-                _messages.Enqueue(new LogMessage(level, message));
+                _messages.Enqueue(new LogMessage(level, $"{DateTime.Now.ToString("hh:MM:ss.ff")} {message}"));
         }
 
         public bool Dequeue(out LogMessage message)

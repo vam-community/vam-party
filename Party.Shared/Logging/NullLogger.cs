@@ -6,6 +6,11 @@ namespace Party.Shared.Logging
         {
         }
 
+        public ILogger For(string name)
+        {
+            return this;
+        }
+
         public void Log(LogLevel level, string message)
         {
         }
